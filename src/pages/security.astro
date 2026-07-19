@@ -61,34 +61,31 @@ const securityClaimSpecs = [
   ["security-standards-alignment", "external-alignment"],
 ] as const;
 
-const securityClaims = await Promise.all(
-  securityClaimSpecs.map(async ([id, classification]) => {
-    const entry = await getEntry("claims", id);
+async function loadSecurityClaim([
+  id,
+  classification,
+]: (typeof securityClaimSpecs)[number]) {
+  const entry = await getEntry("claims", id);
 
-    if (!entry) {
-      throw new Error(`Missing security claim: ${id}.`);
-    }
+  if (!entry) {
+    throw new Error(`Missing security claim: ${id}.`);
+  }
 
-    if (entry.data.classification !== classification) {
-      throw new Error(
-        `Security claim ${entry.data.id} must be ${classification}.`,
-      );
-    }
+  if (entry.data.classification !== classification) {
+    throw new Error(
+      `Security claim ${entry.data.id} must be ${classification}.`,
+    );
+  }
 
-    return entry.data;
-  }),
-);
+  return entry.data;
+}
 
 const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
-  securityClaims;
-
-if (
-  !controlAuthorityClaim ||
-  !requestIntegrityClaim ||
-  !standardsAlignmentClaim
-) {
-  throw new Error("Missing required security page claims.");
-}
+  await Promise.all([
+    loadSecurityClaim(securityClaimSpecs[0]),
+    loadSecurityClaim(securityClaimSpecs[1]),
+    loadSecurityClaim(securityClaimSpecs[2]),
+  ]);
 ---
 
 <SiteLayout

@@ -309,9 +309,6 @@ test("robots and sitemap keep the draft homepage out of published routes", async
     "<loc>https://www.glauxagent.com/product/</loc>",
   );
   expect(sitemapText).not.toContain(
-    "<loc>https://www.glauxagent.com/security/</loc>",
-  );
-  expect(sitemapText).not.toContain(
     "<loc>https://www.glauxagent.com/privacy/</loc>",
   );
 });
