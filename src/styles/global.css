@@ -8,12 +8,6 @@
   --color-hairline: #e5e5e5;
   --color-mist: #f2f2f2;
   --color-chalk: #ffffff;
-  --glaux-graphite: var(--color-graphite);
-  --glaux-carbon: var(--color-carbon);
-  --glaux-concrete: var(--color-concrete);
-  --glaux-hairline: var(--color-hairline);
-  --glaux-mist: var(--color-mist);
-  --glaux-chalk: var(--color-chalk);
   --font-sans:
     Geist, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -35,8 +29,8 @@
   --text-lead: 1.125rem;
   --text-display: clamp(2.75rem, 7vw, 5.5rem);
   font-family: var(--font-sans);
-  background: var(--glaux-chalk);
-  color: var(--glaux-graphite);
+  background: var(--color-chalk);
+  color: var(--color-graphite);
 }
 
 * {
@@ -45,15 +39,15 @@
 
 html {
   min-block-size: 100%;
-  background: var(--glaux-chalk);
+  background: var(--color-chalk);
   scroll-behavior: smooth;
 }
 
 body {
   min-block-size: 100vh;
   margin: 0;
-  background: var(--glaux-chalk);
-  color: var(--glaux-graphite);
+  background: var(--color-chalk);
+  color: var(--color-graphite);
   font-size: var(--text-body);
   line-height: 1.6;
   letter-spacing: 0;
@@ -89,8 +83,8 @@ img {
 }
 
 ::selection {
-  background: var(--glaux-graphite);
-  color: var(--glaux-chalk);
+  background: var(--color-graphite);
+  color: var(--color-chalk);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -284,13 +278,6 @@ img {
 
 .surface--inverted .asset-proof__note {
   color: var(--color-hairline);
-}
-
-.primitive-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-block-start: var(--space-8);
 }
 
 .surface-grid {

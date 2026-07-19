@@ -5,7 +5,7 @@ import Badge from "../components/Badge.astro";
 import BrandLogo from "../components/BrandLogo.astro";
 import Button from "../components/Button.astro";
 import Surface from "../components/Surface.astro";
-import { brandAssets, previewBadges } from "../lib/design-system";
+import { brandAssets } from "../lib/design-system";
 import { buildPageHeadMetadata, siteStatus } from "../lib/site";
 
 const homeEntry = await getEntry("pages", "home");
@@ -60,8 +60,8 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
             </h1>
             <p class="foundation-description">
               This proof surface validates the Glaux-only brand assets,
-              monochrome tokens, focus states, touch targets, and launch
-              maturity labels before the launch pages are composed.
+              monochrome tokens, focus states, and touch targets before the
+              launch pages are composed.
             </p>
             <div class="foundation-actions" aria-label="Foundation actions">
               <Button href="#foundation-primitives" variant="ghost">
@@ -82,11 +82,8 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
           </Surface>
         </section>
 
-        <div id="foundation-primitives" class="primitive-row">
-          {previewBadges.map((badge) => <Badge>{badge.label}</Badge>)}
-        </div>
-
         <section
+          id="foundation-primitives"
           class="surface-grid"
           aria-label="Website design foundation primitives"
         >

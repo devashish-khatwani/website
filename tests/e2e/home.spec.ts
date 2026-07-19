@@ -29,12 +29,10 @@ test("home page exposes the W-03 design foundation contract", async ({
   await expect(
     page.getByRole("link", { name: "View primitives" }),
   ).toHaveAttribute("href", "#foundation-primitives");
-  await expect(page.getByText("Skill Hub Preview")).toBeVisible();
-  await expect(page.getByText("Enterprise MCP Preview")).toBeVisible();
-  await expect(page.getByText("Observability Preview")).toBeVisible();
-  await expect(
-    page.getByText("Build your own model Coming soon"),
-  ).toBeVisible();
+  await expect(page.locator(".site-header .badge")).toHaveText(
+    "Design foundation",
+  );
+  await expect(page.locator("#foundation-primitives .badge")).toHaveCount(0);
   await expect(page.getByText(/Powered by Hermes Agent/i)).toHaveCount(0);
 });
 

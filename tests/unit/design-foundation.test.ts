@@ -1,8 +1,9 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { access } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { brandAssets, previewBadges } from "../../src/lib/design-system";
+import { brandAssets } from "../../src/lib/design-system";
 
 const websiteRoot = process.cwd();
 const approvedPalette = new Set([
@@ -14,6 +15,25 @@ const approvedPalette = new Set([
   "#FFFFFF",
 ]);
 const hexColorPattern = /#[0-9A-Fa-f]{6}/gu;
+const assetFileNames = [
+  "glaux-lockup.svg",
+  "glaux-mark.svg",
+  "glaux-mark-reversed.svg",
+] as const;
+// Hashes pin the parent-approved Glaux source assets without requiring the
+// standalone website checkout to have the parent docs tree.
+const approvedAssetHashes = {
+  "glaux-lockup.svg":
+    "51019811cac765c90bf4eaac35933a6d98446b58a749d83b2ba7f36f85f4dc41",
+  "glaux-mark.svg":
+    "516bec3d9b51699637e1a6c8585789ebb09354cc06f8ff7e62d562226ab2a29d",
+  "glaux-mark-reversed.svg":
+    "6b54189748d9522144d12be3343a515835685584d347b23941ec5b110aadf1db",
+} as const satisfies Record<(typeof assetFileNames)[number], string>;
+
+function sha256(content: string): string {
+  return createHash("sha256").update(content).digest("hex");
+}
 
 describe("W-03 design token contract", () => {
   const css = readFileSync(
@@ -30,42 +50,30 @@ describe("W-03 design token contract", () => {
     expect(css).toMatch(/--color-chalk:\s*#ffffff;/u);
   });
 
-  it("documents raster-in-SVG provenance for every Glaux brand asset", async () => {
+  it("keeps runtime brand assets limited to rendering fields", async () => {
     for (const asset of Object.values(brandAssets)) {
       await access(join(websiteRoot, "public", asset.src));
-      expect(asset.provenance).toContain("docs/website/assets/");
-      expect(asset.geometryPolicy).toBe("preserve-source-geometry");
+      expect(Object.keys(asset).sort()).toEqual([
+        "alt",
+        "height",
+        "src",
+        "width",
+      ]);
     }
-
-    expect(brandAssets.lockup.kind).toBe("raster-embedded-svg");
-    expect(brandAssets.mark.kind).toBe("raster-embedded-svg");
-    expect(brandAssets.reversedMark.kind).toBe("raster-embedded-svg");
   });
 
-  it("keeps the copied SVG assets as source-geometry embeds rather than traced redraws", () => {
-    for (const assetName of [
-      "glaux-lockup.svg",
-      "glaux-mark.svg",
-      "glaux-mark-reversed.svg",
-    ]) {
-      const svg = readFileSync(
+  it("keeps the copied SVG assets pinned source-geometry embeds", () => {
+    for (const assetName of assetFileNames) {
+      const copiedSvg = readFileSync(
         join(websiteRoot, "public", "brand", assetName),
         "utf8",
       );
 
-      expect(svg).toContain("<image");
-      expect(svg).toContain("data:image/png;base64");
-      expect(svg).not.toContain("<path");
+      expect(sha256(copiedSvg)).toBe(approvedAssetHashes[assetName]);
+      expect(copiedSvg).toContain("<image");
+      expect(copiedSvg).toContain("data:image/png;base64");
+      expect(copiedSvg).not.toContain("<path");
     }
-  });
-
-  it("labels launch maturity badges without inventing availability states", () => {
-    expect(previewBadges.map((badge) => badge.label)).toEqual([
-      "Skill Hub Preview",
-      "Enterprise MCP Preview",
-      "Observability Preview",
-      "Build your own model Coming soon",
-    ]);
   });
 });
 
