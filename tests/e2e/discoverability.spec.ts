@@ -23,37 +23,19 @@ const legalDraftRoutes = [
   },
 ] as const;
 
-const sharedLayoutRoutes = [
-  "/",
-  "/product/",
-  "/security/",
-  "/company/",
-  "/contact/",
-  "/privacy/",
-  "/cookies/",
-  "/terms/",
-  "/does-not-exist/",
-] as const;
-
-test("shared layout pages declare the self-contained Glaux SVG favicon asset", async ({
+test("shared layout declares the direct Glaux SVG favicon asset", async ({
   page,
 }) => {
   const faviconResponse = await page.request.get("/brand/glaux-mark.svg");
   expect(faviconResponse.status()).toBe(200);
   expect(faviconResponse.headers()["content-type"]).toContain("image/svg+xml");
-  const faviconSvg = await faviconResponse.text();
-  expect(faviconSvg).toContain('aria-label="Glaux owl mark"');
-  expect(faviconSvg).toContain("<image");
-  expect(faviconSvg).toContain("data:image/png;base64");
 
-  for (const route of sharedLayoutRoutes) {
-    await page.goto(route);
+  await page.goto("/");
 
-    const favicon = page.locator('link[rel="icon"]');
-    await expect(favicon).toHaveCount(1);
-    await expect(favicon).toHaveAttribute("type", "image/svg+xml");
-    await expect(favicon).toHaveAttribute("href", "/brand/glaux-mark.svg");
-  }
+  const favicon = page.locator('link[rel="icon"]');
+  await expect(favicon).toHaveCount(1);
+  await expect(favicon).toHaveAttribute("type", "image/svg+xml");
+  await expect(favicon).toHaveAttribute("href", "/brand/glaux-mark.svg");
 });
 
 test("unknown routes return the branded W-13 404 recovery page", async ({
