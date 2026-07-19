@@ -66,10 +66,39 @@ describe("site discoverability metadata", () => {
       url: "https://www.glauxagent.com/",
       type: "website",
     });
+    expect(pageHead.og).not.toHaveProperty("image");
+    expect(pageHead.og).not.toHaveProperty("imageAlt");
+  });
+
+  it("resolves relative Open Graph images and preserves their alt text", () => {
+    const pageHead = buildPageHeadMetadata({
+      ...homeMetadata,
+      og: {
+        ...homeMetadata.og,
+        image: "/social/home.png",
+      },
+    });
+
+    expect(pageHead.og.image).toBe(
+      "https://www.glauxagent.com/social/home.png",
+    );
+    expect(pageHead.og.imageAlt).toBe(homeMetadata.og.imageAlt);
+  });
+
+  it("preserves absolute HTTPS Open Graph image URLs", () => {
+    const pageHead = buildPageHeadMetadata({
+      ...homeMetadata,
+      og: {
+        ...homeMetadata.og,
+        image: "https://cdn.example.com/home.png",
+      },
+    });
+
+    expect(pageHead.og.image).toBe("https://cdn.example.com/home.png");
   });
 
   it("allows crawling only for an explicit Cloudflare Pages production build", () => {
-    expect(publishedRoutes).toEqual([{ path: "/" }]);
+    expect(publishedRoutes).toEqual(["/"]);
     expect(isSearchIndexingAllowed({})).toBe(false);
     expect(
       isSearchIndexingAllowed({
@@ -85,6 +114,12 @@ describe("site discoverability metadata", () => {
     ).toBe(false);
 
     expect(buildRobotsTxt({})).toContain("Disallow: /");
+    expect(
+      buildRobotsTxt({
+        CF_PAGES: "1",
+        CF_PAGES_BRANCH: "main",
+      }),
+    ).toContain("Allow: /");
     expect(buildSitemapXml()).toContain(
       "<loc>https://www.glauxagent.com/</loc>",
     );

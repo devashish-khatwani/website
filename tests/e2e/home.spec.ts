@@ -1,6 +1,13 @@
 import { expect, test } from "@playwright/test";
 
 const canonicalUrl = "https://www.glauxagent.com/";
+const isProductionPagesBuild =
+  (process.env.CF_PAGES === "1" ||
+    process.env.CF_PAGES?.toLowerCase() === "true") &&
+  process.env.CF_PAGES_BRANCH === "main";
+const expectedRobotsDirective = isProductionPagesBuild
+  ? "Allow: /"
+  : "Disallow: /";
 
 test("home page exposes the W-02 placeholder contract", async ({ page }) => {
   await page.goto("/");
@@ -41,6 +48,8 @@ test("home page exposes canonical and base Open Graph metadata", async ({
     "content",
     canonicalUrl,
   );
+  await expect(page.locator('meta[property="og:image"]')).toHaveCount(0);
+  await expect(page.locator('meta[property="og:image:alt"]')).toHaveCount(0);
 });
 
 test("robots and sitemap expose the current published route set", async ({
@@ -53,7 +62,7 @@ test("robots and sitemap expose the current published route set", async ({
   );
   const robotsText = await robots.text();
   expect(robotsText).toContain("User-agent: *");
-  expect(robotsText).toContain("Disallow: /");
+  expect(robotsText).toContain(expectedRobotsDirective);
   expect(robotsText).toContain(
     "Sitemap: https://www.glauxagent.com/sitemap.xml",
   );

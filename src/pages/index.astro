@@ -23,6 +23,14 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     <meta property="og:title" content={pageHead.og.title} />
     <meta property="og:description" content={pageHead.og.description} />
     <meta property="og:url" content={pageHead.og.url} />
+    {
+      pageHead.og.image && (
+        <>
+          <meta property="og:image" content={pageHead.og.image} />
+          <meta property="og:image:alt" content={pageHead.og.imageAlt} />
+        </>
+      )
+    }
     <title>{pageHead.title}</title>
   </head>
   <body>

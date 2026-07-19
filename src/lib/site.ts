@@ -5,13 +5,7 @@ type SiteEnvironment = Readonly<Record<string, string | undefined>>;
 const defaultCanonicalSiteOrigin = "https://www.glauxagent.com";
 const productionBranch = "main";
 
-type PublishedRoute = {
-  path: "/";
-};
-
-export const publishedRoutes = [
-  { path: "/" },
-] as const satisfies readonly PublishedRoute[];
+export const publishedRoutes = ["/"] as const;
 
 type PageMetadataForHead = Pick<
   PageMetadata,
@@ -76,7 +70,7 @@ function absoluteSiteUrl(
   return new URL(path, `${getCanonicalSiteOrigin(environment)}/`).toString();
 }
 
-function escapeXml(value: string): string {
+function escapeXmlTextContent(value: string): string {
   return value
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -100,6 +94,12 @@ export function buildPageHeadMetadata(
   environment: SiteEnvironment = process.env,
 ) {
   const canonicalUrl = absoluteSiteUrl(page.canonicalPath, environment);
+  const imageUrl = page.og.image
+    ? new URL(
+        page.og.image,
+        `${getCanonicalSiteOrigin(environment)}/`,
+      ).toString()
+    : undefined;
 
   return {
     title: page.title,
@@ -110,6 +110,12 @@ export function buildPageHeadMetadata(
       description: page.og.description,
       url: canonicalUrl,
       type: "website",
+      ...(imageUrl
+        ? {
+            image: imageUrl,
+            imageAlt: page.og.imageAlt,
+          }
+        : {}),
     },
   } as const;
 }
@@ -136,9 +142,9 @@ export function buildSitemapXml(
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...publishedRoutes.flatMap((route) => [
+    ...publishedRoutes.flatMap((path) => [
       "  <url>",
-      `    <loc>${escapeXml(absoluteSiteUrl(route.path, environment))}</loc>`,
+      `    <loc>${escapeXmlTextContent(absoluteSiteUrl(path, environment))}</loc>`,
       "  </url>",
     ]),
     "</urlset>",
