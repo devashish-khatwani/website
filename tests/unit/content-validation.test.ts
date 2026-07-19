@@ -35,29 +35,6 @@ const approvedClaim = {
   },
 };
 
-const draftPlatformClaims = [
-  {
-    id: "claim-observability-preview",
-    title: "Observability preview",
-    statement:
-      "See how agents perform, where they struggle, and where controls intervene.",
-    classification: "preview",
-    publicationState: "draft",
-    evidence: [{ label: "Website PRD section 9.1", source: "PRD" }],
-    review: { status: "draft" },
-  },
-  {
-    id: "claim-model-studio-coming-soon",
-    title: "Model Studio coming soon",
-    statement:
-      "Turn carefully selected enterprise experience into a specialized model the enterprise owns and controls.",
-    classification: "coming-soon",
-    publicationState: "draft",
-    evidence: [{ label: "Website PRD section 9.4", source: "PRD" }],
-    review: { status: "draft" },
-  },
-];
-
 describe("content release validation", () => {
   it("rejects claim registry entries with an unknown evidence class", () => {
     const result = validateContentForRelease({
@@ -229,7 +206,17 @@ describe("content release validation", () => {
 
   it("allows a draft homepage to reference draft platform claims without publishing them", () => {
     const result = validateContentForRelease({
-      claims: draftPlatformClaims,
+      claims: [
+        {
+          id: "claim-preview",
+          title: "Preview claim",
+          statement: "A draft capability statement.",
+          classification: "preview",
+          publicationState: "draft",
+          evidence: [{ label: "Product note", source: "PRD" }],
+          review: { status: "draft" },
+        },
+      ],
       pages: [
         {
           title: "Glaux | AI your whole team can work with",
@@ -245,10 +232,7 @@ describe("content release validation", () => {
           launchState: "draft",
           publicationState: "draft",
           claimReviewStatus: "draft",
-          claimReferences: [
-            "claim-observability-preview",
-            "claim-model-studio-coming-soon",
-          ],
+          claimReferences: ["claim-preview"],
         },
       ],
     });

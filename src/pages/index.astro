@@ -19,6 +19,15 @@ const claimIds = [
   "model-studio-coming-soon",
 ] as const;
 
+type HomepageClaimId = (typeof claimIds)[number];
+
+const displayTitleByClaimId = {
+  "observability-preview": "Observability",
+  "skillhub-preview": "Enterprise SkillHub",
+  "enterprise-mcp-preview": "Enterprise connections",
+  "model-studio-coming-soon": "Model Studio",
+} satisfies Record<HomepageClaimId, string>;
+
 const claimEntries = await Promise.all(
   claimIds.map(async (id) => {
     const entry = await getEntry("claims", id);
@@ -27,7 +36,7 @@ const claimEntries = await Promise.all(
       throw new Error(`Missing homepage platform claim: ${id}.`);
     }
 
-    return entry;
+    return { id, entry };
   }),
 );
 
@@ -36,7 +45,7 @@ const availabilityLabelByClass = {
   "coming-soon": "Coming soon",
 } as const;
 
-const platformCards = claimEntries.map((entry) => {
+const platformCards = claimEntries.map(({ id, entry }) => {
   const classification = entry.data.classification;
 
   if (classification !== "preview" && classification !== "coming-soon") {
@@ -47,14 +56,7 @@ const platformCards = claimEntries.map((entry) => {
 
   return {
     id: entry.data.id,
-    title: entry.data.title
-      .replace("Enterprise SkillHub preview", "Enterprise SkillHub")
-      .replace(
-        "Prebuilt enterprise connections preview",
-        "Enterprise connections",
-      )
-      .replace("Model Studio coming soon", "Model Studio")
-      .replace("Observability preview", "Observability"),
+    title: displayTitleByClaimId[id],
     statement: entry.data.statement,
     label: availabilityLabelByClass[classification],
   };
@@ -178,10 +180,6 @@ const governanceOutcomes = [
     <section class="preview-list" aria-labelledby="preview-heading">
       <div class="section-heading">
         <h2 id="preview-heading">Useful work, clear boundaries.</h2>
-        <p>
-          The homepage stays simple: show what people can do, where approval
-          appears, and how administrators keep the work aligned.
-        </p>
       </div>
       <div class="preview-list__items">
         {
@@ -220,9 +218,6 @@ const governanceOutcomes = [
     <section class="platform-section" aria-labelledby="platform-heading">
       <div class="section-heading">
         <h2 id="platform-heading">What comes next for enterprise teams.</h2>
-        <p>
-          These capabilities are shown with their current availability labels.
-        </p>
       </div>
       <div class="platform-grid">
         {
@@ -244,10 +239,6 @@ const governanceOutcomes = [
         <h2 id="security-heading">
           Built for teams that need answers and control.
         </h2>
-        <p>
-          Security details belong one click deeper, with plain explanations and
-          no unsupported promises.
-        </p>
       </div>
       <Button href="/security/" variant="ghost">Read security details</Button>
     </section>

@@ -717,10 +717,6 @@ img {
   color: inherit;
 }
 
-.conversation p {
-  margin: 0;
-}
-
 @media (max-width: 860px) {
   .site-header {
     inline-size: min(100% - 48px, 1240px);

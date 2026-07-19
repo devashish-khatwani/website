@@ -102,38 +102,40 @@ test("home page renders only approved draft platform labels and statements", asy
 }) => {
   await page.goto("/");
 
-  await expect(
-    page.getByRole("heading", { name: "Observability" }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(
+  const platformClaims = [
+    [
+      "claim-observability-preview",
+      "Observability",
       "See how agents perform, where they struggle, and where controls intervene.",
-    ),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Enterprise SkillHub" }),
-  ).toBeVisible();
-  await expect(page.getByText("Share trusted ways of working.")).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Enterprise connections" }),
-  ).toBeVisible();
-  await expect(
-    page.getByText("Connect the tools your company depends on."),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Model Studio" }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(
+      "Preview",
+    ],
+    [
+      "claim-skillhub-preview",
+      "Enterprise SkillHub",
+      "Share trusted ways of working.",
+      "Preview",
+    ],
+    [
+      "claim-enterprise-mcp-preview",
+      "Enterprise connections",
+      "Connect the tools your company depends on.",
+      "Preview",
+    ],
+    [
+      "claim-model-studio-coming-soon",
+      "Model Studio",
       "Turn carefully selected enterprise experience into a specialized model the enterprise owns and controls.",
-    ),
-  ).toBeVisible();
-  await expect(page.locator(".platform-card .badge")).toHaveText([
-    "Preview",
-    "Preview",
-    "Preview",
-    "Coming soon",
-  ]);
+      "Coming soon",
+    ],
+  ] as const;
+
+  for (const [claimId, title, statement, label] of platformClaims) {
+    const card = page.locator(`[data-claim-id="${claimId}"]`);
+    await expect(card.getByRole("heading", { name: title })).toBeVisible();
+    await expect(card.getByText(statement, { exact: true })).toBeVisible();
+    await expect(card.locator(".badge")).toHaveText(label);
+  }
+
   await expect(
     page.getByText(
       /Laminar|Inkling|Tinker|Powered by Hermes|Hermes Agent|draft claim registry|certification claims|governed Hermes Agent/u,
