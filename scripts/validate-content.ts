@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { validateContentForRelease } from "../src/lib/content/validate.ts";
@@ -38,14 +38,12 @@ function parseFrontmatter(path: string): Record<string, unknown> {
 const claimsDirectory = join(root, "src/content/claims");
 const pagesDirectory = join(root, "src/content/pages");
 
-const claims = statSync(claimsDirectory).isDirectory()
-  ? walkFiles(claimsDirectory, new Set([".json"])).map((path) =>
-      JSON.parse(readFileSync(path, "utf8")),
-    )
-  : [];
-const pages = statSync(pagesDirectory).isDirectory()
-  ? walkFiles(pagesDirectory, new Set([".md", ".mdx"])).map(parseFrontmatter)
-  : [];
+const claims = walkFiles(claimsDirectory, new Set([".json"])).map((path) =>
+  JSON.parse(readFileSync(path, "utf8")),
+);
+const pages = walkFiles(pagesDirectory, new Set([".md", ".mdx"])).map(
+  parseFrontmatter,
+);
 
 const result = validateContentForRelease({ claims, pages });
 
