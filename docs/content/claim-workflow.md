@@ -31,8 +31,10 @@ An approved claim must include its evidence class, at least one evidence item,
 an owner, approved review status, reviewer, and review date. Draft and blocked
 claims may omit this approval metadata until they are ready for review.
 
-Blocked claims are allowed only as non-public drafts. The observability claim is
-seeded this way because W-01 has not assigned its launch availability label.
+Blocked claims are allowed only as non-public drafts. Based on the accepted
+W-01 availability decision, observability is seeded as a draft `preview` claim.
+It is not approved for publication until the normal owner and reviewer evidence
+exists.
 
 Do not add owner names, reviewer names, dates, customer proof, certification
 claims, or production-security claims unless the evidence exists in the repo and

@@ -1,0 +1,17 @@
+{
+  "id": "claim-observability-preview",
+  "title": "Observability preview",
+  "statement": "See how agents perform, where they struggle, and where controls intervene.",
+  "classification": "preview",
+  "publicationState": "draft",
+  "evidence": [
+    {
+      "label": "Website PRD section 9.1",
+      "source": "Observe with Laminar website language"
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "notes": "Representative draft claim seeded from the PRD; not approved for publication."
+  }
+}
