@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 
 const canonicalUrl = "https://www.glauxagent.com/";
 const isProductionPagesBuild =
@@ -8,6 +8,24 @@ const isProductionPagesBuild =
 const expectedRobotsDirective = isProductionPagesBuild
   ? "Allow: /"
   : "Disallow: /";
+
+async function expectVisibleFocusOutline(locator: Locator) {
+  await expect(locator).toBeFocused();
+
+  const outline = await locator.evaluate((element) => {
+    const styles = window.getComputedStyle(element);
+
+    return {
+      color: styles.outlineColor,
+      style: styles.outlineStyle,
+      width: styles.outlineWidth,
+    };
+  });
+
+  expect(outline.style).not.toBe("none");
+  expect(Number.parseFloat(outline.width)).toBeGreaterThan(0);
+  expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
+}
 
 test("home page exposes the W-03 design foundation contract", async ({
   page,
@@ -85,6 +103,28 @@ test("home page exposes visible keyboard focus and mobile touch targets", async 
   ).toBeVisible();
   await page.keyboard.press("Enter");
   await expect(page.locator("#main-content")).toBeFocused();
+});
+
+test("header and footer calls to action expose visible keyboard focus", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const primaryNavigation = page.getByRole("navigation", { name: "Primary" });
+  await primaryNavigation.getByRole("link", { name: "Sign in" }).focus();
+  await page.keyboard.press("Tab");
+  await expectVisibleFocusOutline(
+    page.getByRole("banner").getByRole("link", { name: "Book a demo" }),
+  );
+
+  const footer = page.getByRole("contentinfo");
+  await footer
+    .getByRole("navigation", { name: "Footer" })
+    .getByRole("link", { name: "Book a demo" })
+    .focus();
+  await page.keyboard.press("Tab");
+  const privacyLink = footer.getByRole("link", { name: "Privacy" });
+  await expectVisibleFocusOutline(privacyLink);
 });
 
 test("mobile menu exposes the approved navigation without horizontal overflow", async ({
