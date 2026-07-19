@@ -1,0 +1,20 @@
+{
+  "id": "claim-observability-blocked",
+  "title": "Observability availability pending",
+  "statement": "Understand every governed run.",
+  "publicationState": "draft",
+  "blocked": {
+    "reason": "The W-01 availability decision has not assigned a launch label for observability.",
+    "pendingDecision": "W-01 availability matrix"
+  },
+  "evidence": [
+    {
+      "label": "Website PRD section 9.1",
+      "source": "Observe with Laminar website language"
+    }
+  ],
+  "review": {
+    "status": "blocked",
+    "notes": "No final availability label is assigned; this claim cannot be published."
+  }
+}

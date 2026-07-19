@@ -1,0 +1,17 @@
+{
+  "id": "claim-enterprise-mcp-preview",
+  "title": "Prebuilt enterprise connections preview",
+  "statement": "Connect the tools your company depends on.",
+  "classification": "preview",
+  "publicationState": "draft",
+  "evidence": [
+    {
+      "label": "Website PRD section 9.3",
+      "source": "Prebuilt enterprise connections — Preview at launch"
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "notes": "Representative draft claim seeded from the PRD; not approved for publication."
+  }
+}

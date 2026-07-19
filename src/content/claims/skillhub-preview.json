@@ -1,0 +1,17 @@
+{
+  "id": "claim-skillhub-preview",
+  "title": "Enterprise SkillHub preview",
+  "statement": "Share trusted ways of working.",
+  "classification": "preview",
+  "publicationState": "draft",
+  "evidence": [
+    {
+      "label": "Website PRD section 9.2",
+      "source": "Enterprise SkillHub — Preview at launch"
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "notes": "Representative draft claim seeded from the PRD; not approved for publication."
+  }
+}

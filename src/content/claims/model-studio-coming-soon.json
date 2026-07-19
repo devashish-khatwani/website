@@ -1,0 +1,17 @@
+{
+  "id": "claim-model-studio-coming-soon",
+  "title": "Model Studio coming soon",
+  "statement": "Turn carefully selected enterprise experience into a specialized model the enterprise owns and controls.",
+  "classification": "coming-soon",
+  "publicationState": "draft",
+  "evidence": [
+    {
+      "label": "Website PRD section 9.4",
+      "source": "Model Studio: learn from approved experience — Coming soon"
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "notes": "Representative draft claim seeded from the PRD; not approved for publication."
+  }
+}

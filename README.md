@@ -29,6 +29,7 @@ npm ci
 npm run dev
 npm run build
 npm run preview
+npm run validate:content
 npm run typecheck
 npm run lint
 npm run format:check
@@ -38,8 +39,12 @@ npm run test:e2e
 
 `npm run build` writes the static Cloudflare Pages output to `dist/`.
 
+Content authors should run `npm run validate:content` before requesting release
+review. The claim workflow and evidence classes are documented in
+[`docs/content/claim-workflow.md`](docs/content/claim-workflow.md).
+
 ## Scope guardrails
 
-W-02 is a toolchain bootstrap only. It does not include analytics, a form
+The current route remains a placeholder. It does not include analytics, a form
 backend, auth logic, production credentials, React islands, upstream Hermes
 branding, or public product claims.
