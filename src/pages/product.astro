@@ -1,11 +1,324 @@
 ---
-import RouteStub from "../components/RouteStub.astro";
+import { getEntry } from "astro:content";
+import Button from "../components/Button.astro";
+import SiteLayout from "../components/SiteLayout.astro";
+import { buildPageHeadMetadata } from "../lib/site";
+
+const productEntry = await getEntry("pages", "product");
+
+if (!productEntry) {
+  throw new Error("Missing product page metadata entry.");
+}
+
+const pageHead = buildPageHeadMetadata(productEntry.data);
+
+const workModes = [
+  {
+    title: "Ask",
+    body: "Ask questions across approved company knowledge and see the answer in the same work thread.",
+  },
+  {
+    title: "Research",
+    body: "Collect source notes, compare options, and keep open questions visible for the team.",
+  },
+  {
+    title: "Write",
+    body: "Draft briefs, replies, summaries, and handoffs from the context your team has approved.",
+  },
+  {
+    title: "Analyze",
+    body: "Turn notes, documents, and work history into clear patterns without hiding the source trail.",
+  },
+  {
+    title: "Browse",
+    body: "Use approved browsing paths when the task needs fresh external context.",
+  },
+  {
+    title: "Create artifacts",
+    body: "Leave with the memo, plan, table, or checklist the work actually needs.",
+  },
+] as const;
+
+const approvedToolsCapability = {
+  title: "Approved tools",
+  body: "Use the tools an administrator has approved for the workspace and task.",
+  label: "Approved before use",
+} as const;
+
+const automationsCapability = {
+  title: "Automations",
+  body: "Run repeated work with the same boundaries as one-off requests.",
+  label: "Governed workflow",
+} as const;
+
+const capabilityClaimIds = [
+  "skillhub-preview",
+  "enterprise-mcp-preview",
+] as const;
+
+type CapabilityClaimId = (typeof capabilityClaimIds)[number];
+
+const capabilityTitleByClaimId = {
+  "skillhub-preview": "Enterprise SkillHub",
+  "enterprise-mcp-preview": "Enterprise connections",
+} satisfies Record<CapabilityClaimId, string>;
+
+const capabilityClaimEntries = await Promise.all(
+  capabilityClaimIds.map(async (id) => {
+    const entry = await getEntry("claims", id);
+
+    if (!entry) {
+      throw new Error(`Missing product capability claim: ${id}.`);
+    }
+
+    return { id, entry };
+  }),
+);
+
+const availabilityLabelByClass = {
+  preview: "Preview",
+} as const;
+
+const previewCapabilities = capabilityClaimEntries.map(({ id, entry }) => {
+  const classification = entry.data.classification;
+
+  if (classification !== "preview") {
+    throw new Error(
+      `Product capability claim ${entry.data.id} must be Preview.`,
+    );
+  }
+
+  return {
+    claimId: entry.data.id,
+    title: capabilityTitleByClaimId[id],
+    body: entry.data.statement,
+    label: availabilityLabelByClass[classification],
+  };
+});
+
+const capabilityCards = [
+  approvedToolsCapability,
+  ...previewCapabilities,
+  automationsCapability,
+];
+
+const adminScopes = [
+  "People",
+  "Groups",
+  "Tools",
+  "Models",
+  "Skills",
+  "Usage",
+  "Activity",
+] as const;
+
+const recentDecisions = [
+  {
+    label: "continued",
+    item: "Renewal-risk brief",
+    meaning: "The request matched the rules, so work carried on.",
+  },
+  {
+    label: "approval requested",
+    item: "External customer email",
+    meaning: "The next step needs the right person to approve it first.",
+  },
+  {
+    label: "stopped",
+    item: "Unapproved data export",
+    meaning: "The request crossed a boundary and was blocked before action.",
+  },
+  {
+    label: "needs attention",
+    item: "Automation source changed",
+    meaning: "A person should review the change before the workflow continues.",
+  },
+] as const;
 ---
 
-<RouteStub
-  title="Product shell | Glaux"
-  description="Draft Glaux product route shell awaiting launch-page content."
-  canonicalPath="/product/"
-  heading="Product"
-  body="This route is ready for the product page. The launch copy and product preview remain owned by the later product-page task."
-/>
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  noindex
+  og={pageHead.og}
+>
+  <div class="product-page">
+    <section class="product-hero" aria-labelledby="product-heading">
+      <div class="product-hero__copy">
+        <p class="plain-label">Product</p>
+        <h1 id="product-heading" class="product-title">
+          Useful work, with the rules built in.
+        </h1>
+        <p class="product-lede">
+          Glaux helps employees ask, research, write, analyze, browse, and
+          create artifacts with approved company knowledge and approved tools.
+          When work needs access or approval, the request stays in the task.
+        </p>
+        <div class="product-actions" aria-label="Primary product actions">
+          <Button href="/contact/" variant="primary">Book a demo</Button>
+          <Button href="/security/" variant="ghost"
+            >Read security details</Button
+          >
+        </div>
+      </div>
+
+      <div class="product-workspace-preview" aria-label="Product work preview">
+        <div class="preview-toolbar">
+          <span>Launch brief</span>
+          <span>Desktop and web where available</span>
+        </div>
+        <div class="preview-prompt">
+          <span>Ask Glaux</span>
+          <p>
+            Compare the top customer requests with the approved roadmap and
+            draft the launch brief.
+          </p>
+        </div>
+        <div class="preview-answer">
+          <p class="conversation__speaker">Glaux</p>
+          <p>
+            I found the strongest requests, wrote the brief, and marked the
+            customer email as approval requested before it can be sent.
+          </p>
+        </div>
+        <div class="artifact-preview">
+          <span>Created artifact</span>
+          <strong>Q3 launch brief</strong>
+          <p>
+            Summary, source notes, open decisions, and approval-ready next
+            steps.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="product-work-section" aria-labelledby="work-heading">
+      <div class="section-heading">
+        <h2 id="work-heading">What employees can do.</h2>
+        <p>
+          The work starts like a normal request and ends with a brief, plan,
+          table, or next step someone can use.
+        </p>
+      </div>
+      <div class="work-mode-grid">
+        {
+          workModes.map((mode) => (
+            <article>
+              <h3>{mode.title}</h3>
+              <p>{mode.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="access-section" aria-labelledby="access-heading">
+      <div class="access-section__copy">
+        <p class="plain-label">Access and approval</p>
+        <h2 id="access-heading">Ask without leaving the work.</h2>
+        <p>
+          If a task needs a new tool, source, or sensitive action, Glaux keeps
+          the request attached to the work so the approver sees the reason and
+          the user sees what happens next.
+        </p>
+      </div>
+      <div class="approval-preview" aria-label="Approval request preview">
+        <div>
+          <span class="badge">Approval requested</span>
+          <h3>Send external customer summary</h3>
+          <p>
+            Reason: share the final launch brief with the account team after
+            review.
+          </p>
+        </div>
+        <div class="approval-preview__steps">
+          <span>1. Request stays with the task</span>
+          <span>2. Approver reviews the reason</span>
+          <span>3. Work continues or stops with an explanation</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="capability-section" aria-labelledby="capability-heading">
+      <div class="section-heading">
+        <h2 id="capability-heading">
+          Approved tools, skills, and automations.
+        </h2>
+        <p>
+          Teams can make useful capabilities available without implying every
+          tool is open to every person.
+        </p>
+      </div>
+      <div class="capability-grid">
+        {
+          capabilityCards.map((capability) => (
+            <article
+              class="capability-card"
+              data-claim-id={
+                "claimId" in capability ? capability.claimId : undefined
+              }
+            >
+              <div class="capability-card__header">
+                <h3>{capability.title}</h3>
+                <span class="badge">{capability.label}</span>
+              </div>
+              <p>{capability.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="admin-heading">
+      <div class="section-heading section-heading--compact">
+        <h2 id="admin-heading">What administrators can manage.</h2>
+        <p>
+          Administrators get a plain operating view of who can use what, how
+          work is changing, and where attention is needed.
+        </p>
+      </div>
+      <div class="admin-scope-list" aria-label="Administrator management scope">
+        {adminScopes.map((scope) => <span>{scope}</span>)}
+      </div>
+    </section>
+
+    <section class="decision-section" aria-labelledby="decision-heading">
+      <div class="section-heading">
+        <h2 id="decision-heading">Recent decisions in everyday language.</h2>
+        <p>
+          See what moved ahead, what needs a person, and what stopped before
+          action.
+        </p>
+      </div>
+      <div class="decision-list" aria-label="Recent decisions">
+        {
+          recentDecisions.map((decision) => (
+            <article class="decision-row">
+              <div>
+                <span class="badge">{decision.label}</span>
+                <h3>{decision.item}</h3>
+              </div>
+              <p>{decision.meaning}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="technical-depth" aria-labelledby="technical-depth-heading">
+      <div>
+        <p class="plain-label">For evaluators</p>
+        <h2 id="technical-depth-heading">
+          Technical detail is available, not the main story.
+        </h2>
+        <p>
+          Security and platform reviewers can go deeper into controls and
+          evidence when they need it. The main flow stays focused on what
+          employees and administrators can do.
+        </p>
+      </div>
+      <Button href="/security/" variant="ghost">Open technical details</Button>
+    </section>
+  </div>
+</SiteLayout>

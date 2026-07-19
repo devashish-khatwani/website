@@ -94,7 +94,7 @@ test("home page uses plain-language benefits and governance outcomes", async ({
     await expect(page.getByRole("heading", { name: outcome })).toBeVisible();
   }
   await expect(page.getByText(/flowchart/i)).toHaveCount(0);
-  await expect(page.locator("svg")).toHaveCount(0);
+  await expect(page.getByRole("main").locator("svg")).toHaveCount(0);
 });
 
 test("home page renders only approved draft platform labels and statements", async ({
@@ -197,7 +197,7 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   });
   await page.goto("/");
 
-  const menu = page.getByText("Menu");
+  const menu = page.getByLabel("Open navigation");
   const box = await menu.boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);
   expect(box?.width).toBeGreaterThanOrEqual(44);
@@ -228,11 +228,10 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   expect(consoleErrors).toEqual([]);
 });
 
-test("navigation targets render honest noindexed route shells", async ({
+test("navigation targets render honest noindexed pages or route shells", async ({
   page,
 }) => {
   for (const [path, heading] of [
-    ["/product/", "Product"],
     ["/security/", "Security"],
     ["/company/", "Company"],
     ["/contact/", "Book a demo"],
@@ -250,6 +249,17 @@ test("navigation targets render honest noindexed route shells", async ({
       "noindex, nofollow",
     );
   }
+
+  await page.goto("/product/");
+  await expect(
+    page.getByRole("heading", {
+      name: "Useful work, with the rules built in.",
+    }),
+  ).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex, nofollow",
+  );
 });
 
 test("home page exposes canonical and draft Open Graph metadata", async ({

@@ -239,6 +239,57 @@ describe("content release validation", () => {
 
     expect(result).toEqual({ valid: true, issues: [] });
   });
+
+  it("allows a draft product page to reference draft product claims without publishing them", () => {
+    const draftClaims = [
+      {
+        id: "claim-skillhub-preview",
+        title: "Enterprise SkillHub preview",
+        statement: "Share trusted ways of working.",
+        classification: "preview",
+        publicationState: "draft",
+        evidence: [{ label: "PRD section 9.2", source: "PRD" }],
+        review: { status: "draft" },
+      },
+      {
+        id: "claim-enterprise-mcp-preview",
+        title: "Prebuilt enterprise connections preview",
+        statement: "Connect the tools your company depends on.",
+        classification: "preview",
+        publicationState: "draft",
+        evidence: [{ label: "PRD section 9.3", source: "PRD" }],
+        review: { status: "draft" },
+      },
+    ];
+
+    const result = validateContentForRelease({
+      claims: draftClaims,
+      pages: [
+        {
+          title: "Product | Glaux",
+          description:
+            "See how Glaux helps employees work with approved company knowledge, tools, approvals, and administrative controls.",
+          canonicalPath: "/product/",
+          og: {
+            title: "Product | Glaux",
+            description:
+              "See how Glaux helps employees work with approved company knowledge, tools, approvals, and administrative controls.",
+            imageAlt:
+              "Monochrome Glaux product page work and governance preview.",
+          },
+          launchState: "draft",
+          publicationState: "draft",
+          claimReviewStatus: "draft",
+          claimReferences: [
+            "claim-skillhub-preview",
+            "claim-enterprise-mcp-preview",
+          ],
+        },
+      ],
+    });
+
+    expect(result).toEqual({ valid: true, issues: [] });
+  });
 });
 
 describe("content validator required roots", () => {
