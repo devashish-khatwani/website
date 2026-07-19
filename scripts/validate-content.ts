@@ -58,7 +58,7 @@ function parseFrontmatter(path: string): Record<string, unknown> {
   return parsed as Record<string, unknown>;
 }
 
-export function runContentValidation(): void {
+function runContentValidation(): void {
   const claimsDirectory = join(root, "src/content/claims");
   const pagesDirectory = join(root, "src/content/pages");
 
