@@ -1,0 +1,17 @@
+{
+  "id": "claim-security-control-authority",
+  "title": "Control Tower authority boundary",
+  "statement": "Control Tower owns authorization, approvals, runtime activity, audit, and safe projections while clients can request and display decisions but cannot grant authority.",
+  "classification": "verified-architecture",
+  "publicationState": "draft",
+  "evidence": [
+    {
+      "label": "ADR-014 APP-003",
+      "source": "Control Tower owns authorization, approvals, runtime activity, audit, and safe projections"
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "notes": "Draft architecture claim seeded from the current product-surface decision register; not approved for publication."
+  }
+}

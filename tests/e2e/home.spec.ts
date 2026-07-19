@@ -232,7 +232,6 @@ test("navigation targets render honest noindexed pages or route shells", async (
   page,
 }) => {
   for (const [path, heading] of [
-    ["/security/", "Security"],
     ["/company/", "Company"],
     ["/contact/", "Book a demo"],
     ["/privacy/", "Privacy"],
@@ -308,6 +307,9 @@ test("robots and sitemap keep the draft homepage out of published routes", async
   expect(sitemapText).not.toContain(`<loc>${canonicalUrl}</loc>`);
   expect(sitemapText).not.toContain(
     "<loc>https://www.glauxagent.com/product/</loc>",
+  );
+  expect(sitemapText).not.toContain(
+    "<loc>https://www.glauxagent.com/security/</loc>",
   );
   expect(sitemapText).not.toContain(
     "<loc>https://www.glauxagent.com/privacy/</loc>",

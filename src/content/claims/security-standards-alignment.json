@@ -1,0 +1,21 @@
+{
+  "id": "claim-security-standards-alignment",
+  "title": "Standards alignment posture",
+  "statement": "Glaux security posture supports alignment with NIST AI RMF and OWASP agentic, MCP, and agentic skills guidance as design input.",
+  "classification": "external-alignment",
+  "publicationState": "draft",
+  "evidence": [
+    {
+      "label": "Website PRD section 12",
+      "source": "External alignment publication rule"
+    },
+    {
+      "label": "Website PRD references",
+      "source": "NIST AI RMF, OWASP Agentic Security Initiative, OWASP MCP Top 10, and OWASP Agentic Skills Top 10"
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "notes": "Draft external-alignment claim seeded from the PRD; not approved for publication."
+  }
+}

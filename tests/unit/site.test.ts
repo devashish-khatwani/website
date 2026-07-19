@@ -132,6 +132,7 @@ describe("site discoverability metadata", () => {
 
   it("allows crawling only for an explicit Cloudflare Pages production build", () => {
     expect(publishedRoutes).toEqual([]);
+    expect(publishedRoutes).not.toContain("/security/");
     expect(isSearchIndexingAllowed({})).toBe(false);
     expect(
       isSearchIndexingAllowed({

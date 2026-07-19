@@ -1,11 +1,372 @@
 ---
-import RouteStub from "../components/RouteStub.astro";
+import { getEntry } from "astro:content";
+import Badge from "../components/Badge.astro";
+import Button from "../components/Button.astro";
+import SiteLayout from "../components/SiteLayout.astro";
+import { buildPageHeadMetadata } from "../lib/site";
+
+const securityEntry = await getEntry("pages", "security");
+
+if (!securityEntry) {
+  throw new Error("Missing security page metadata entry.");
+}
+
+const pageHead = buildPageHeadMetadata(securityEntry.data);
+
+const controlScopes = [
+  {
+    title: "People",
+    body: "Choose which employees, service accounts, and roles can request governed work.",
+  },
+  {
+    title: "Teams",
+    body: "Group permissions by workspace or team so access follows how the company operates.",
+  },
+  {
+    title: "Tools",
+    body: "Make approved connections available only where they belong, with unsafe requests stopped before use.",
+  },
+  {
+    title: "Models",
+    body: "Set which model and provider choices are available for the work being done.",
+  },
+  {
+    title: "Sensitive actions",
+    body: "Require approval or stop work before high-impact actions such as external sharing or data export.",
+  },
+] as const;
+
+const requestSteps = [
+  "The user asks for a tool, source, model, or action from the task.",
+  "The request keeps the reason, workspace, and approver path together.",
+  "Work continues only when the request is approved or already allowed.",
+] as const;
+
+const visibilityItems = [
+  {
+    label: "Recorded",
+    title: "Activity history",
+    body: "Admins can review what moved ahead, what needed approval, and what stopped before action.",
+  },
+  {
+    label: "Visible to admins",
+    title: "Admin visibility",
+    body: "Security reviewers get a governance view without exposing secrets, private prompts, or raw internal configuration.",
+  },
+] as const;
+
+const securityClaimSpecs = [
+  ["security-control-authority", "verified-architecture"],
+  ["security-request-integrity", "verified-implementation"],
+  ["security-standards-alignment", "external-alignment"],
+] as const;
+
+const securityClaims = await Promise.all(
+  securityClaimSpecs.map(async ([id, classification]) => {
+    const entry = await getEntry("claims", id);
+
+    if (!entry) {
+      throw new Error(`Missing security claim: ${id}.`);
+    }
+
+    if (entry.data.classification !== classification) {
+      throw new Error(
+        `Security claim ${entry.data.id} must be ${classification}.`,
+      );
+    }
+
+    return entry.data;
+  }),
+);
+
+const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
+  securityClaims;
+
+if (
+  !controlAuthorityClaim ||
+  !requestIntegrityClaim ||
+  !standardsAlignmentClaim
+) {
+  throw new Error("Missing required security page claims.");
+}
 ---
 
-<RouteStub
-  title="Security shell | Glaux"
-  description="Draft Glaux security route shell awaiting launch-page content."
-  canonicalPath="/security/"
-  heading="Security"
-  body="This route is ready for the security page. The plain-language controls, data-boundary copy, and review evidence remain owned by the later security-page task."
-/>
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  noindex
+  og={pageHead.og}
+>
+  <div class="product-page security-page">
+    <section
+      class="product-hero security-hero"
+      aria-labelledby="security-heading"
+    >
+      <div class="product-hero__copy security-hero__copy">
+        <p class="plain-label">Security</p>
+        <h1 id="security-heading" class="product-title security-title">
+          You choose what Glaux can access and do.
+        </h1>
+        <p class="product-lede security-lede">
+          Glaux puts company rules in the path of work. Admins decide which
+          people and teams can use which knowledge, tools, models, and sensitive
+          actions, and when a person must approve the next step.
+        </p>
+        <div
+          class="product-actions security-actions"
+          aria-label="Security page actions"
+        >
+          <Button href="/contact/" variant="primary">Book a demo</Button>
+          <Button href="/product/" variant="ghost">See the product</Button>
+        </div>
+      </div>
+
+      <div
+        class="work-preview security-check-preview"
+        aria-label="Security control preview"
+      >
+        <div class="work-preview__bar preview-toolbar">
+          <span>External customer summary</span>
+          <span>Policy check before action</span>
+        </div>
+        <div class="conversation preview-prompt">
+          <span>Requested action</span>
+          <p>Send the summary outside the company workspace.</p>
+        </div>
+        <div class="conversation conversation--agent preview-answer">
+          <p class="conversation__speaker">Before action</p>
+          <p>Rule applied: approval is required before anything is sent.</p>
+        </div>
+        <div class="completed-work security-result-preview">
+          <span>Afterward</span>
+          <strong>Result recorded</strong>
+          <p>
+            The activity history records the request, decision, outcome, and
+            policy context that applied.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="product-work-section" aria-labelledby="controls-heading">
+      <div class="section-heading">
+        <h2 id="controls-heading">Controls cover the people and the action.</h2>
+        <p>
+          Security starts with plain boundaries: who is asking, which team they
+          are working in, what source or tool is involved, and whether the next
+          step needs approval.
+        </p>
+      </div>
+      <div class="work-mode-grid security-control-grid">
+        {
+          controlScopes.map((scope) => (
+            <article>
+              <h3>{scope.title}</h3>
+              <p>{scope.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section
+      class="governance-section access-section security-request-section"
+      aria-labelledby="requests-heading"
+    >
+      <div
+        class="section-heading section-heading--compact access-section__copy"
+      >
+        <p class="plain-label">Approval and access requests</p>
+        <h2 id="requests-heading">People can ask without leaving the task.</h2>
+        <p>
+          When work needs access to a source, tool, model, or sensitive action,
+          the request stays attached to the reason for the work. Approvers see
+          the context before deciding.
+        </p>
+      </div>
+      <div class="surface approval-preview" aria-label="Access request path">
+        <div>
+          <Badge>Access requested</Badge>
+          <h3>Use customer-success knowledge source</h3>
+          <p>
+            Reason: answer a renewal-risk question with the approved source
+            trail visible.
+          </p>
+        </div>
+        <div class="approval-preview__steps">
+          {requestSteps.map((step) => <span>{step}</span>)}
+        </div>
+      </div>
+    </section>
+
+    <section class="decision-section" aria-labelledby="prevention-heading">
+      <div class="section-heading">
+        <h2 id="prevention-heading">
+          Prevention and evidence are different jobs.
+        </h2>
+        <p>
+          The rule is checked before the action. The record is written after the
+          result. Glaux should not make teams wait for after-the-fact evidence
+          to find out whether an action was allowed.
+        </p>
+      </div>
+      <div class="preview-list__items decision-list security-evidence-list">
+        <article class="preview-row decision-row">
+          <div>
+            <Badge>Before action</Badge>
+            <h3>Apply the rule</h3>
+          </div>
+          <p>
+            Check identity, workspace, approved source, tool, model, policy, and
+            approval requirements before a governed read or side effect happens.
+          </p>
+        </article>
+        <article class="preview-row decision-row">
+          <div>
+            <Badge>Afterward</Badge>
+            <h3>Record the result</h3>
+          </div>
+          <p>
+            Keep the outcome visible through activity history, approval history,
+            and audit-oriented admin views.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section
+      class="admin-section security-visibility-section"
+      aria-labelledby="visibility-heading"
+    >
+      <div class="section-heading section-heading--compact">
+        <h2 id="visibility-heading">
+          Activity history supports admin visibility.
+        </h2>
+        <p>
+          Security and governance teams need to see where controls applied
+          without turning internal secrets or raw configuration into
+          visitor-facing explanations.
+        </p>
+      </div>
+      <div
+        class="preview-list__items security-visibility-list"
+        aria-label="Activity history and admin visibility"
+      >
+        {
+          visibilityItems.map((item) => (
+            <article class="preview-row decision-row">
+              <div>
+                <Badge>{item.label}</Badge>
+                <h3>{item.title}</h3>
+              </div>
+              <p>{item.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section
+      class="governance-section security-data-section"
+      aria-labelledby="data-heading"
+    >
+      <div class="section-heading section-heading--compact">
+        <p class="plain-label">Data and deployment diligence</p>
+        <h2 id="data-heading">
+          Inventory first. Guarantees only when approved.
+        </h2>
+        <p>
+          A security review should map the real categories involved: people and
+          groups, approved knowledge sources, tool connections, model choices,
+          skills, automations, approvals, access requests, and activity records.
+        </p>
+      </div>
+      <div class="surface approval-preview security-data-panel">
+        <div>
+          <h3>What we confirm during diligence</h3>
+          <p>
+            Glaux treats deployment, data handling, and evidence sharing as
+            review topics until the approved terms are clear for your
+            environment.
+          </p>
+        </div>
+        <div class="approval-preview__steps">
+          <span>Which deployment boundary applies to your environment?</span>
+          <span
+            >Which retention, residency, deletion, and export terms have been
+            approved?</span
+          >
+          <span>Which security evidence can be shared with your reviewers?</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <details class="surface security-detail">
+      <summary>For security teams</summary>
+      <div class="security-detail__body">
+        <div class="security-detail__intro">
+          <h2>Technical depth stays optional.</h2>
+          <p>
+            The main page stays plain. Security reviewers can still inspect the
+            architecture areas that usually matter during diligence.
+          </p>
+        </div>
+        <div class="platform-grid capability-grid security-technical-grid">
+          <article class="platform-card">
+            <h3>Authentication</h3>
+            <p>
+              Service calls are authenticated and versioned before protected
+              Control Tower paths accept them.
+            </p>
+          </article>
+          <article
+            class="platform-card"
+            data-claim-id={requestIntegrityClaim.id}
+          >
+            <h3>Request integrity</h3>
+            <p>{requestIntegrityClaim.statement}</p>
+          </article>
+          <article
+            class="platform-card"
+            data-claim-id={controlAuthorityClaim.id}
+          >
+            <h3>Isolation</h3>
+            <p>{controlAuthorityClaim.statement}</p>
+          </article>
+          <article class="platform-card">
+            <h3>Redaction</h3>
+            <p>
+              Admin and activity surfaces should expose safe explanations and
+              audit pivots, not secrets, private prompts, or raw credentials.
+            </p>
+          </article>
+          <article class="platform-card">
+            <h3>Audit</h3>
+            <p>
+              Audit-oriented admin views are designed for filtered lookup and
+              controlled export rather than public log exposure.
+            </p>
+          </article>
+        </div>
+      </div>
+    </details>
+
+    <section
+      class="security-cta technical-depth security-standards"
+      aria-labelledby="standards-heading"
+      data-claim-id={standardsAlignmentClaim.id}
+    >
+      <div class="section-heading technical-depth__copy">
+        <p class="plain-label">Standards posture</p>
+        <h2 id="standards-heading">Alignment language only.</h2>
+        <p>
+          {standardsAlignmentClaim.statement} Standards are design input here, not
+          proof of third-party review.
+        </p>
+      </div>
+      <Button href="/contact/" variant="ghost">Start security diligence</Button>
+    </section>
+  </div>
+</SiteLayout>

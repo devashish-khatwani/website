@@ -1,0 +1,21 @@
+{
+  "id": "claim-security-request-integrity",
+  "title": "Signed request integrity",
+  "statement": "Signed Control Tower service requests bind method, path and raw query, request ID, contract version, and body hash, with replay protection.",
+  "classification": "verified-implementation",
+  "publicationState": "draft",
+  "evidence": [
+    {
+      "label": "Request signature input",
+      "source": "control-tower/src/controltower/auth/service.py"
+    },
+    {
+      "label": "Service auth dependency",
+      "source": "control-tower/src/controltower/auth/dependencies.py"
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "notes": "Draft implementation claim verified against current Control Tower auth source; not approved for publication."
+  }
+}
