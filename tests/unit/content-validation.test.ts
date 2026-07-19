@@ -1,4 +1,8 @@
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { assertRequiredContentDirectory } from "../../scripts/validate-content";
 import { validateContentForRelease } from "../../src/lib/content/validate";
 
 const approvedLaunchPage = {
@@ -198,5 +202,34 @@ describe("content release validation", () => {
     });
 
     expect(result).toEqual({ valid: true, issues: [] });
+  });
+});
+
+describe("content validator required roots", () => {
+  it("reports an actionable error when a required content root is missing", () => {
+    const directory = join(
+      mkdtempSync(join(tmpdir(), "glaux-content-")),
+      "src/content/claims",
+    );
+
+    expect(() =>
+      assertRequiredContentDirectory(directory, "src/content/claims"),
+    ).toThrow(
+      'Required content directory "src/content/claims" is missing. Create src/content/claims before running content validation.',
+    );
+  });
+
+  it("reports an actionable error when a required content root is not a directory", () => {
+    const directory = join(
+      mkdtempSync(join(tmpdir(), "glaux-content-")),
+      "claims",
+    );
+    writeFileSync(directory, "");
+
+    expect(() =>
+      assertRequiredContentDirectory(directory, "src/content/claims"),
+    ).toThrow(
+      'Required content path "src/content/claims" must be a directory. Create src/content/claims/ and add version-controlled content before running content validation.',
+    );
   });
 });
