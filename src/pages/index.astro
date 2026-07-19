@@ -1,0 +1,70 @@
+---
+import "../styles/global.css";
+import { siteStatus } from "@lib/site";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={siteStatus.description} />
+    <title>{siteStatus.title}</title>
+  </head>
+  <body>
+    <main
+      class="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-6 py-8 sm:px-8 lg:px-10"
+    >
+      <header
+        class="flex items-center justify-between border-b border-[var(--glaux-hairline)] pb-5"
+      >
+        <a href="/" aria-label="Glaux home" class="text-base font-semibold">
+          {siteStatus.name}
+        </a>
+        <span
+          class="rounded-[26px] bg-[var(--glaux-mist)] px-3 py-1 text-xs font-medium text-[var(--glaux-carbon)]"
+        >
+          {siteStatus.statusLabel}
+        </span>
+      </header>
+
+      <section class="flex flex-1 flex-col justify-center gap-8 py-16 sm:py-24">
+        <div class="max-w-3xl">
+          <p class="mb-4 text-sm text-[var(--glaux-concrete)]">
+            Static Astro foundation for Cloudflare Pages
+          </p>
+          <h1
+            class="text-balance text-4xl font-semibold leading-[1.1] tracking-normal sm:text-5xl"
+          >
+            Glaux public website bootstrap is ready for the launch surface.
+          </h1>
+          <p
+            class="mt-5 max-w-[68ch] text-base leading-7 text-[var(--glaux-carbon)]"
+          >
+            This placeholder verifies the build, TypeScript, Tailwind, linting,
+            formatting, unit test, and Playwright smoke-test contract before
+            real marketing pages are implemented.
+          </p>
+        </div>
+
+        <section
+          aria-labelledby="guardrails-heading"
+          class="border border-[var(--glaux-hairline)] p-5"
+        >
+          <h2 id="guardrails-heading" class="text-lg font-semibold">
+            Bootstrap guardrails
+          </h2>
+          <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+            {
+              siteStatus.guardrails.map((guardrail) => (
+                <li class="border border-[var(--glaux-hairline)] bg-[var(--glaux-chalk)] px-4 py-3 text-sm text-[var(--glaux-carbon)]">
+                  {guardrail}
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

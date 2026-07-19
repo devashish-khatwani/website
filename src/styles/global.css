@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --glaux-graphite: #0a0a0a;
+  --glaux-carbon: #171717;
+  --glaux-concrete: #737373;
+  --glaux-hairline: #e5e5e5;
+  --glaux-mist: #f2f2f2;
+  --glaux-chalk: #ffffff;
+  font-family:
+    Geist,
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: var(--glaux-chalk);
+  color: var(--glaux-graphite);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-block-size: 100%;
+  background: var(--glaux-chalk);
+}
+
+body {
+  min-block-size: 100vh;
+  margin: 0;
+  background: var(--glaux-chalk);
+  color: var(--glaux-graphite);
+  font-size: 14px;
+  line-height: 1.43;
+}
+
+a {
+  color: inherit;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--glaux-graphite);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--glaux-graphite);
+  color: var(--glaux-chalk);
+}
