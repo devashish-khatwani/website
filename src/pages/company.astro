@@ -12,21 +12,6 @@ if (!companyEntry) {
 
 const pageHead = buildPageHeadMetadata(companyEntry.data);
 
-const statusItems = [
-  {
-    title: "Design-partner stage",
-    body: "Glaux is focused on design-partner and architecture-review conversations with teams working through real deployment and governance needs.",
-  },
-  {
-    title: "Focused access",
-    body: "Glaux is not currently offered through self-serve signup or as a generally available product.",
-  },
-  {
-    title: "Verified information",
-    body: "Customer proof and company facts are shared only when they are approved for publication.",
-  },
-] as const;
-
 const partnerFit = [
   "Teams evaluating whether an AI assistant can work with approved company knowledge and tools.",
   "Security and governance reviewers who need access controls, approvals, and activity history before broader rollout.",
@@ -41,19 +26,22 @@ const partnerFit = [
   noindex
   og={pageHead.og}
 >
-  <div class="company-page">
-    <section class="company-hero" aria-labelledby="company-heading">
-      <div class="company-hero__copy">
+  <div class="product-page">
+    <section
+      class="product-hero company-hero"
+      aria-labelledby="company-heading"
+    >
+      <div class="product-hero__copy">
         <p class="plain-label">Company</p>
-        <h1 id="company-heading" class="company-title">
+        <h1 id="company-heading" class="product-title">
           Building useful AI work with visible control.
         </h1>
-        <p class="company-lede">
+        <p class="product-lede">
           Glaux is an AI assistant for work. It helps teams research, create,
           automate, and complete work with approved company knowledge and tools
           while administrators decide what can be accessed or approved.
         </p>
-        <div class="company-actions" aria-label="Company page actions">
+        <div class="product-actions" aria-label="Company page actions">
           <Button href="/contact/" variant="primary">Book a demo</Button>
           <Button href="/product/" variant="ghost">Explore the product</Button>
         </div>
@@ -85,29 +73,6 @@ const partnerFit = [
       </div>
     </section>
 
-    <section class="company-status" aria-labelledby="company-status-heading">
-      <div class="section-heading section-heading--compact">
-        <p class="plain-label">Status</p>
-        <h2 id="company-status-heading">Where Glaux is today.</h2>
-        <p>
-          The current stage is centered on focused conversations with teams that
-          need useful AI work and clear organizational control.
-        </p>
-      </div>
-      <div class="company-status-list">
-        {
-          statusItems.map((item) => (
-            <article class="preview-row">
-              <h3>{item.title}</h3>
-              <div>
-                <p>{item.body}</p>
-              </div>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
     <section class="company-fit" aria-labelledby="company-fit-heading">
       <div class="section-heading">
         <p class="plain-label">Who should talk to us</p>
@@ -115,7 +80,7 @@ const partnerFit = [
           Design-partner conversations are for teams with real governance needs.
         </h2>
       </div>
-      <div class="company-fit-grid">
+      <div class="work-mode-grid">
         {
           partnerFit.map((item) => (
             <article>

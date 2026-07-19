@@ -11,6 +11,3 @@ publicationState: "draft"
 claimReviewStatus: "draft"
 claimReferences: []
 ---
-
-Company page metadata for Glaux's mission, current stage, and design-partner
-conversations.

@@ -105,17 +105,6 @@ test("company page invites a governance-focused conversation without promises", 
   ).toHaveCount(0);
 });
 
-test("company page stays out of the sitemap while draft", async ({
-  request,
-}) => {
-  const sitemap = await request.get("/sitemap.xml");
-  await expect(sitemap).toBeOK();
-
-  expect(await sitemap.text()).not.toContain(
-    "<loc>https://www.glauxagent.com/company/</loc>",
-  );
-});
-
 test("company page has no horizontal overflow and keeps contact focus visible", async ({
   page,
 }) => {

@@ -422,19 +422,16 @@ img {
   color: var(--color-chalk);
 }
 
-/* Homepage and Product share the page and split-hero foundations.
-   Each surface keeps only its column and text-measure deltas. */
+/* Homepage and Product share the page and split-hero foundations. */
 .home-page,
-.product-page,
-.company-page {
+.product-page {
   inline-size: min(100% - 48px, 1240px);
   margin-inline: auto;
   padding-block: var(--space-12) var(--space-24);
 }
 
 .home-hero,
-.product-hero,
-.company-hero {
+.product-hero {
   display: grid;
   gap: clamp(var(--space-8), 6vw, var(--space-16));
   align-items: center;
@@ -450,8 +447,7 @@ img {
 }
 
 .home-hero__copy,
-.product-hero__copy,
-.company-hero__copy {
+.product-hero__copy {
   display: grid;
   gap: var(--space-6);
 }
@@ -466,12 +462,6 @@ img {
 
 .company-hero {
   grid-template-columns: minmax(0, 1fr) minmax(340px, 0.72fr);
-  align-items: stretch;
-}
-
-.company-hero__copy {
-  align-content: center;
-  max-inline-size: 76ch;
 }
 
 .home-kicker,
@@ -483,8 +473,7 @@ img {
 }
 
 .home-title,
-.product-title,
-.company-title {
+.product-title {
   margin: 0;
   color: var(--color-graphite);
   font-size: var(--text-display);
@@ -498,14 +487,12 @@ img {
   max-inline-size: 11ch;
 }
 
-.product-title,
-.company-title {
+.product-title {
   max-inline-size: 12ch;
 }
 
 .home-lede,
-.product-lede,
-.company-lede {
+.product-lede {
   margin: 0;
   color: var(--color-carbon);
   font-size: var(--text-lead);
@@ -517,14 +504,12 @@ img {
   max-inline-size: 62ch;
 }
 
-.product-lede,
-.company-lede {
+.product-lede {
   max-inline-size: 66ch;
 }
 
 .home-actions,
-.product-actions,
-.company-actions {
+.product-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
@@ -590,8 +575,7 @@ img {
 .section-heading p,
 .work-mode-grid p,
 .approval-preview p,
-.company-status-card p,
-.company-fit-grid p {
+.company-status-card p {
   margin: 0;
 }
 
@@ -665,8 +649,7 @@ img {
 .section-heading p,
 .work-mode-grid p,
 .approval-preview p,
-.company-status-card p,
-.company-fit-grid p {
+.company-status-card p {
   color: var(--color-carbon);
   line-height: 1.6;
   text-wrap: pretty;
@@ -677,8 +660,7 @@ img {
 .platform-section,
 .security-cta,
 .closing-cta,
-.product-hero ~ section,
-.company-hero ~ section {
+.product-hero ~ section {
   margin-block-start: clamp(var(--space-16), 10vw, var(--space-24));
 }
 
@@ -979,31 +961,6 @@ img {
   font-size: clamp(1.75rem, 4vw, 3rem);
 }
 
-.company-status-list {
-  margin-block-start: var(--space-8);
-}
-
-.company-status-list .preview-row {
-  grid-template-columns: minmax(200px, 0.35fr) minmax(0, 0.65fr);
-}
-
-.company-status-list .preview-row h3 {
-  margin: 0;
-  font-size: var(--text-lead);
-}
-
-.company-fit-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-4);
-  margin-block-start: var(--space-8);
-}
-
-.company-fit-grid article {
-  border-block-start: 1px solid var(--color-hairline);
-  padding-block-start: var(--space-4);
-}
-
 @media (max-width: 860px) {
   .site-header {
     inline-size: min(100% - 48px, 1240px);
@@ -1022,8 +979,7 @@ img {
   }
 
   .home-page,
-  .product-page,
-  .company-page {
+  .product-page {
     inline-size: min(100% - 48px, 1240px);
     padding-block-start: var(--space-8);
   }
@@ -1035,11 +991,8 @@ img {
   .platform-grid,
   .preview-row,
   .product-hero,
-  .company-hero,
   .work-mode-grid,
-  .admin-section,
-  .company-status-list .preview-row,
-  .company-fit-grid {
+  .admin-section {
     grid-template-columns: 1fr;
   }
 
@@ -1080,10 +1033,6 @@ img {
   }
 
   .access-section {
-    padding: var(--space-6);
-  }
-
-  .company-status-card {
     padding: var(--space-6);
   }
 
