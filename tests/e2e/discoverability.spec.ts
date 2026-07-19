@@ -9,20 +9,17 @@ const legalDraftRoutes = [
     path: "/privacy/",
     title: "Privacy draft | Glaux",
     description: "Draft Glaux privacy route pending legal approval.",
-    canonical: "https://www.glauxagent.com/privacy/",
   },
   {
     path: "/cookies/",
     title: "Cookie policy draft | Glaux",
     description:
       "Draft Glaux cookie and analytics route pending legal approval.",
-    canonical: "https://www.glauxagent.com/cookies/",
   },
   {
     path: "/terms/",
     title: "Terms draft | Glaux",
     description: "Draft Glaux terms route pending legal approval.",
-    canonical: "https://www.glauxagent.com/terms/",
   },
 ] as const;
 
@@ -96,7 +93,7 @@ for (const route of legalDraftRoutes) {
     );
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       "href",
-      route.canonical,
+      `https://www.glauxagent.com${route.path}`,
     );
   });
 }

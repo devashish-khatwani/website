@@ -11,10 +11,7 @@ Astro.response.status = 404;
   noindex
 >
   <div class="route-main">
-    <section
-      class="route-panel not-found-panel"
-      aria-labelledby="not-found-heading"
-    >
+    <section class="route-panel" aria-labelledby="not-found-heading">
       <p class="not-found-panel__label">404</p>
       <div class="not-found-panel__copy">
         <h1 id="not-found-heading">This page isn’t here.</h1>
@@ -29,10 +26,6 @@ Astro.response.status = 404;
 </SiteLayout>
 
 <style>
-  .not-found-panel {
-    align-content: start;
-  }
-
   .not-found-panel__label {
     color: var(--color-concrete);
     font-size: var(--text-label);
