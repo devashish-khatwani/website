@@ -1,0 +1,26 @@
+---
+type ButtonVariant = "primary" | "ghost";
+
+interface Props {
+  href?: string;
+  variant?: ButtonVariant;
+  class?: string;
+}
+
+const { href, variant = "primary", class: className = "" } = Astro.props;
+---
+
+{
+  href ? (
+    <a class:list={["button", `button--${variant}`, className]} href={href}>
+      <slot />
+    </a>
+  ) : (
+    <button
+      type="button"
+      class:list={["button", `button--${variant}`, className]}
+    >
+      <slot />
+    </button>
+  )
+}

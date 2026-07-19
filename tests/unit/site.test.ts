@@ -10,9 +10,13 @@ import {
 } from "../../src/lib/site";
 
 describe("site bootstrap contract", () => {
-  it("keeps the placeholder scoped to W-02 guardrails", () => {
+  it("keeps the placeholder scoped to W-03 guardrails", () => {
     expect(siteStatus.name).toBe("Glaux");
-    expect(siteStatus.title).toContain("bootstrap");
+    expect(siteStatus.title).toContain("design foundation");
+    expect(siteStatus.guardrails).toContain("Glaux-only branding");
+    expect(siteStatus.guardrails).toContain("Verified source assets");
+    expect(siteStatus.guardrails).toContain("Monochrome production palette");
+    expect(siteStatus.guardrails).toContain("44px interactive targets");
     expect(siteStatus.guardrails).toContain("No analytics yet");
     expect(siteStatus.guardrails).toContain("No auth logic");
     expect(siteStatus.guardrails.join(" ")).not.toMatch(/powered by hermes/i);

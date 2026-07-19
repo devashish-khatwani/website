@@ -9,18 +9,57 @@ const expectedRobotsDirective = isProductionPagesBuild
   ? "Allow: /"
   : "Disallow: /";
 
-test("home page exposes the W-02 placeholder contract", async ({ page }) => {
+test("home page exposes the W-03 design foundation contract", async ({
+  page,
+}) => {
   await page.goto("/");
 
   await expect(page).toHaveTitle(/Glaux draft home content/);
-  await expect(page.getByRole("link", { name: "Glaux home" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Glaux home" }).locator("img"),
+  ).toHaveAttribute("src", "/brand/glaux-lockup.svg");
   await expect(
     page.getByRole("heading", {
-      name: /Glaux public website bootstrap is ready/i,
+      name: /Glaux design foundation/i,
     }),
   ).toBeVisible();
-  await expect(page.getByText("No analytics yet")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Book a demo" })).toHaveCount(
+    0,
+  );
+  await expect(
+    page.getByRole("link", { name: "View primitives" }),
+  ).toHaveAttribute("href", "#foundation-primitives");
+  await expect(page.getByText("Skill Hub Preview")).toBeVisible();
+  await expect(page.getByText("Enterprise MCP Preview")).toBeVisible();
+  await expect(page.getByText("Observability Preview")).toBeVisible();
+  await expect(
+    page.getByText("Build your own model Coming soon"),
+  ).toBeVisible();
   await expect(page.getByText(/Powered by Hermes Agent/i)).toHaveCount(0);
+});
+
+test("home page proves light and dark Glaux logo usage", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("link", { name: "Glaux home" })).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: "Glaux owl mark reversed" }),
+  ).toHaveAttribute("src", "/brand/glaux-mark-reversed.svg");
+});
+
+test("home page exposes visible keyboard focus and mobile touch targets", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  const primitivesLink = page.getByRole("link", { name: "View primitives" });
+  const box = await primitivesLink.boundingBox();
+  expect(box?.height).toBeGreaterThanOrEqual(44);
+  expect(box?.width).toBeGreaterThanOrEqual(44);
+
+  await page.keyboard.press("Tab");
+  await expect(page.locator(":focus-visible")).toBeVisible();
 });
 
 test("home page exposes canonical and base Open Graph metadata", async ({

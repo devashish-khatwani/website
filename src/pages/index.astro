@@ -1,6 +1,11 @@
 ---
 import "../styles/global.css";
 import { getEntry } from "astro:content";
+import Badge from "../components/Badge.astro";
+import BrandLogo from "../components/BrandLogo.astro";
+import Button from "../components/Button.astro";
+import Surface from "../components/Surface.astro";
+import { brandAssets, previewBadges } from "../lib/design-system";
 import { buildPageHeadMetadata, siteStatus } from "../lib/site";
 
 const homeEntry = await getEntry("pages", "home");
@@ -34,59 +39,73 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     <title>{pageHead.title}</title>
   </head>
   <body>
-    <main
-      class="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-6 py-8 sm:px-8 lg:px-10"
-    >
-      <header
-        class="flex items-center justify-between border-b border-[var(--glaux-hairline)] pb-5"
-      >
-        <a href="/" aria-label="Glaux home" class="text-base font-semibold">
-          {siteStatus.name}
+    <div class="page-shell">
+      <header class="site-header">
+        <a href="/" aria-label="Glaux home" class="brand-home">
+          <BrandLogo priority alt="" />
         </a>
-        <span
-          class="rounded-[26px] bg-[var(--glaux-mist)] px-3 py-1 text-xs font-medium text-[var(--glaux-carbon)]"
-        >
-          {siteStatus.statusLabel}
-        </span>
+        <div class="site-header__actions">
+          <Badge>{siteStatus.statusLabel}</Badge>
+        </div>
       </header>
 
-      <section class="flex flex-1 flex-col justify-center gap-8 py-16 sm:py-24">
-        <div class="max-w-3xl">
-          <p class="mb-4 text-sm text-[var(--glaux-concrete)]">
-            Static Astro foundation for Cloudflare Pages
-          </p>
-          <h1
-            class="text-balance text-4xl font-semibold leading-[1.1] tracking-normal sm:text-5xl"
-          >
-            Glaux public website bootstrap is ready for the launch surface.
-          </h1>
-          <p
-            class="mt-5 max-w-[68ch] text-base leading-7 text-[var(--glaux-carbon)]"
-          >
-            This placeholder verifies the build, TypeScript, Tailwind, linting,
-            formatting, unit test, and Playwright smoke-test contract before
-            real marketing pages are implemented.
-          </p>
+      <main class="foundation-main">
+        <section class="foundation-hero" aria-labelledby="foundation-heading">
+          <div class="foundation-copy">
+            <p class="foundation-kicker">
+              Static Astro foundation for the public website
+            </p>
+            <h1 id="foundation-heading" class="foundation-title">
+              Glaux design foundation.
+            </h1>
+            <p class="foundation-description">
+              This proof surface validates the Glaux-only brand assets,
+              monochrome tokens, focus states, touch targets, and launch
+              maturity labels before the launch pages are composed.
+            </p>
+            <div class="foundation-actions" aria-label="Foundation actions">
+              <Button href="#foundation-primitives" variant="ghost">
+                View primitives
+              </Button>
+            </div>
+          </div>
+
+          <Surface tone="inverted" class="asset-proof">
+            <div class="asset-proof__mark">
+              <BrandLogo variant="reversedMark" />
+            </div>
+            <p class="asset-proof__note">
+              Reversed mark for Graphite and Carbon surfaces. Source geometry is
+              preserved from the verified asset; the SVG embeds raster PNG data
+              and is not a native vector redraw.
+            </p>
+          </Surface>
+        </section>
+
+        <div id="foundation-primitives" class="primitive-row">
+          {previewBadges.map((badge) => <Badge>{badge.label}</Badge>)}
         </div>
 
         <section
-          aria-labelledby="guardrails-heading"
-          class="border border-[var(--glaux-hairline)] p-5"
+          class="surface-grid"
+          aria-label="Website design foundation primitives"
         >
-          <h2 id="guardrails-heading" class="text-lg font-semibold">
-            Bootstrap guardrails
-          </h2>
-          <ul class="mt-4 grid gap-3 sm:grid-cols-2">
-            {
-              siteStatus.guardrails.map((guardrail) => (
-                <li class="border border-[var(--glaux-hairline)] bg-[var(--glaux-chalk)] px-4 py-3 text-sm text-[var(--glaux-carbon)]">
-                  {guardrail}
-                </li>
-              ))
-            }
-          </ul>
+          <Surface>
+            <strong>Light logo</strong>
+            <p>
+              Lockup uses {brandAssets.lockup.src} at 120px wide or larger.
+            </p>
+          </Surface>
+          <Surface tone="mist">
+            <strong>Palette</strong>
+            <p>Graphite, Carbon, Concrete, Hairline, Mist, and Chalk only.</p>
+          </Surface>
+          <Surface tone="inverted">
+            <strong>Dark logo</strong>
+            <p>Reversed mark is reserved for Graphite and Carbon surfaces.</p>
+          </Surface>
         </section>
-      </section>
-    </main>
+      </main>
+    </div>
   </body>
 </html>

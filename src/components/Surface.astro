@@ -1,0 +1,14 @@
+---
+type SurfaceTone = "plain" | "mist" | "inverted";
+
+interface Props {
+  tone?: SurfaceTone;
+  class?: string;
+}
+
+const { tone = "plain", class: className = "" } = Astro.props;
+---
+
+<div class:list={["surface", `surface--${tone}`, className]}>
+  <slot />
+</div>

@@ -14,11 +14,15 @@ type PageMetadataForHead = Pick<
 
 export const siteStatus = {
   name: "Glaux",
-  title: "Glaux website bootstrap",
+  title: "Glaux design foundation",
   description:
-    "A static-first placeholder proving the Glaux public website toolchain.",
-  statusLabel: "Website foundation",
+    "A static-first proof of the Glaux public website brand assets and design primitives.",
+  statusLabel: "Design foundation",
   guardrails: [
+    "Glaux-only branding",
+    "Verified source assets",
+    "Monochrome production palette",
+    "44px interactive targets",
     "No analytics yet",
     "No auth logic",
     "No form backend",
