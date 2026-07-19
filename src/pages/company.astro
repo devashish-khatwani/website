@@ -1,11 +1,142 @@
 ---
-import RouteStub from "../components/RouteStub.astro";
+import { getEntry } from "astro:content";
+import Button from "../components/Button.astro";
+import SiteLayout from "../components/SiteLayout.astro";
+import { buildPageHeadMetadata } from "../lib/site";
+
+const companyEntry = await getEntry("pages", "company");
+
+if (!companyEntry) {
+  throw new Error("Missing company page metadata entry.");
+}
+
+const pageHead = buildPageHeadMetadata(companyEntry.data);
+
+const statusItems = [
+  {
+    title: "Design-partner stage",
+    body: "Glaux is focused on design-partner and architecture-review conversations with teams working through real deployment and governance needs.",
+  },
+  {
+    title: "Focused access",
+    body: "Glaux is not currently offered through self-serve signup or as a generally available product.",
+  },
+  {
+    title: "Verified information",
+    body: "Customer proof and company facts are shared only when they are approved for publication.",
+  },
+] as const;
+
+const partnerFit = [
+  "Teams evaluating whether an AI assistant can work with approved company knowledge and tools.",
+  "Security and governance reviewers who need access controls, approvals, and activity history before broader rollout.",
+  "Deployment owners who need everyday AI work to stay understandable to users and manageable for administrators.",
+] as const;
 ---
 
-<RouteStub
-  title="Company shell | Glaux"
-  description="Draft Glaux company route shell awaiting launch-page content."
-  canonicalPath="/company/"
-  heading="Company"
-  body="This route is ready for the company page. Mission and contact copy will stay factual and avoid invented team narrative in the later company-page task."
-/>
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  noindex
+  og={pageHead.og}
+>
+  <div class="company-page">
+    <section class="company-hero" aria-labelledby="company-heading">
+      <div class="company-hero__copy">
+        <p class="plain-label">Company</p>
+        <h1 id="company-heading" class="company-title">
+          Building useful AI work with visible control.
+        </h1>
+        <p class="company-lede">
+          Glaux is an AI assistant for work. It helps teams research, create,
+          automate, and complete work with approved company knowledge and tools
+          while administrators decide what can be accessed or approved.
+        </p>
+        <div class="company-actions" aria-label="Company page actions">
+          <Button href="/contact/" variant="primary">Book a demo</Button>
+          <Button href="/product/" variant="ghost">Explore the product</Button>
+        </div>
+      </div>
+
+      <aside class="surface company-status-card" aria-label="Company status">
+        <span class="badge">Design-partner stage</span>
+        <h2>Current stage</h2>
+        <p>
+          Glaux is focused on design-partner and architecture-review
+          conversations. It is not currently offered through self-serve signup
+          or as a generally available product.
+        </p>
+      </aside>
+    </section>
+
+    <section class="company-mission" aria-labelledby="company-mission-heading">
+      <div class="section-heading">
+        <p class="plain-label">Mission</p>
+        <h2 id="company-mission-heading">
+          Make AI useful without moving control out of the organization.
+        </h2>
+        <p>
+          The company direction is to put knowledge, tools, approvals, and
+          administrative controls into the same path as the work. People should
+          be able to ask for useful help, and organizations should be able to
+          see and decide what that help can access or do.
+        </p>
+      </div>
+    </section>
+
+    <section class="company-status" aria-labelledby="company-status-heading">
+      <div class="section-heading section-heading--compact">
+        <p class="plain-label">Status</p>
+        <h2 id="company-status-heading">Where Glaux is today.</h2>
+        <p>
+          The current stage is centered on focused conversations with teams that
+          need useful AI work and clear organizational control.
+        </p>
+      </div>
+      <div class="company-status-list">
+        {
+          statusItems.map((item) => (
+            <article class="preview-row">
+              <h3>{item.title}</h3>
+              <div>
+                <p>{item.body}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="company-fit" aria-labelledby="company-fit-heading">
+      <div class="section-heading">
+        <p class="plain-label">Who should talk to us</p>
+        <h2 id="company-fit-heading">
+          Design-partner conversations are for teams with real governance needs.
+        </h2>
+      </div>
+      <div class="company-fit-grid">
+        {
+          partnerFit.map((item) => (
+            <article>
+              <p>{item}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="closing-cta" aria-labelledby="company-contact-heading">
+      <h2 id="company-contact-heading">
+        Tell us what you want AI to help your team accomplish.
+      </h2>
+      <p>
+        Share the work you want to support, the company knowledge or tools
+        involved, and the governance needs shaping your evaluation.
+      </p>
+      <Button href="/contact/" variant="primary"
+        >Tell us about your needs</Button
+      >
+    </section>
+  </div>
+</SiteLayout>
