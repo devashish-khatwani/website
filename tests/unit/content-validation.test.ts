@@ -35,6 +35,29 @@ const approvedClaim = {
   },
 };
 
+const draftPlatformClaims = [
+  {
+    id: "claim-observability-preview",
+    title: "Observability preview",
+    statement:
+      "See how agents perform, where they struggle, and where controls intervene.",
+    classification: "preview",
+    publicationState: "draft",
+    evidence: [{ label: "Website PRD section 9.1", source: "PRD" }],
+    review: { status: "draft" },
+  },
+  {
+    id: "claim-model-studio-coming-soon",
+    title: "Model Studio coming soon",
+    statement:
+      "Turn carefully selected enterprise experience into a specialized model the enterprise owns and controls.",
+    classification: "coming-soon",
+    publicationState: "draft",
+    evidence: [{ label: "Website PRD section 9.4", source: "PRD" }],
+    review: { status: "draft" },
+  },
+];
+
 describe("content release validation", () => {
   it("rejects claim registry entries with an unknown evidence class", () => {
     const result = validateContentForRelease({
@@ -199,6 +222,35 @@ describe("content release validation", () => {
     const result = validateContentForRelease({
       claims: [approvedClaim],
       pages: [approvedLaunchPage],
+    });
+
+    expect(result).toEqual({ valid: true, issues: [] });
+  });
+
+  it("allows a draft homepage to reference draft platform claims without publishing them", () => {
+    const result = validateContentForRelease({
+      claims: draftPlatformClaims,
+      pages: [
+        {
+          title: "Glaux | AI your whole team can work with",
+          description:
+            "Glaux helps teams research, create, and automate with approved company knowledge and tools while keeping governance visible.",
+          canonicalPath: "/",
+          og: {
+            title: "Glaux | AI your whole team can work with",
+            description:
+              "Glaux helps teams research, create, and automate with approved company knowledge and tools while keeping governance visible.",
+            imageAlt: "Monochrome Glaux homepage product preview.",
+          },
+          launchState: "draft",
+          publicationState: "draft",
+          claimReviewStatus: "draft",
+          claimReferences: [
+            "claim-observability-preview",
+            "claim-model-studio-coming-soon",
+          ],
+        },
+      ],
     });
 
     expect(result).toEqual({ valid: true, issues: [] });

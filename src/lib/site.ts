@@ -6,7 +6,7 @@ const defaultCanonicalSiteOrigin = "https://www.glauxagent.com";
 const defaultAppOrigin = "https://app.glauxagent.com";
 const productionBranch = "main";
 
-export const publishedRoutes = ["/"] as const;
+export const publishedRoutes = [] as const;
 
 export const primaryNavigation = [
   { label: "Product", href: "/product/" },

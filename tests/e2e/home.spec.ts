@@ -27,23 +27,125 @@ async function expectVisibleFocusOutline(locator: Locator) {
   expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
 }
 
-test("home page exposes the W-03 design foundation contract", async ({
+test("home page renders the W-06 homepage promise and product preview", async ({
   page,
 }) => {
   await page.goto("/");
 
-  await expect(page).toHaveTitle(/Glaux draft home content/);
+  await expect(page).toHaveTitle(/AI your whole team can work with/);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex, nofollow",
+  );
   await expect(
     page.getByRole("link", { name: "Glaux home" }).locator("img"),
   ).toHaveAttribute("src", "/brand/glaux-lockup.svg");
   await expect(
     page.getByRole("heading", {
-      name: /Glaux design foundation/i,
+      name: "AI your whole team can work with.",
     }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      /research, create, and automate with company knowledge and tools/i,
+    ),
   ).toBeVisible();
   await expect(
     page.getByRole("banner").getByRole("link", { name: "Book a demo" }),
   ).toHaveAttribute("href", "/contact/");
+  await expect(
+    page.getByRole("main").getByRole("link", { name: "Explore the product" }),
+  ).toHaveAttribute("href", "/product/");
+  await expect(
+    page.getByLabel("Illustrative product view").getByText("Team lead"),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Renewal-risk brief", { exact: true }),
+  ).toBeVisible();
+});
+
+test("home page uses plain-language benefits and governance outcomes", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  for (const label of [
+    "Work with your knowledge",
+    "Take useful action",
+    "Stay in control",
+    "Research",
+    "Automation",
+    "Administration",
+  ]) {
+    await expect(page.getByRole("heading", { name: label })).toBeVisible();
+  }
+
+  await expect(
+    page.getByRole("heading", {
+      name: "Set the rules once. Glaux carries them into the work.",
+    }),
+  ).toBeVisible();
+  for (const outcome of [
+    "Continue",
+    "Ask for approval",
+    "Stop safely",
+    "Explain why",
+  ]) {
+    await expect(page.getByRole("heading", { name: outcome })).toBeVisible();
+  }
+  await expect(page.getByText(/flowchart/i)).toHaveCount(0);
+  await expect(page.locator("svg")).toHaveCount(0);
+});
+
+test("home page renders only approved draft platform labels and statements", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await expect(
+    page.getByRole("heading", { name: "Observability" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "See how agents perform, where they struggle, and where controls intervene.",
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Enterprise SkillHub" }),
+  ).toBeVisible();
+  await expect(page.getByText("Share trusted ways of working.")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Enterprise connections" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Connect the tools your company depends on."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Model Studio" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Turn carefully selected enterprise experience into a specialized model the enterprise owns and controls.",
+    ),
+  ).toBeVisible();
+  await expect(page.locator(".platform-card .badge")).toHaveText([
+    "Preview",
+    "Preview",
+    "Preview",
+    "Coming soon",
+  ]);
+  await expect(
+    page.getByText(
+      /Laminar|Inkling|Tinker|Powered by Hermes|Hermes Agent|draft claim registry|certification claims|governed Hermes Agent/u,
+    ),
+  ).toHaveCount(0);
+});
+
+test("home page preserves shell navigation, legal links, and focus behavior", async ({
+  page,
+}) => {
+  await page.goto("/");
+
   await expect(
     page.getByRole("navigation", { name: "Primary" }).getByRole("link"),
   ).toHaveText(["Product", "Security", "Company", "Sign in", "Book a demo"]);
@@ -56,59 +158,12 @@ test("home page exposes the W-03 design foundation contract", async ({
     page.getByRole("link", { name: "Sign in" }).first(),
   ).toHaveAttribute("href", "https://app.glauxagent.com/login");
   await expect(
-    page.getByRole("link", { name: "View primitives" }),
-  ).toHaveAttribute("href", "#foundation-primitives");
-  await expect(
     page.getByRole("contentinfo").getByRole("navigation", { name: "Legal" }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Privacy" })).toHaveAttribute(
     "href",
     "/privacy/",
   );
-  await expect(
-    page.getByRole("link", { name: "Cookie policy" }),
-  ).toHaveAttribute("href", "/cookies/");
-  await expect(page.getByRole("link", { name: "Terms" })).toHaveAttribute(
-    "href",
-    "/terms/",
-  );
-  await expect(page.locator("#foundation-primitives .badge")).toHaveCount(0);
-  await expect(page.getByText(/Powered by Hermes Agent/i)).toHaveCount(0);
-  await expect(page.getByText(/upstream runtime branding/i)).toHaveCount(0);
-});
-
-test("home page proves light and dark Glaux logo usage", async ({ page }) => {
-  await page.goto("/");
-
-  await expect(page.getByRole("link", { name: "Glaux home" })).toBeVisible();
-  await expect(
-    page.getByRole("img", { name: "Glaux owl mark reversed" }),
-  ).toHaveAttribute("src", "/brand/glaux-mark-reversed.svg");
-});
-
-test("home page exposes visible keyboard focus and mobile touch targets", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-
-  const menu = page.getByText("Menu");
-  const box = await menu.boundingBox();
-  expect(box?.height).toBeGreaterThanOrEqual(44);
-  expect(box?.width).toBeGreaterThanOrEqual(44);
-
-  await page.keyboard.press("Tab");
-  await expect(
-    page.getByRole("link", { name: "Skip to main content" }),
-  ).toBeVisible();
-  await page.keyboard.press("Enter");
-  await expect(page.locator("#main-content")).toBeFocused();
-});
-
-test("header and footer calls to action expose visible keyboard focus", async ({
-  page,
-}) => {
-  await page.goto("/");
 
   const primaryNavigation = page.getByRole("navigation", { name: "Primary" });
   await primaryNavigation.getByRole("link", { name: "Sign in" }).focus();
@@ -123,11 +178,12 @@ test("header and footer calls to action expose visible keyboard focus", async ({
     .getByRole("link", { name: "Book a demo" })
     .focus();
   await page.keyboard.press("Tab");
-  const privacyLink = footer.getByRole("link", { name: "Privacy" });
-  await expectVisibleFocusOutline(privacyLink);
+  await expectVisibleFocusOutline(
+    footer.getByRole("link", { name: "Privacy" }),
+  );
 });
 
-test("mobile menu exposes the approved navigation without horizontal overflow", async ({
+test("mobile home page exposes navigation without horizontal overflow", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -139,8 +195,13 @@ test("mobile menu exposes the approved navigation without horizontal overflow", 
   });
   await page.goto("/");
 
+  const menu = page.getByText("Menu");
+  const box = await menu.boundingBox();
+  expect(box?.height).toBeGreaterThanOrEqual(44);
+  expect(box?.width).toBeGreaterThanOrEqual(44);
+
   await expect(page.getByRole("navigation", { name: "Primary" })).toBeHidden();
-  await page.getByText("Menu").click();
+  await menu.click();
   const mobileNav = page.getByRole("navigation", { name: "Mobile primary" });
   await expect(
     mobileNav.getByRole("link", { name: "Product" }),
@@ -165,7 +226,9 @@ test("mobile menu exposes the approved navigation without horizontal overflow", 
   expect(consoleErrors).toEqual([]);
 });
 
-test("navigation targets render honest route shells", async ({ page }) => {
+test("navigation targets render honest noindexed route shells", async ({
+  page,
+}) => {
   for (const [path, heading] of [
     ["/product/", "Product"],
     ["/security/", "Security"],
@@ -187,7 +250,7 @@ test("navigation targets render honest route shells", async ({ page }) => {
   }
 });
 
-test("home page exposes canonical and base Open Graph metadata", async ({
+test("home page exposes canonical and draft Open Graph metadata", async ({
   page,
 }) => {
   await page.goto("/");
@@ -202,11 +265,11 @@ test("home page exposes canonical and base Open Graph metadata", async ({
   );
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
     "content",
-    "Glaux draft home content",
+    "Glaux | AI your whole team can work with",
   );
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
     "content",
-    /Draft home metadata/u,
+    /keeping governance visible/u,
   );
   await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
     "content",
@@ -216,7 +279,7 @@ test("home page exposes canonical and base Open Graph metadata", async ({
   await expect(page.locator('meta[property="og:image:alt"]')).toHaveCount(0);
 });
 
-test("robots and sitemap expose the current published route set", async ({
+test("robots and sitemap keep the draft homepage out of published routes", async ({
   request,
 }) => {
   const robots = await request.get("/robots.txt");
@@ -241,7 +304,7 @@ test("robots and sitemap expose the current published route set", async ({
   expect(sitemapText).toContain(
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
   );
-  expect(sitemapText).toContain(`<loc>${canonicalUrl}</loc>`);
+  expect(sitemapText).not.toContain(`<loc>${canonicalUrl}</loc>`);
   expect(sitemapText).not.toContain(
     "<loc>https://www.glauxagent.com/product/</loc>",
   );

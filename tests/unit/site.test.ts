@@ -54,15 +54,15 @@ describe("site shell navigation contract", () => {
 
 describe("site discoverability metadata", () => {
   const description =
-    "Draft home metadata used to validate the Glaux website content model before launch pages are published.";
+    "Glaux helps teams research, create, and automate with approved company knowledge and tools while keeping governance visible.";
   const homeMetadata = {
-    title: "Glaux draft home content",
+    title: "Glaux | AI your whole team can work with",
     description,
     canonicalPath: "/",
     og: {
-      title: "Glaux draft home content",
+      title: "Glaux | AI your whole team can work with",
       description,
-      imageAlt: "Monochrome Glaux draft home social preview.",
+      imageAlt: "Monochrome Glaux homepage product preview.",
     },
   };
 
@@ -90,11 +90,11 @@ describe("site discoverability metadata", () => {
   it("builds page canonical and Open Graph metadata from W-04 page data", () => {
     const pageHead = buildPageHeadMetadata(homeMetadata);
 
-    expect(pageHead.title).toBe("Glaux draft home content");
+    expect(pageHead.title).toBe("Glaux | AI your whole team can work with");
     expect(pageHead.description).toBe(description);
     expect(pageHead.canonicalUrl).toBe("https://www.glauxagent.com/");
     expect(pageHead.og).toMatchObject({
-      title: "Glaux draft home content",
+      title: "Glaux | AI your whole team can work with",
       description,
       url: "https://www.glauxagent.com/",
       type: "website",
@@ -131,7 +131,7 @@ describe("site discoverability metadata", () => {
   });
 
   it("allows crawling only for an explicit Cloudflare Pages production build", () => {
-    expect(publishedRoutes).toEqual(["/"]);
+    expect(publishedRoutes).toEqual([]);
     expect(isSearchIndexingAllowed({})).toBe(false);
     expect(
       isSearchIndexingAllowed({
@@ -153,8 +153,6 @@ describe("site discoverability metadata", () => {
         CF_PAGES_BRANCH: "main",
       }),
     ).toContain("Allow: /");
-    expect(buildSitemapXml()).toContain(
-      "<loc>https://www.glauxagent.com/</loc>",
-    );
+    expect(buildSitemapXml()).not.toContain("<loc>");
   });
 });

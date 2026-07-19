@@ -1,10 +1,7 @@
 ---
 import { getEntry } from "astro:content";
-import BrandLogo from "../components/BrandLogo.astro";
 import Button from "../components/Button.astro";
 import SiteLayout from "../components/SiteLayout.astro";
-import Surface from "../components/Surface.astro";
-import { brandAssets } from "../lib/design-system";
 import { buildPageHeadMetadata } from "../lib/site";
 
 const homeEntry = await getEntry("pages", "home");
@@ -14,64 +11,254 @@ if (!homeEntry) {
 }
 
 const pageHead = buildPageHeadMetadata(homeEntry.data);
+
+const claimIds = [
+  "observability-preview",
+  "skillhub-preview",
+  "enterprise-mcp-preview",
+  "model-studio-coming-soon",
+] as const;
+
+const claimEntries = await Promise.all(
+  claimIds.map(async (id) => {
+    const entry = await getEntry("claims", id);
+
+    if (!entry) {
+      throw new Error(`Missing homepage platform claim: ${id}.`);
+    }
+
+    return entry;
+  }),
+);
+
+const availabilityLabelByClass = {
+  preview: "Preview",
+  "coming-soon": "Coming soon",
+} as const;
+
+const platformCards = claimEntries.map((entry) => {
+  const classification = entry.data.classification;
+
+  if (classification !== "preview" && classification !== "coming-soon") {
+    throw new Error(
+      `Homepage platform claim ${entry.data.id} must use Preview or Coming soon.`,
+    );
+  }
+
+  return {
+    id: entry.data.id,
+    title: entry.data.title
+      .replace("Enterprise SkillHub preview", "Enterprise SkillHub")
+      .replace(
+        "Prebuilt enterprise connections preview",
+        "Enterprise connections",
+      )
+      .replace("Model Studio coming soon", "Model Studio")
+      .replace("Observability preview", "Observability"),
+    statement: entry.data.statement,
+    label: availabilityLabelByClass[classification],
+  };
+});
+
+const benefits = [
+  {
+    title: "Work with your knowledge",
+    body: "Ask questions across approved company context instead of starting from a blank prompt.",
+  },
+  {
+    title: "Take useful action",
+    body: "Research, write, browse, and create work with the tools your team has approved.",
+  },
+  {
+    title: "Stay in control",
+    body: "Set access rules, approval points, and safe stops before work reaches sensitive systems.",
+  },
+] as const;
+
+const previews = [
+  {
+    title: "Research",
+    body: "Turn a messy question into sourced notes, next steps, and a clear handoff.",
+    label: "Employee view",
+  },
+  {
+    title: "Automation",
+    body: "Let repeated work run with the same approvals and boundaries as one-off requests.",
+    label: "Team workflow",
+  },
+  {
+    title: "Administration",
+    body: "Give owners one place to review access, requests, and recent decisions.",
+    label: "Control view",
+  },
+] as const;
+
+const governanceOutcomes = [
+  {
+    title: "Continue",
+    body: "The request fits the rules, so the work moves ahead.",
+  },
+  {
+    title: "Ask for approval",
+    body: "The work may be allowed, but the right person needs to approve it first.",
+  },
+  {
+    title: "Stop safely",
+    body: "The request crosses a boundary, so Glaux blocks it before action is taken.",
+  },
+  {
+    title: "Explain why",
+    body: "People see a plain-language reason and the next useful step.",
+  },
+] as const;
 ---
 
 <SiteLayout
   title={pageHead.title}
   description={pageHead.description}
   canonicalUrl={pageHead.canonicalUrl}
+  noindex
   og={pageHead.og}
 >
-  <div class="foundation-main">
-    <section class="foundation-hero" aria-labelledby="foundation-heading">
-      <div class="foundation-copy">
-        <p class="foundation-kicker">
-          Static Astro foundation for the public website
-        </p>
-        <h1 id="foundation-heading" class="foundation-title">
-          Glaux design foundation.
+  <div class="home-page">
+    <section class="home-hero" aria-labelledby="home-heading">
+      <div class="home-hero__copy">
+        <p class="home-kicker">For teams bringing AI into daily work</p>
+        <h1 id="home-heading" class="home-title">
+          AI your whole team can work with.
         </h1>
-        <p class="foundation-description">
-          This proof surface validates the Glaux-only brand assets, monochrome
-          tokens, focus states, and touch targets before the launch pages are
-          composed.
+        <p class="home-lede">
+          Glaux helps teams research, create, and automate with company
+          knowledge and tools while keeping the rules visible.
         </p>
-        <div class="foundation-actions" aria-label="Foundation actions">
-          <Button href="#foundation-primitives" variant="ghost">
-            View primitives
-          </Button>
+        <div class="home-actions" aria-label="Primary home actions">
+          <Button href="/contact/" variant="primary">Book a demo</Button>
+          <Button href="/product/" variant="ghost">Explore the product</Button>
         </div>
       </div>
 
-      <Surface tone="inverted" class="asset-proof">
-        <div class="asset-proof__mark">
-          <BrandLogo variant="reversedMark" priority />
+      <div class="work-preview" aria-label="Illustrative product view">
+        <div class="work-preview__bar">
+          <span>Research request</span>
+          <span>Completed</span>
         </div>
-        <p class="asset-proof__note">
-          Reversed mark for Graphite and Carbon surfaces. Source geometry is
-          preserved from the verified asset; the SVG embeds raster PNG data and
-          is not a native vector redraw.
-        </p>
-      </Surface>
+        <div class="conversation">
+          <p class="conversation__speaker">Team lead</p>
+          <p>
+            Summarize the renewal risks from the approved account notes and
+            draft the follow-up.
+          </p>
+        </div>
+        <div class="conversation conversation--agent">
+          <p class="conversation__speaker">Glaux</p>
+          <p>
+            I found three risks, prepared a short brief, and drafted the
+            follow-up. Sending externally needs approval.
+          </p>
+        </div>
+        <div class="completed-work">
+          <span>Completed work</span>
+          <strong>Renewal-risk brief</strong>
+          <p>Evidence, proposed next steps, and an approval-ready draft.</p>
+        </div>
+      </div>
     </section>
 
-    <section
-      id="foundation-primitives"
-      class="surface-grid"
-      aria-label="Website design foundation primitives"
-    >
-      <Surface>
-        <strong>Light logo</strong>
-        <p>Lockup uses {brandAssets.lockup.src} at 120px wide or larger.</p>
-      </Surface>
-      <Surface tone="mist">
-        <strong>Palette</strong>
-        <p>Graphite, Carbon, Concrete, Hairline, Mist, and Chalk only.</p>
-      </Surface>
-      <Surface tone="inverted">
-        <strong>Dark logo</strong>
-        <p>Reversed mark is reserved for Graphite and Carbon surfaces.</p>
-      </Surface>
+    <section class="benefit-strip" aria-label="Core benefits">
+      {
+        benefits.map((benefit) => (
+          <article>
+            <h2>{benefit.title}</h2>
+            <p>{benefit.body}</p>
+          </article>
+        ))
+      }
+    </section>
+
+    <section class="preview-list" aria-labelledby="preview-heading">
+      <div class="section-heading">
+        <h2 id="preview-heading">Useful work, clear boundaries.</h2>
+        <p>
+          The homepage stays simple: show what people can do, where approval
+          appears, and how administrators keep the work aligned.
+        </p>
+      </div>
+      <div class="preview-list__items">
+        {
+          previews.map((preview) => (
+            <article class="preview-row">
+              <div>
+                <span class="plain-label">{preview.label}</span>
+                <h3>{preview.title}</h3>
+              </div>
+              <p>{preview.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="governance-section" aria-labelledby="governance-heading">
+      <div class="section-heading section-heading--compact">
+        <h2 id="governance-heading">
+          Set the rules once. Glaux carries them into the work.
+        </h2>
+        <p>Just the four outcomes people need to recognize during real work.</p>
+      </div>
+      <div class="governance-grid">
+        {
+          governanceOutcomes.map((outcome) => (
+            <article>
+              <h3>{outcome.title}</h3>
+              <p>{outcome.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="platform-section" aria-labelledby="platform-heading">
+      <div class="section-heading">
+        <h2 id="platform-heading">What comes next for enterprise teams.</h2>
+        <p>
+          These capabilities are shown with their current availability labels.
+        </p>
+      </div>
+      <div class="platform-grid">
+        {
+          platformCards.map((card) => (
+            <article class="platform-card" data-claim-id={card.id}>
+              <div class="platform-card__header">
+                <h3>{card.title}</h3>
+                <span class="badge">{card.label}</span>
+              </div>
+              <p>{card.statement}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="security-cta" aria-labelledby="security-heading">
+      <div>
+        <h2 id="security-heading">
+          Built for teams that need answers and control.
+        </h2>
+        <p>
+          Security details belong one click deeper, with plain explanations and
+          no unsupported promises.
+        </p>
+      </div>
+      <Button href="/security/" variant="ghost">Read security details</Button>
+    </section>
+
+    <section class="closing-cta" aria-labelledby="closing-heading">
+      <h2 id="closing-heading">See Glaux with your team’s work.</h2>
+      <p>
+        Request a walkthrough of the product direction and how Glaux can fit
+        your team’s work.
+      </p>
+      <Button href="/contact/" variant="primary">Book a demo</Button>
     </section>
   </div>
 </SiteLayout>
