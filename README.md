@@ -15,14 +15,11 @@ Tower service. It is static-first and targets Cloudflare Pages with:
 
 ## Current source documents
 
-Until this website repository has a remote, the parent workspace remains the
-source for product requirements and implementation planning:
+The parent Glaux repository remains the durable source for product requirements
+and implementation planning:
 
-- [Website PRD](../docs/website/website-prd.md)
-- [Website implementation plan](../docs/website/implementation-plan.md)
-
-Before remote publication, replace these relative links with durable repository
-URLs or permanent documentation URLs.
+- [Website PRD](https://github.com/devashish-khatwani/Glaux/blob/main/docs/website/website-prd.md)
+- [Website implementation plan](https://github.com/devashish-khatwani/Glaux/blob/main/docs/website/implementation-plan.md)
 
 ## Commands
 
