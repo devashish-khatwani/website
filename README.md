@@ -46,9 +46,9 @@ review. The claim workflow and evidence classes are documented in
 ## Continuous integration and deployment
 
 GitHub Actions runs formatting, lint, type, unit, build, dependency-audit, and
-browser checks for pull requests targeting `main`, pushes to `main`, and merge
-queue groups. CI validates changes but does not deploy them and contains no
-Cloudflare credentials.
+browser checks for pull requests targeting `main` and pushes to `main`. CI
+validates changes but does not deploy them and contains no Cloudflare
+credentials.
 
 Cloudflare Pages deployment is intentionally a separate GitHub App integration.
 An operator must still create and connect the Pages project; this repository

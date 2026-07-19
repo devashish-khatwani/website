@@ -5,7 +5,6 @@ on:
     branches: [main]
   push:
     branches: [main]
-  merge_group:
 
 permissions:
   contents: read
@@ -43,28 +42,13 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Build and development tooling executes in CI, so high advisories anywhere
+      # in the full dependency tree block merge.
       - name: Audit dependencies
         run: npm audit --audit-level=high
-
-  e2e:
-    name: End-to-end tests
-    needs: quality
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Install Chromium and system dependencies
         run: npx playwright install --with-deps chromium
 
       - name: Run end-to-end tests
-        run: npm run test:e2e
+        run: npx playwright test
