@@ -348,29 +348,13 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     );
   }
 
-  checkButton?.addEventListener("click", () => {
-    void checkRequest();
-  });
-
-  form?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    void checkRequest();
-  });
-
-  form?.addEventListener("keydown", (event) => {
-    const target = event.target;
-
-    if (
-      event.key !== "Enter" ||
-      !(target instanceof HTMLInputElement) ||
-      ["button", "checkbox", "radio", "reset", "submit"].includes(target.type)
-    ) {
-      return;
-    }
-
-    event.preventDefault();
-    void checkRequest();
-  });
+  if (form && checkButton) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      void checkRequest();
+    });
+    checkButton.type = "submit";
+  }
 
   retryButton?.addEventListener("click", () => {
     void checkRequest();

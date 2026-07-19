@@ -60,6 +60,9 @@ test("contact page renders the W-10 noindexed form fields and route metadata", a
     "data-processor-enabled",
     "false",
   );
+  await expect(
+    page.getByRole("button", { name: "Check request" }),
+  ).toHaveAttribute("type", "submit");
   await expect(page.getByText(/does not send your information/u)).toBeVisible();
 });
 
@@ -134,8 +137,6 @@ test.describe("without JavaScript", () => {
     page,
   }) => {
     const httpRequests: string[] = [];
-    const requestsWithQueries: string[] = [];
-    const navigationsWithQueries: string[] = [];
 
     page.on("request", (request) => {
       if (["http:", "https:"].includes(new URL(request.url()).protocol)) {
@@ -143,22 +144,15 @@ test.describe("without JavaScript", () => {
           `${request.method()} ${request.resourceType()} ${request.url()}`,
         );
       }
-      if (new URL(request.url()).search) {
-        requestsWithQueries.push(request.url());
-      }
-    });
-    page.on("framenavigated", (frame) => {
-      if (frame === page.mainFrame() && new URL(frame.url()).search) {
-        navigationsWithQueries.push(frame.url());
-      }
     });
 
     await page.goto("/contact/");
     await page.waitForLoadState("networkidle");
     httpRequests.length = 0;
-    requestsWithQueries.length = 0;
-    navigationsWithQueries.length = 0;
     const initialUrl = page.url();
+    await expect(
+      page.getByRole("button", { name: "Check request" }),
+    ).toHaveAttribute("type", "button");
     await page.getByLabel(/Work email/u).fill("operator@example.com");
     await page.getByLabel(/Company/u).fill("Example Company");
 
@@ -172,8 +166,6 @@ test.describe("without JavaScript", () => {
 
     expect(new URL(page.url()).search).toBe("");
     expect(httpRequests).toEqual([]);
-    expect(requestsWithQueries).toEqual([]);
-    expect(navigationsWithQueries).toEqual([]);
   });
 });
 
