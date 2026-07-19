@@ -13,6 +13,3 @@ claimReferences:
   - "claim-skillhub-preview"
   - "claim-enterprise-mcp-preview"
 ---
-
-This draft Markdown entry tracks product page claim references without
-publishing launch claims.

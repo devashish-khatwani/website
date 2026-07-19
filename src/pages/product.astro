@@ -51,50 +51,33 @@ const automationsCapability = {
   label: "Governed workflow",
 } as const;
 
-const capabilityClaimIds = [
-  "skillhub-preview",
-  "enterprise-mcp-preview",
-] as const;
+const previewCapabilitySpecs = [
+  ["skillhub-preview", "Enterprise SkillHub"],
+  ["enterprise-mcp-preview", "Enterprise connections"],
+] as const satisfies ReadonlyArray<readonly [string, string]>;
 
-type CapabilityClaimId = (typeof capabilityClaimIds)[number];
-
-const capabilityTitleByClaimId = {
-  "skillhub-preview": "Enterprise SkillHub",
-  "enterprise-mcp-preview": "Enterprise connections",
-} satisfies Record<CapabilityClaimId, string>;
-
-const capabilityClaimEntries = await Promise.all(
-  capabilityClaimIds.map(async (id) => {
+const previewCapabilities = await Promise.all(
+  previewCapabilitySpecs.map(async ([id, title]) => {
     const entry = await getEntry("claims", id);
 
     if (!entry) {
       throw new Error(`Missing product capability claim: ${id}.`);
     }
 
-    return { id, entry };
+    if (entry.data.classification !== "preview") {
+      throw new Error(
+        `Product capability claim ${entry.data.id} must be Preview.`,
+      );
+    }
+
+    return {
+      claimId: entry.data.id,
+      title,
+      body: entry.data.statement,
+      label: "Preview",
+    };
   }),
 );
-
-const availabilityLabelByClass = {
-  preview: "Preview",
-} as const;
-
-const previewCapabilities = capabilityClaimEntries.map(({ id, entry }) => {
-  const classification = entry.data.classification;
-
-  if (classification !== "preview") {
-    throw new Error(
-      `Product capability claim ${entry.data.id} must be Preview.`,
-    );
-  }
-
-  return {
-    claimId: entry.data.id,
-    title: capabilityTitleByClaimId[id],
-    body: entry.data.statement,
-    label: availabilityLabelByClass[classification],
-  };
-});
 
 const capabilityCards = [
   approvedToolsCapability,
@@ -163,26 +146,29 @@ const recentDecisions = [
         </div>
       </div>
 
-      <div class="product-workspace-preview" aria-label="Product work preview">
-        <div class="preview-toolbar">
+      <div
+        class="work-preview product-workspace-preview"
+        aria-label="Product work preview"
+      >
+        <div class="work-preview__bar preview-toolbar">
           <span>Launch brief</span>
           <span>Desktop and web where available</span>
         </div>
-        <div class="preview-prompt">
+        <div class="conversation preview-prompt">
           <span>Ask Glaux</span>
           <p>
             Compare the top customer requests with the approved roadmap and
             draft the launch brief.
           </p>
         </div>
-        <div class="preview-answer">
+        <div class="conversation conversation--agent preview-answer">
           <p class="conversation__speaker">Glaux</p>
           <p>
             I found the strongest requests, wrote the brief, and marked the
             customer email as approval requested before it can be sent.
           </p>
         </div>
-        <div class="artifact-preview">
+        <div class="completed-work artifact-preview">
           <span>Created artifact</span>
           <strong>Q3 launch brief</strong>
           <p>
@@ -213,8 +199,13 @@ const recentDecisions = [
       </div>
     </section>
 
-    <section class="access-section" aria-labelledby="access-heading">
-      <div class="access-section__copy">
+    <section
+      class="governance-section access-section"
+      aria-labelledby="access-heading"
+    >
+      <div
+        class="section-heading section-heading--compact access-section__copy"
+      >
         <p class="plain-label">Access and approval</p>
         <h2 id="access-heading">Ask without leaving the work.</h2>
         <p>
@@ -223,7 +214,10 @@ const recentDecisions = [
           the user sees what happens next.
         </p>
       </div>
-      <div class="approval-preview" aria-label="Approval request preview">
+      <div
+        class="surface approval-preview"
+        aria-label="Approval request preview"
+      >
         <div>
           <span class="badge">Approval requested</span>
           <h3>Send external customer summary</h3>
@@ -250,11 +244,11 @@ const recentDecisions = [
           tool is open to every person.
         </p>
       </div>
-      <div class="capability-grid">
+      <div class="platform-grid capability-grid">
         {
           capabilityCards.map((capability) => (
             <article
-              class="capability-card"
+              class="platform-card capability-card"
               data-claim-id={
                 "claimId" in capability ? capability.claimId : undefined
               }
@@ -278,8 +272,11 @@ const recentDecisions = [
           work is changing, and where attention is needed.
         </p>
       </div>
-      <div class="admin-scope-list" aria-label="Administrator management scope">
-        {adminScopes.map((scope) => <span>{scope}</span>)}
+      <div
+        class="surface admin-scope-list"
+        aria-label="Administrator management scope"
+      >
+        {adminScopes.map((scope) => <span class="badge">{scope}</span>)}
       </div>
     </section>
 
@@ -291,10 +288,13 @@ const recentDecisions = [
           action.
         </p>
       </div>
-      <div class="decision-list" aria-label="Recent decisions">
+      <div
+        class="preview-list__items decision-list"
+        aria-label="Recent decisions"
+      >
         {
           recentDecisions.map((decision) => (
-            <article class="decision-row">
+            <article class="preview-row decision-row">
               <div>
                 <span class="badge">{decision.label}</span>
                 <h3>{decision.item}</h3>
@@ -306,8 +306,11 @@ const recentDecisions = [
       </div>
     </section>
 
-    <section class="technical-depth" aria-labelledby="technical-depth-heading">
-      <div>
+    <section
+      class="security-cta technical-depth"
+      aria-labelledby="technical-depth-heading"
+    >
+      <div class="section-heading technical-depth__copy">
         <p class="plain-label">For evaluators</p>
         <h2 id="technical-depth-heading">
           Technical detail is available, not the main story.

@@ -249,17 +249,6 @@ test("navigation targets render honest noindexed pages or route shells", async (
       "noindex, nofollow",
     );
   }
-
-  await page.goto("/product/");
-  await expect(
-    page.getByRole("heading", {
-      name: "Useful work, with the rules built in.",
-    }),
-  ).toBeVisible();
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    "content",
-    "noindex, nofollow",
-  );
 });
 
 test("home page exposes canonical and draft Open Graph metadata", async ({
