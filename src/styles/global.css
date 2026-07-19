@@ -922,12 +922,6 @@ img {
   padding-block-start: var(--space-6);
 }
 
-.security-detail__intro {
-  display: grid;
-  gap: var(--space-3);
-  max-inline-size: 66ch;
-}
-
 .security-detail h2,
 .security-detail h3,
 .security-detail p {

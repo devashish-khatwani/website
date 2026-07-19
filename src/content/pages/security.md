@@ -14,6 +14,3 @@ claimReferences:
   - "claim-security-request-integrity"
   - "claim-security-standards-alignment"
 ---
-
-This draft Markdown entry tracks Security page claim references without
-publishing launch claims.

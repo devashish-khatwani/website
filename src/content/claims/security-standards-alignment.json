@@ -10,8 +10,24 @@
       "source": "External alignment publication rule"
     },
     {
-      "label": "Website PRD references",
-      "source": "NIST AI RMF, OWASP Agentic Security Initiative, OWASP MCP Top 10, and OWASP Agentic Skills Top 10"
+      "label": "NIST AI Risk Management Framework",
+      "source": "National Institute of Standards and Technology",
+      "href": "https://www.nist.gov/itl/ai-risk-management-framework"
+    },
+    {
+      "label": "OWASP Agentic Security Initiative",
+      "source": "OWASP GenAI Security Project",
+      "href": "https://genai.owasp.org/initiatives/agentic-security-initiative/"
+    },
+    {
+      "label": "OWASP MCP Top 10",
+      "source": "OWASP Foundation",
+      "href": "https://owasp.org/www-project-mcp-top-10/"
+    },
+    {
+      "label": "OWASP Agentic Skills Top 10",
+      "source": "OWASP Foundation",
+      "href": "https://owasp.org/www-project-agentic-skills-top-10/"
     }
   ],
   "review": {

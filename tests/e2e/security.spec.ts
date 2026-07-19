@@ -1,32 +1,10 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import {
+  expectNoHorizontalOverflow,
+  expectVisibleFocusOutline,
+} from "./assertions";
 
 const canonicalUrl = "https://www.glauxagent.com/security/";
-
-async function expectNoHorizontalOverflow(page: Page) {
-  const hasHorizontalOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > window.innerWidth,
-  );
-
-  expect(hasHorizontalOverflow).toBe(false);
-}
-
-async function expectVisibleFocusOutline(locator: Locator) {
-  await expect(locator).toBeFocused();
-
-  const outline = await locator.evaluate((element) => {
-    const styles = window.getComputedStyle(element);
-
-    return {
-      color: styles.outlineColor,
-      style: styles.outlineStyle,
-      width: styles.outlineWidth,
-    };
-  });
-
-  expect(outline.style).not.toBe("none");
-  expect(Number.parseFloat(outline.width)).toBeGreaterThan(0);
-  expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
-}
 
 test("security page renders W-08 plain-language controls and metadata", async ({
   page,
@@ -222,6 +200,8 @@ test("security page has no horizontal overflow and keeps disclosure keyboard foc
   await expectVisibleFocusOutline(summary);
   await page.keyboard.press("Enter");
   await expect(
-    page.getByRole("heading", { name: "Technical depth stays optional." }),
+    page.getByRole("heading", {
+      name: "Review the controls behind governed work.",
+    }),
   ).toBeVisible();
 });

@@ -61,31 +61,31 @@ const securityClaimSpecs = [
   ["security-standards-alignment", "external-alignment"],
 ] as const;
 
-async function loadSecurityClaim([
-  id,
-  classification,
-]: (typeof securityClaimSpecs)[number]) {
-  const entry = await getEntry("claims", id);
-
-  if (!entry) {
-    throw new Error(`Missing security claim: ${id}.`);
-  }
-
-  if (entry.data.classification !== classification) {
-    throw new Error(
-      `Security claim ${entry.data.id} must be ${classification}.`,
-    );
-  }
-
-  return entry.data;
+function mapTuple<T extends readonly unknown[], U>(
+  values: T,
+  mapper: (value: T[number]) => U,
+): { [K in keyof T]: U } {
+  return values.map(mapper) as { [K in keyof T]: U };
 }
 
 const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
-  await Promise.all([
-    loadSecurityClaim(securityClaimSpecs[0]),
-    loadSecurityClaim(securityClaimSpecs[1]),
-    loadSecurityClaim(securityClaimSpecs[2]),
-  ]);
+  await Promise.all(
+    mapTuple(securityClaimSpecs, async ([id, classification]) => {
+      const entry = await getEntry("claims", id);
+
+      if (!entry) {
+        throw new Error(`Missing security claim: ${id}.`);
+      }
+
+      if (entry.data.classification !== classification) {
+        throw new Error(
+          `Security claim ${entry.data.id} must be ${classification}.`,
+        );
+      }
+
+      return entry.data;
+    }),
+  );
 ---
 
 <SiteLayout
@@ -96,33 +96,24 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
   og={pageHead.og}
 >
   <div class="product-page security-page">
-    <section
-      class="product-hero security-hero"
-      aria-labelledby="security-heading"
-    >
-      <div class="product-hero__copy security-hero__copy">
+    <section class="product-hero" aria-labelledby="security-heading">
+      <div class="product-hero__copy">
         <p class="plain-label">Security</p>
         <h1 id="security-heading" class="product-title security-title">
           You choose what Glaux can access and do.
         </h1>
-        <p class="product-lede security-lede">
+        <p class="product-lede">
           Glaux puts company rules in the path of work. Admins decide which
           people and teams can use which knowledge, tools, models, and sensitive
           actions, and when a person must approve the next step.
         </p>
-        <div
-          class="product-actions security-actions"
-          aria-label="Security page actions"
-        >
+        <div class="product-actions" aria-label="Security page actions">
           <Button href="/contact/" variant="primary">Book a demo</Button>
           <Button href="/product/" variant="ghost">See the product</Button>
         </div>
       </div>
 
-      <div
-        class="work-preview security-check-preview"
-        aria-label="Security control preview"
-      >
+      <div class="work-preview" aria-label="Security control preview">
         <div class="work-preview__bar preview-toolbar">
           <span>External customer summary</span>
           <span>Policy check before action</span>
@@ -135,7 +126,7 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
           <p class="conversation__speaker">Before action</p>
           <p>Rule applied: approval is required before anything is sent.</p>
         </div>
-        <div class="completed-work security-result-preview">
+        <div class="completed-work">
           <span>Afterward</span>
           <strong>Result recorded</strong>
           <p>
@@ -168,7 +159,7 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
     </section>
 
     <section
-      class="governance-section access-section security-request-section"
+      class="governance-section access-section"
       aria-labelledby="requests-heading"
     >
       <div
@@ -208,7 +199,7 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
           to find out whether an action was allowed.
         </p>
       </div>
-      <div class="preview-list__items decision-list security-evidence-list">
+      <div class="preview-list__items decision-list">
         <article class="preview-row decision-row">
           <div>
             <Badge>Before action</Badge>
@@ -232,10 +223,7 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
       </div>
     </section>
 
-    <section
-      class="admin-section security-visibility-section"
-      aria-labelledby="visibility-heading"
-    >
+    <section class="admin-section" aria-labelledby="visibility-heading">
       <div class="section-heading section-heading--compact">
         <h2 id="visibility-heading">
           Activity history supports admin visibility.
@@ -264,10 +252,7 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
       </div>
     </section>
 
-    <section
-      class="governance-section security-data-section"
-      aria-labelledby="data-heading"
-    >
+    <section class="governance-section" aria-labelledby="data-heading">
       <div class="section-heading section-heading--compact">
         <p class="plain-label">Data and deployment diligence</p>
         <h2 id="data-heading">
@@ -279,7 +264,7 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
           skills, automations, approvals, access requests, and activity records.
         </p>
       </div>
-      <div class="surface approval-preview security-data-panel">
+      <div class="surface approval-preview">
         <div>
           <h3>What we confirm during diligence</h3>
           <p>
@@ -303,13 +288,7 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
     <details class="surface security-detail">
       <summary>For security teams</summary>
       <div class="security-detail__body">
-        <div class="security-detail__intro">
-          <h2>Technical depth stays optional.</h2>
-          <p>
-            The main page stays plain. Security reviewers can still inspect the
-            architecture areas that usually matter during diligence.
-          </p>
-        </div>
+        <h2>Review the controls behind governed work.</h2>
         <div class="platform-grid capability-grid security-technical-grid">
           <article class="platform-card">
             <h3>Authentication</h3>
@@ -351,7 +330,7 @@ const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
     </details>
 
     <section
-      class="security-cta technical-depth security-standards"
+      class="security-cta technical-depth"
       aria-labelledby="standards-heading"
       data-claim-id={standardsAlignmentClaim.id}
     >

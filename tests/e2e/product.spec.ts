@@ -1,14 +1,7 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { expectNoHorizontalOverflow } from "./assertions";
 
 const canonicalUrl = "https://www.glauxagent.com/product/";
-
-async function expectNoHorizontalOverflow(page: Page) {
-  const hasHorizontalOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > window.innerWidth,
-  );
-
-  expect(hasHorizontalOverflow).toBe(false);
-}
 
 test("product page renders the W-07 employee and admin story", async ({
   page,

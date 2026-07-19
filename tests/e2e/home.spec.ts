@@ -1,4 +1,5 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { expectVisibleFocusOutline } from "./assertions";
 
 const canonicalUrl = "https://www.glauxagent.com/";
 const isProductionPagesBuild =
@@ -8,24 +9,6 @@ const isProductionPagesBuild =
 const expectedRobotsDirective = isProductionPagesBuild
   ? "Allow: /"
   : "Disallow: /";
-
-async function expectVisibleFocusOutline(locator: Locator) {
-  await expect(locator).toBeFocused();
-
-  const outline = await locator.evaluate((element) => {
-    const styles = window.getComputedStyle(element);
-
-    return {
-      color: styles.outlineColor,
-      style: styles.outlineStyle,
-      width: styles.outlineWidth,
-    };
-  });
-
-  expect(outline.style).not.toBe("none");
-  expect(Number.parseFloat(outline.width)).toBeGreaterThan(0);
-  expect(outline.color).not.toBe("rgba(0, 0, 0, 0)");
-}
 
 test("home page renders the W-06 homepage promise and product preview", async ({
   page,
