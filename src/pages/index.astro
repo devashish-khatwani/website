@@ -1,12 +1,11 @@
 ---
-import "../styles/global.css";
 import { getEntry } from "astro:content";
-import Badge from "../components/Badge.astro";
 import BrandLogo from "../components/BrandLogo.astro";
 import Button from "../components/Button.astro";
+import SiteLayout from "../components/SiteLayout.astro";
 import Surface from "../components/Surface.astro";
 import { brandAssets } from "../lib/design-system";
-import { buildPageHeadMetadata, siteStatus } from "../lib/site";
+import { buildPageHeadMetadata } from "../lib/site";
 
 const homeEntry = await getEntry("pages", "home");
 
@@ -17,92 +16,62 @@ if (!homeEntry) {
 const pageHead = buildPageHeadMetadata(homeEntry.data);
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={pageHead.description} />
-    <link rel="canonical" href={pageHead.canonicalUrl} />
-    <meta property="og:type" content={pageHead.og.type} />
-    <meta property="og:title" content={pageHead.og.title} />
-    <meta property="og:description" content={pageHead.og.description} />
-    <meta property="og:url" content={pageHead.og.url} />
-    {
-      pageHead.og.image && (
-        <>
-          <meta property="og:image" content={pageHead.og.image} />
-          <meta property="og:image:alt" content={pageHead.og.imageAlt} />
-        </>
-      )
-    }
-    <title>{pageHead.title}</title>
-  </head>
-  <body>
-    <div class="page-shell">
-      <header class="site-header">
-        <a href="/" aria-label="Glaux home" class="brand-home">
-          <BrandLogo priority alt="" />
-        </a>
-        <div class="site-header__actions">
-          <Badge>{siteStatus.statusLabel}</Badge>
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  og={pageHead.og}
+>
+  <div class="foundation-main">
+    <section class="foundation-hero" aria-labelledby="foundation-heading">
+      <div class="foundation-copy">
+        <p class="foundation-kicker">
+          Static Astro foundation for the public website
+        </p>
+        <h1 id="foundation-heading" class="foundation-title">
+          Glaux design foundation.
+        </h1>
+        <p class="foundation-description">
+          This proof surface validates the Glaux-only brand assets, monochrome
+          tokens, focus states, and touch targets before the launch pages are
+          composed.
+        </p>
+        <div class="foundation-actions" aria-label="Foundation actions">
+          <Button href="#foundation-primitives" variant="ghost">
+            View primitives
+          </Button>
         </div>
-      </header>
+      </div>
 
-      <main class="foundation-main">
-        <section class="foundation-hero" aria-labelledby="foundation-heading">
-          <div class="foundation-copy">
-            <p class="foundation-kicker">
-              Static Astro foundation for the public website
-            </p>
-            <h1 id="foundation-heading" class="foundation-title">
-              Glaux design foundation.
-            </h1>
-            <p class="foundation-description">
-              This proof surface validates the Glaux-only brand assets,
-              monochrome tokens, focus states, and touch targets before the
-              launch pages are composed.
-            </p>
-            <div class="foundation-actions" aria-label="Foundation actions">
-              <Button href="#foundation-primitives" variant="ghost">
-                View primitives
-              </Button>
-            </div>
-          </div>
+      <Surface tone="inverted" class="asset-proof">
+        <div class="asset-proof__mark">
+          <BrandLogo variant="reversedMark" priority />
+        </div>
+        <p class="asset-proof__note">
+          Reversed mark for Graphite and Carbon surfaces. Source geometry is
+          preserved from the verified asset; the SVG embeds raster PNG data and
+          is not a native vector redraw.
+        </p>
+      </Surface>
+    </section>
 
-          <Surface tone="inverted" class="asset-proof">
-            <div class="asset-proof__mark">
-              <BrandLogo variant="reversedMark" />
-            </div>
-            <p class="asset-proof__note">
-              Reversed mark for Graphite and Carbon surfaces. Source geometry is
-              preserved from the verified asset; the SVG embeds raster PNG data
-              and is not a native vector redraw.
-            </p>
-          </Surface>
-        </section>
-
-        <section
-          id="foundation-primitives"
-          class="surface-grid"
-          aria-label="Website design foundation primitives"
-        >
-          <Surface>
-            <strong>Light logo</strong>
-            <p>
-              Lockup uses {brandAssets.lockup.src} at 120px wide or larger.
-            </p>
-          </Surface>
-          <Surface tone="mist">
-            <strong>Palette</strong>
-            <p>Graphite, Carbon, Concrete, Hairline, Mist, and Chalk only.</p>
-          </Surface>
-          <Surface tone="inverted">
-            <strong>Dark logo</strong>
-            <p>Reversed mark is reserved for Graphite and Carbon surfaces.</p>
-          </Surface>
-        </section>
-      </main>
-    </div>
-  </body>
-</html>
+    <section
+      id="foundation-primitives"
+      class="surface-grid"
+      aria-label="Website design foundation primitives"
+    >
+      <Surface>
+        <strong>Light logo</strong>
+        <p>Lockup uses {brandAssets.lockup.src} at 120px wide or larger.</p>
+      </Surface>
+      <Surface tone="mist">
+        <strong>Palette</strong>
+        <p>Graphite, Carbon, Concrete, Hairline, Mist, and Chalk only.</p>
+      </Surface>
+      <Surface tone="inverted">
+        <strong>Dark logo</strong>
+        <p>Reversed mark is reserved for Graphite and Carbon surfaces.</p>
+      </Surface>
+    </section>
+  </div>
+</SiteLayout>

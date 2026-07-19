@@ -23,17 +23,40 @@ test("home page exposes the W-03 design foundation contract", async ({
       name: /Glaux design foundation/i,
     }),
   ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Book a demo" })).toHaveCount(
-    0,
-  );
+  await expect(
+    page.getByRole("banner").getByRole("link", { name: "Book a demo" }),
+  ).toHaveAttribute("href", "/contact/");
+  await expect(
+    page.getByRole("navigation", { name: "Primary" }).getByRole("link"),
+  ).toHaveText(["Product", "Security", "Company", "Sign in", "Book a demo"]);
+  await expect(
+    page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: "Resources" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Sign in" }).first(),
+  ).toHaveAttribute("href", "https://app.glauxagent.com/login");
   await expect(
     page.getByRole("link", { name: "View primitives" }),
   ).toHaveAttribute("href", "#foundation-primitives");
-  await expect(page.locator(".site-header .badge")).toHaveText(
-    "Design foundation",
+  await expect(
+    page.getByRole("contentinfo").getByRole("navigation", { name: "Legal" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Privacy" })).toHaveAttribute(
+    "href",
+    "/privacy/",
+  );
+  await expect(
+    page.getByRole("link", { name: "Cookie policy" }),
+  ).toHaveAttribute("href", "/cookies/");
+  await expect(page.getByRole("link", { name: "Terms" })).toHaveAttribute(
+    "href",
+    "/terms/",
   );
   await expect(page.locator("#foundation-primitives .badge")).toHaveCount(0);
   await expect(page.getByText(/Powered by Hermes Agent/i)).toHaveCount(0);
+  await expect(page.getByText(/upstream runtime branding/i)).toHaveCount(0);
 });
 
 test("home page proves light and dark Glaux logo usage", async ({ page }) => {
@@ -51,13 +74,90 @@ test("home page exposes visible keyboard focus and mobile touch targets", async 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
 
-  const primitivesLink = page.getByRole("link", { name: "View primitives" });
-  const box = await primitivesLink.boundingBox();
+  const menu = page.getByText("Menu");
+  const box = await menu.boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);
   expect(box?.width).toBeGreaterThanOrEqual(44);
 
   await page.keyboard.press("Tab");
-  await expect(page.locator(":focus-visible")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Skip to main content" }),
+  ).toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#main-content")).toBeFocused();
+});
+
+test("mobile menu exposes the approved navigation without horizontal overflow", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      consoleErrors.push(message.text());
+    }
+  });
+  await page.goto("/");
+
+  await expect(page.getByRole("navigation", { name: "Primary" })).toBeHidden();
+  await page.getByText("Menu").click();
+  const mobileNav = page.getByRole("navigation", { name: "Mobile primary" });
+  await expect(
+    mobileNav.getByRole("link", { name: "Product" }),
+  ).toHaveAttribute("href", "/product/");
+  await expect(
+    mobileNav.getByRole("link", { name: "Security" }),
+  ).toHaveAttribute("href", "/security/");
+  await expect(
+    mobileNav.getByRole("link", { name: "Company" }),
+  ).toHaveAttribute("href", "/company/");
+  await expect(
+    mobileNav.getByRole("link", { name: "Sign in" }),
+  ).toHaveAttribute("href", "https://app.glauxagent.com/login");
+  await expect(
+    mobileNav.getByRole("link", { name: "Book a demo" }),
+  ).toHaveAttribute("href", "/contact/");
+
+  const hasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > window.innerWidth,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+  expect(consoleErrors).toEqual([]);
+});
+
+test("navigation targets render honest route shells", async ({ page }) => {
+  for (const [path, heading] of [
+    ["/product/", "Product"],
+    ["/security/", "Security"],
+    ["/company/", "Company"],
+    ["/contact/", "Book a demo"],
+    ["/privacy/", "Privacy"],
+    ["/cookies/", "Cookie policy"],
+    ["/terms/", "Terms"],
+  ] as const) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+    await expect(
+      page.getByText(/route is intentionally a draft shell|route is ready/u),
+    ).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      "noindex, nofollow",
+    );
+  }
+});
+
+test("configured app origin controls the sign-in handoff", async ({ page }) => {
+  await page.goto("/", {
+    waitUntil: "domcontentloaded",
+  });
+
+  await expect(
+    page.getByRole("link", { name: "Sign in" }).first(),
+  ).toHaveAttribute("href", "https://app.glauxagent.com/login");
+  await expect(
+    page.getByRole("link", { name: "Sign in" }).first(),
+  ).not.toHaveAttribute("href", /\/chat/u);
 });
 
 test("home page exposes canonical and base Open Graph metadata", async ({
@@ -115,4 +215,10 @@ test("robots and sitemap expose the current published route set", async ({
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
   );
   expect(sitemapText).toContain(`<loc>${canonicalUrl}</loc>`);
+  expect(sitemapText).not.toContain(
+    "<loc>https://www.glauxagent.com/product/</loc>",
+  );
+  expect(sitemapText).not.toContain(
+    "<loc>https://www.glauxagent.com/privacy/</loc>",
+  );
 });

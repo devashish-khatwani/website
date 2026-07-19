@@ -1,0 +1,126 @@
+---
+import "../styles/global.css";
+import BrandLogo from "./BrandLogo.astro";
+import Button from "./Button.astro";
+import {
+  buildAppLoginUrl,
+  legalNavigation,
+  primaryNavigation,
+} from "../lib/site";
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  noindex?: boolean;
+  og?: {
+    title: string;
+    description: string;
+    url: string;
+    type: string;
+    image?: string;
+    imageAlt?: string;
+  };
+}
+
+const { title, description, canonicalUrl, noindex = false, og } = Astro.props;
+const signInUrl = buildAppLoginUrl();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {og && <meta property="og:type" content={og.type} />}
+    {og && <meta property="og:title" content={og.title} />}
+    {og && <meta property="og:description" content={og.description} />}
+    {og && <meta property="og:url" content={og.url} />}
+    {
+      og?.image && (
+        <>
+          <meta property="og:image" content={og.image} />
+          <meta property="og:image:alt" content={og.imageAlt} />
+        </>
+      )
+    }
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="page-shell">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+
+      <header class="site-header" data-shell-header>
+        <a href="/" aria-label="Glaux home" class="brand-home">
+          <BrandLogo priority alt="" />
+        </a>
+
+        <nav class="site-nav site-nav--desktop" aria-label="Primary">
+          <div class="site-nav__pages">
+            {
+              primaryNavigation.map((item) => (
+                <a class="site-nav__link" href={item.href}>
+                  {item.label}
+                </a>
+              ))
+            }
+          </div>
+          <div class="site-nav__actions">
+            <a class="site-nav__link site-nav__link--signin" href={signInUrl}>
+              Sign in
+            </a>
+            <Button href="/contact/" variant="primary">Book a demo</Button>
+          </div>
+        </nav>
+
+        <details class="mobile-nav">
+          <summary class="mobile-nav__summary" aria-label="Open navigation">
+            Menu
+          </summary>
+          <nav class="mobile-nav__panel" aria-label="Mobile primary">
+            {
+              primaryNavigation.map((item) => (
+                <a class="site-nav__link" href={item.href}>
+                  {item.label}
+                </a>
+              ))
+            }
+            <a class="site-nav__link" href={signInUrl}>Sign in</a>
+            <Button href="/contact/" variant="primary">Book a demo</Button>
+          </nav>
+        </details>
+      </header>
+
+      <main id="main-content" tabindex="-1">
+        <slot />
+      </main>
+
+      <footer class="site-footer">
+        <div class="site-footer__inner">
+          <div class="site-footer__brand">
+            <BrandLogo alt="Glaux" />
+          </div>
+          <nav class="site-footer__nav" aria-label="Footer">
+            {
+              primaryNavigation.map((item) => (
+                <a href={item.href}>{item.label}</a>
+              ))
+            }
+            <a href={signInUrl}>Sign in</a>
+            <a href="/contact/">Book a demo</a>
+          </nav>
+          <nav class="site-footer__legal" aria-label="Legal">
+            {
+              legalNavigation.map((item) => (
+                <a href={item.href}>{item.label}</a>
+              ))
+            }
+          </nav>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -3,9 +3,22 @@ import type { PageMetadata } from "./content/schemas.ts";
 type SiteEnvironment = Readonly<Record<string, string | undefined>>;
 
 const defaultCanonicalSiteOrigin = "https://www.glauxagent.com";
+const defaultAppOrigin = "https://app.glauxagent.com";
 const productionBranch = "main";
 
 export const publishedRoutes = ["/"] as const;
+
+export const primaryNavigation = [
+  { label: "Product", href: "/product/" },
+  { label: "Security", href: "/security/" },
+  { label: "Company", href: "/company/" },
+] as const;
+
+export const legalNavigation = [
+  { label: "Privacy", href: "/privacy/" },
+  { label: "Cookie policy", href: "/cookies/" },
+  { label: "Terms", href: "/terms/" },
+] as const;
 
 type PageMetadataForHead = Pick<
   PageMetadata,
@@ -14,10 +27,9 @@ type PageMetadataForHead = Pick<
 
 export const siteStatus = {
   name: "Glaux",
-  title: "Glaux design foundation",
+  title: "Glaux website shell",
   description:
-    "A static-first proof of the Glaux public website brand assets and design primitives.",
-  statusLabel: "Design foundation",
+    "A static-first shell for the Glaux public website navigation, routing, and app handoff.",
   guardrails: [
     "Glaux-only branding",
     "Verified source assets",
@@ -30,22 +42,20 @@ export const siteStatus = {
   ],
 } as const;
 
-export function getCanonicalSiteOrigin(
-  environment: SiteEnvironment = process.env,
+function getHttpsOrigin(
+  value: string,
+  variableName: "PUBLIC_SITE_ORIGIN" | "PUBLIC_APP_ORIGIN",
 ): string {
-  const configuredOrigin =
-    environment.PUBLIC_SITE_ORIGIN?.trim() || defaultCanonicalSiteOrigin;
-
   let url: URL;
 
   try {
-    url = new URL(configuredOrigin);
+    url = new URL(value);
   } catch {
-    throw new Error("PUBLIC_SITE_ORIGIN must be an absolute https origin.");
+    throw new Error(`${variableName} must be an absolute https origin.`);
   }
 
   if (url.protocol !== "https:") {
-    throw new Error("PUBLIC_SITE_ORIGIN must be an absolute https origin.");
+    throw new Error(`${variableName} must be an absolute https origin.`);
   }
 
   if (
@@ -56,11 +66,35 @@ export function getCanonicalSiteOrigin(
     url.hash
   ) {
     throw new Error(
-      "PUBLIC_SITE_ORIGIN must be an origin without a path, query, or hash.",
+      `${variableName} must be an origin without a path, query, or hash.`,
     );
   }
 
   return url.origin;
+}
+
+export function getCanonicalSiteOrigin(
+  environment: SiteEnvironment = process.env,
+): string {
+  const configuredOrigin =
+    environment.PUBLIC_SITE_ORIGIN?.trim() || defaultCanonicalSiteOrigin;
+
+  return getHttpsOrigin(configuredOrigin, "PUBLIC_SITE_ORIGIN");
+}
+
+export function getAppOrigin(
+  environment: SiteEnvironment = process.env,
+): string {
+  const configuredOrigin =
+    environment.PUBLIC_APP_ORIGIN?.trim() || defaultAppOrigin;
+
+  return getHttpsOrigin(configuredOrigin, "PUBLIC_APP_ORIGIN");
+}
+
+export function buildAppLoginUrl(
+  environment: SiteEnvironment = process.env,
+): string {
+  return new URL("/login", `${getAppOrigin(environment)}/`).toString();
 }
 
 function absoluteSiteUrl(
