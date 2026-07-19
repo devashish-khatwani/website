@@ -43,6 +43,19 @@ Content authors should run `npm run validate:content` before requesting release
 review. The claim workflow and evidence classes are documented in
 [`docs/content/claim-workflow.md`](docs/content/claim-workflow.md).
 
+## Continuous integration and deployment
+
+GitHub Actions runs formatting, lint, type, unit, build, dependency-audit, and
+browser checks for pull requests targeting `main`, pushes to `main`, and merge
+queue groups. CI validates changes but does not deploy them and contains no
+Cloudflare credentials.
+
+Cloudflare Pages deployment is intentionally a separate GitHub App integration.
+An operator must still create and connect the Pages project; this repository
+does not claim a live production or preview deployment. See the
+[Cloudflare Pages deployment runbook](docs/deployment/cloudflare-pages.md) for
+the reviewed settings, access controls, verification, and rollback steps.
+
 ## Scope guardrails
 
 The current route remains a placeholder. It does not include analytics, a form
