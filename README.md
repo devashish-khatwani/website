@@ -15,8 +15,9 @@ Tower service. It is static-first and targets Cloudflare Pages with:
 
 ## Current source documents
 
-The parent Glaux repository remains the durable source for product requirements
-and implementation planning:
+The private parent Glaux repository remains the source of truth for product
+requirements and implementation planning. These links are intentionally
+repository-scoped and require access to the Glaux repository:
 
 - [Website PRD](https://github.com/devashish-khatwani/Glaux/blob/main/docs/website/website-prd.md)
 - [Website implementation plan](https://github.com/devashish-khatwani/Glaux/blob/main/docs/website/implementation-plan.md)
