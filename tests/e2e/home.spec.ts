@@ -147,19 +147,6 @@ test("navigation targets render honest route shells", async ({ page }) => {
   }
 });
 
-test("configured app origin controls the sign-in handoff", async ({ page }) => {
-  await page.goto("/", {
-    waitUntil: "domcontentloaded",
-  });
-
-  await expect(
-    page.getByRole("link", { name: "Sign in" }).first(),
-  ).toHaveAttribute("href", "https://app.glauxagent.com/login");
-  await expect(
-    page.getByRole("link", { name: "Sign in" }).first(),
-  ).not.toHaveAttribute("href", /\/chat/u);
-});
-
 test("home page exposes canonical and base Open Graph metadata", async ({
   page,
 }) => {

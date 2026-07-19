@@ -10,22 +10,7 @@ import {
   legalNavigation,
   primaryNavigation,
   publishedRoutes,
-  siteStatus,
 } from "../../src/lib/site";
-
-describe("site bootstrap contract", () => {
-  it("keeps the shell scoped to Glaux-only guardrails", () => {
-    expect(siteStatus.name).toBe("Glaux");
-    expect(siteStatus.title).toContain("website shell");
-    expect(siteStatus.guardrails).toContain("Glaux-only branding");
-    expect(siteStatus.guardrails).toContain("Verified source assets");
-    expect(siteStatus.guardrails).toContain("Monochrome production palette");
-    expect(siteStatus.guardrails).toContain("44px interactive targets");
-    expect(siteStatus.guardrails).toContain("No analytics yet");
-    expect(siteStatus.guardrails).toContain("No auth logic");
-    expect(siteStatus.guardrails.join(" ")).not.toMatch(/powered by hermes/i);
-  });
-});
 
 describe("site shell navigation contract", () => {
   it("keeps the primary navigation to the approved launch items", () => {

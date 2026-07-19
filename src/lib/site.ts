@@ -25,23 +25,6 @@ type PageMetadataForHead = Pick<
   "title" | "description" | "canonicalPath" | "og"
 >;
 
-export const siteStatus = {
-  name: "Glaux",
-  title: "Glaux website shell",
-  description:
-    "A static-first shell for the Glaux public website navigation, routing, and app handoff.",
-  guardrails: [
-    "Glaux-only branding",
-    "Verified source assets",
-    "Monochrome production palette",
-    "44px interactive targets",
-    "No analytics yet",
-    "No auth logic",
-    "No form backend",
-    "No upstream Hermes branding",
-  ],
-} as const;
-
 function getHttpsOrigin(
   value: string,
   variableName: "PUBLIC_SITE_ORIGIN" | "PUBLIC_APP_ORIGIN",
