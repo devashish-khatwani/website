@@ -61,31 +61,31 @@ const securityClaimSpecs = [
   ["security-standards-alignment", "external-alignment"],
 ] as const;
 
-function mapTuple<T extends readonly unknown[], U>(
-  values: T,
-  mapper: (value: T[number]) => U,
-): { [K in keyof T]: U } {
-  return values.map(mapper) as { [K in keyof T]: U };
+async function loadSecurityClaim([
+  id,
+  classification,
+]: (typeof securityClaimSpecs)[number]) {
+  const entry = await getEntry("claims", id);
+
+  if (!entry) {
+    throw new Error(`Missing security claim: ${id}.`);
+  }
+
+  if (entry.data.classification !== classification) {
+    throw new Error(
+      `Security claim ${entry.data.id} must be ${classification}.`,
+    );
+  }
+
+  return entry.data;
 }
 
 const [controlAuthorityClaim, requestIntegrityClaim, standardsAlignmentClaim] =
-  await Promise.all(
-    mapTuple(securityClaimSpecs, async ([id, classification]) => {
-      const entry = await getEntry("claims", id);
-
-      if (!entry) {
-        throw new Error(`Missing security claim: ${id}.`);
-      }
-
-      if (entry.data.classification !== classification) {
-        throw new Error(
-          `Security claim ${entry.data.id} must be ${classification}.`,
-        );
-      }
-
-      return entry.data;
-    }),
-  );
+  await Promise.all([
+    loadSecurityClaim(securityClaimSpecs[0]),
+    loadSecurityClaim(securityClaimSpecs[1]),
+    loadSecurityClaim(securityClaimSpecs[2]),
+  ]);
 ---
 
 <SiteLayout
