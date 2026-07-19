@@ -1,11 +1,348 @@
 ---
-import RouteStub from "../components/RouteStub.astro";
+import { getEntry } from "astro:content";
+import Button from "../components/Button.astro";
+import SiteLayout from "../components/SiteLayout.astro";
+import {
+  deploymentStageOptions,
+  expectedUsersOptions,
+  governanceConcernOptions,
+} from "../lib/contact-form";
+import { buildPageHeadMetadata } from "../lib/site";
+
+const contactEntry = await getEntry("pages", "contact");
+
+if (!contactEntry) {
+  throw new Error("Missing contact page metadata entry.");
+}
+
+const pageHead = buildPageHeadMetadata(contactEntry.data);
 ---
 
-<RouteStub
-  title="Book a demo shell | Glaux"
-  description="Draft Glaux contact route shell awaiting approved demo processing."
-  canonicalPath="/contact/"
-  heading="Book a demo"
-  body="This route is ready for the demo page. The form is intentionally not present until the owner, destination, data terms, and spam controls are approved."
-/>
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  noindex
+  og={pageHead.og}
+>
+  <div class="product-page contact-page">
+    <section
+      class="product-hero contact-hero"
+      aria-labelledby="contact-heading"
+    >
+      <div class="product-hero__copy">
+        <p class="plain-label">Book a demo</p>
+        <h1 id="contact-heading" class="product-title">
+          Tell us what your team wants AI to help with.
+        </h1>
+        <p class="product-lede">
+          Share enough context for a useful governance conversation. Online demo
+          requests are not open yet, so this page does not send your information
+          until online request handling is open.
+        </p>
+        <div class="product-actions" aria-label="Contact page actions">
+          <Button href="/product/" variant="ghost">Explore the product</Button>
+          <Button href="/security/" variant="ghost">Review security</Button>
+        </div>
+      </div>
+
+      <aside class="surface company-status-card contact-note">
+        <span class="badge">Request status</span>
+        <h2>Prepared, not open</h2>
+        <p>
+          The form validates the details we expect to need. It will not submit
+          anything until online request handling, data terms, misuse protection,
+          and response expectations are decided.
+        </p>
+      </aside>
+    </section>
+
+    <section class="contact-section" aria-labelledby="demo-form-heading">
+      <div class="section-heading section-heading--compact">
+        <p class="plain-label">Demo request</p>
+        <h2 id="demo-form-heading">Prepare your request</h2>
+        <p>
+          Use a work email and avoid confidential details, credentials, or
+          sensitive architecture information.
+        </p>
+      </div>
+
+      <form
+        id="contact-demo-form"
+        class="contact-form surface"
+        aria-label="Demo request"
+        data-processor-enabled="false"
+        novalidate
+      >
+        <div
+          id="contact-form-status"
+          class="form-status"
+          role="status"
+          aria-live="polite"
+        >
+          Complete the form to prepare a demo request.
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="workEmail">Work email <span>Required</span></label>
+            <input
+              id="workEmail"
+              name="workEmail"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              aria-describedby="workEmail-hint workEmail-error"
+              required
+            />
+            <p id="workEmail-hint" class="field-hint">
+              Use your company email address.
+            </p>
+            <p id="workEmail-error" class="field-error" hidden></p>
+          </div>
+
+          <div class="field-group">
+            <label for="name">Name <span>Required</span></label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              aria-describedby="name-error"
+              required
+            />
+            <p id="name-error" class="field-error" hidden></p>
+          </div>
+
+          <div class="field-group">
+            <label for="company">Company <span>Required</span></label>
+            <input
+              id="company"
+              name="company"
+              type="text"
+              autocomplete="organization"
+              aria-describedby="company-error"
+              required
+            />
+            <p id="company-error" class="field-error" hidden></p>
+          </div>
+
+          <div class="field-group">
+            <label for="role">Role <span>Required</span></label>
+            <input
+              id="role"
+              name="role"
+              type="text"
+              autocomplete="organization-title"
+              aria-describedby="role-error"
+              required
+            />
+            <p id="role-error" class="field-error" hidden></p>
+          </div>
+
+          <div class="field-group">
+            <label for="deploymentStage">
+              Deployment stage <span>Required</span>
+            </label>
+            <select
+              id="deploymentStage"
+              name="deploymentStage"
+              aria-describedby="deploymentStage-error"
+              required
+            >
+              <option value="">Choose one</option>
+              {
+                deploymentStageOptions.map((option) => (
+                  <option value={option}>{option}</option>
+                ))
+              }
+            </select>
+            <p id="deploymentStage-error" class="field-error" hidden></p>
+          </div>
+
+          <div class="field-group">
+            <label for="expectedUsers">
+              Expected users <span>Required</span>
+            </label>
+            <select
+              id="expectedUsers"
+              name="expectedUsers"
+              aria-describedby="expectedUsers-error"
+              required
+            >
+              <option value="">Choose one</option>
+              {
+                expectedUsersOptions.map((option) => (
+                  <option value={option}>{option}</option>
+                ))
+              }
+            </select>
+            <p id="expectedUsers-error" class="field-error" hidden></p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="governanceConcern">
+            Primary governance concern <span>Required</span>
+          </label>
+          <select
+            id="governanceConcern"
+            name="governanceConcern"
+            aria-describedby="governanceConcern-hint governanceConcern-error"
+            required
+          >
+            <option value="">Choose one</option>
+            {
+              governanceConcernOptions.map((option) => (
+                <option value={option}>{option}</option>
+              ))
+            }
+          </select>
+          <p id="governanceConcern-hint" class="field-hint">
+            Choose the one topic that most shapes your evaluation.
+          </p>
+          <p id="governanceConcern-error" class="field-error" hidden></p>
+        </div>
+
+        <div class="field-group">
+          <label for="message">Optional message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            aria-describedby="message-hint message-error"></textarea>
+          <p id="message-hint" class="field-hint">
+            Share the work you want to support. Do not include confidential
+            information, credentials, or sensitive architecture details.
+          </p>
+          <p id="message-error" class="field-error" hidden></p>
+        </div>
+
+        <div class="consent-field">
+          <input
+            id="consent"
+            name="consent"
+            type="checkbox"
+            value="yes"
+            aria-describedby="consent-error"
+            required
+          />
+          <label for="consent">
+            I understand this form is for preparation only, does not send my
+            information yet, and should not include confidential information.
+          </label>
+          <p id="consent-error" class="field-error" hidden></p>
+        </div>
+
+        <div class="form-actions">
+          <button class="button button--primary" type="submit">
+            Check request
+          </button>
+          <button
+            id="contact-form-retry"
+            class="button button--ghost"
+            type="button"
+            hidden
+          >
+            Try again
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</SiteLayout>
+
+<script>
+  import {
+    contactFormFields,
+    contactSubmissionStateCopy,
+    firstInvalidContactField,
+    inputFromFormData,
+    submitContactForm,
+    validateContactForm,
+  } from "../lib/contact-form";
+
+  const form = document.querySelector<HTMLFormElement>("#contact-demo-form");
+  const statusRegion = document.querySelector<HTMLElement>(
+    "#contact-form-status",
+  );
+  const retryButton = document.querySelector<HTMLButtonElement>(
+    "#contact-form-retry",
+  );
+
+  function setFieldError(field: string, message: string | undefined) {
+    const control = form?.elements.namedItem(field) as
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+    const error = document.querySelector<HTMLElement>(`#${field}-error`);
+
+    if (!control || !error) {
+      return;
+    }
+
+    if (message) {
+      control.setAttribute("aria-invalid", "true");
+      error.textContent = message;
+      error.hidden = false;
+    } else {
+      control.removeAttribute("aria-invalid");
+      error.textContent = "";
+      error.hidden = true;
+    }
+  }
+
+  function setStatus(message: string) {
+    if (statusRegion) {
+      statusRegion.textContent = message;
+    }
+  }
+
+  function clearErrors() {
+    for (const field of contactFormFields) {
+      setFieldError(field, undefined);
+    }
+  }
+
+  async function checkRequest() {
+    if (!form) {
+      return;
+    }
+
+    setStatus(contactSubmissionStateCopy.validating);
+    clearErrors();
+
+    const result = validateContactForm(inputFromFormData(new FormData(form)));
+
+    if (result.status === "validation-error") {
+      setStatus(contactSubmissionStateCopy["validation-error"]);
+
+      for (const [field, message] of Object.entries(result.errors)) {
+        setFieldError(field, message);
+      }
+
+      const firstInvalid = firstInvalidContactField(result.errors);
+      const firstInvalidControl = firstInvalid
+        ? (form.elements.namedItem(firstInvalid) as HTMLElement | null)
+        : null;
+      firstInvalidControl?.focus();
+      retryButton?.setAttribute("hidden", "");
+      return;
+    }
+
+    setStatus(contactSubmissionStateCopy.submitting);
+    const submissionState = await submitContactForm(result.submission);
+    setStatus(submissionState.message);
+
+    if ("canRetry" in submissionState && submissionState.canRetry) {
+      retryButton?.removeAttribute("hidden");
+    }
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    void checkRequest();
+  });
+
+  retryButton?.addEventListener("click", () => {
+    void checkRequest();
+  });
+</script>

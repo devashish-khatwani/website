@@ -211,11 +211,10 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   expect(consoleErrors).toEqual([]);
 });
 
-test("navigation targets render honest noindexed draft shells", async ({
+test("legal navigation targets render honest noindexed draft shells", async ({
   page,
 }) => {
   for (const [path, heading] of [
-    ["/contact/", "Book a demo"],
     ["/privacy/", "Privacy"],
     ["/cookies/", "Cookie policy"],
     ["/terms/", "Terms"],
