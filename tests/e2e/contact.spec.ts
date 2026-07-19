@@ -69,7 +69,7 @@ test("contact form reports field errors, focuses the first invalid field, and pr
   await page.goto("/contact/");
   await page.getByLabel(/Work email/u).fill("not-an-email");
   await page.getByLabel(/Company/u).fill("Example Company");
-  await page.getByRole("button", { name: "Check request" }).click();
+  await page.getByLabel(/Work email/u).press("Enter");
 
   await expect(page.getByRole("status")).toContainText(
     "Some fields need attention",
@@ -125,6 +125,56 @@ test("contact form does not make a network submission or navigate", async ({
   );
   expect(page.url()).toBe(initialUrl);
   expect(attemptedSubmissions).toEqual([]);
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("contact form cannot submit or expose field values", async ({
+    page,
+  }) => {
+    const httpRequests: string[] = [];
+    const requestsWithQueries: string[] = [];
+    const navigationsWithQueries: string[] = [];
+
+    page.on("request", (request) => {
+      if (["http:", "https:"].includes(new URL(request.url()).protocol)) {
+        httpRequests.push(
+          `${request.method()} ${request.resourceType()} ${request.url()}`,
+        );
+      }
+      if (new URL(request.url()).search) {
+        requestsWithQueries.push(request.url());
+      }
+    });
+    page.on("framenavigated", (frame) => {
+      if (frame === page.mainFrame() && new URL(frame.url()).search) {
+        navigationsWithQueries.push(frame.url());
+      }
+    });
+
+    await page.goto("/contact/");
+    await page.waitForLoadState("networkidle");
+    httpRequests.length = 0;
+    requestsWithQueries.length = 0;
+    navigationsWithQueries.length = 0;
+    const initialUrl = page.url();
+    await page.getByLabel(/Work email/u).fill("operator@example.com");
+    await page.getByLabel(/Company/u).fill("Example Company");
+
+    await page
+      .getByRole("button", { name: "Check request" })
+      .click({ force: true });
+    await expect(page).toHaveURL(initialUrl);
+
+    await page.getByLabel(/Work email/u).press("Enter");
+    await expect(page).toHaveURL(initialUrl);
+
+    expect(new URL(page.url()).search).toBe("");
+    expect(httpRequests).toEqual([]);
+    expect(requestsWithQueries).toEqual([]);
+    expect(navigationsWithQueries).toEqual([]);
+  });
 });
 
 test("contact form keyboard focus remains visible and mobile/desktop layouts do not overflow", async ({

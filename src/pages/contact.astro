@@ -235,7 +235,11 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
         </div>
 
         <div class="form-actions">
-          <button class="button button--primary" type="submit">
+          <button
+            id="contact-form-check"
+            class="button button--primary"
+            type="button"
+          >
             Check request
           </button>
           <button
@@ -265,6 +269,9 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
   const form = document.querySelector<HTMLFormElement>("#contact-demo-form");
   const statusRegion = document.querySelector<HTMLElement>(
     "#contact-form-status",
+  );
+  const checkButton = document.querySelector<HTMLButtonElement>(
+    "#contact-form-check",
   );
   const retryButton = document.querySelector<HTMLButtonElement>(
     "#contact-form-retry",
@@ -302,12 +309,17 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     }
   }
 
+  function setRetryVisible(isVisible: boolean) {
+    retryButton?.toggleAttribute("hidden", !isVisible);
+  }
+
   async function checkRequest() {
     if (!form) {
       return;
     }
 
     setStatus(contactSubmissionStateCopy.validating);
+    setRetryVisible(false);
     clearErrors();
 
     const result = validateContactForm(inputFromFormData(new FormData(form)));
@@ -324,7 +336,6 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
         ? (form.elements.namedItem(firstInvalid) as HTMLElement | null)
         : null;
       firstInvalidControl?.focus();
-      retryButton?.setAttribute("hidden", "");
       return;
     }
 
@@ -332,12 +343,31 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     const submissionState = await submitContactForm(result.submission);
     setStatus(submissionState.message);
 
-    if ("canRetry" in submissionState && submissionState.canRetry) {
-      retryButton?.removeAttribute("hidden");
-    }
+    setRetryVisible(
+      "canRetry" in submissionState && submissionState.canRetry === true,
+    );
   }
 
+  checkButton?.addEventListener("click", () => {
+    void checkRequest();
+  });
+
   form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    void checkRequest();
+  });
+
+  form?.addEventListener("keydown", (event) => {
+    const target = event.target;
+
+    if (
+      event.key !== "Enter" ||
+      !(target instanceof HTMLInputElement) ||
+      ["button", "checkbox", "radio", "reset", "submit"].includes(target.type)
+    ) {
+      return;
+    }
+
     event.preventDefault();
     void checkRequest();
   });
