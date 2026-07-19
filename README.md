@@ -39,6 +39,12 @@ npm run test:e2e
 
 `npm run build` writes the static Cloudflare Pages output to `dist/`.
 
+Set `PUBLIC_SITE_ORIGIN` to the canonical public origin when building for
+production. The default is `https://www.glauxagent.com`, and the value must be
+an HTTPS origin only, without a path, query string, or fragment. Crawling is
+allowed only for an explicit Cloudflare Pages build of the `main` branch;
+preview, local, CI, and unknown builds render `robots.txt` with `Disallow: /`.
+
 Content authors should run `npm run validate:content` before requesting release
 review. The claim workflow and evidence classes are documented in
 [`docs/content/claim-workflow.md`](docs/content/claim-workflow.md).

@@ -29,11 +29,15 @@ dashboard:
    does not create preview URLs for pull requests from forks.
 5. Use the repository's `.nvmrc` as the Node.js version pin. Do not add a
    duplicate `NODE_VERSION` setting unless a future build constraint requires it.
-6. Add `PUBLIC_APP_ORIGIN` separately to the preview and production
+6. Set `PUBLIC_SITE_ORIGIN` in production to the canonical public website origin
+   `https://www.glauxagent.com`. The value must be an origin only, with no path,
+   query string, or fragment, and must use HTTPS. Preview deployments may leave
+   the default in place because `robots.txt` allows crawling only when
+   Cloudflare Pages explicitly identifies the build as the `main` branch.
+7. Add `PUBLIC_APP_ORIGIN` separately to the preview and production
    environments when W-05 or W-12 begins consuming it. It is a non-secret,
    absolute HTTPS origin for the Glaux app; it must not include an invented
-   post-login path. No other custom environment variables are currently
-   required.
+   post-login path.
 
 Cloudflare injects these build variables automatically; do not add their values
 or any secrets to the repository:

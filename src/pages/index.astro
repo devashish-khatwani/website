@@ -1,6 +1,15 @@
 ---
 import "../styles/global.css";
-import { siteStatus } from "../lib/site";
+import { getEntry } from "astro:content";
+import { buildPageHeadMetadata, siteStatus } from "../lib/site";
+
+const homeEntry = await getEntry("pages", "home");
+
+if (!homeEntry) {
+  throw new Error("Missing home page metadata entry.");
+}
+
+const pageHead = buildPageHeadMetadata(homeEntry.data);
 ---
 
 <!doctype html>
@@ -8,8 +17,13 @@ import { siteStatus } from "../lib/site";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={siteStatus.description} />
-    <title>{siteStatus.title}</title>
+    <meta name="description" content={pageHead.description} />
+    <link rel="canonical" href={pageHead.canonicalUrl} />
+    <meta property="og:type" content={pageHead.og.type} />
+    <meta property="og:title" content={pageHead.og.title} />
+    <meta property="og:description" content={pageHead.og.description} />
+    <meta property="og:url" content={pageHead.og.url} />
+    <title>{pageHead.title}</title>
   </head>
   <body>
     <main
