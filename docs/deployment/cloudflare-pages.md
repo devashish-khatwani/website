@@ -135,12 +135,15 @@ owners before the production kill switch is enabled:
 
 - Restrict the trusted domain to `www.glauxagent.com` and verify the production
   embed from that host.
-- Route notifications to a `Demo Requests` team and a backup administrator.
-- Confirm the two-business-day response process.
-- Configure and evidence the 365-day inactivity-deletion process.
-- Provision and monitor `privacy@glauxagent.com`.
+- Route notifications to at least one monitored notification owner or recipient.
+- Record the response owner/process without making a fixed response-time promise
+  unless that promise is separately approved.
+- Document and approve the production retention/deletion rule, including any
+  relevant provider recycle-bin behavior.
+- Publish and monitor a privacy/deletion contact.
+- Keep a backup HubSpot administrator optional rather than launch-blocking.
 - Make the standard DPA available.
-- Schedule the rate-risk review for 30 days after launch.
+- Review provider-rate risk only if traffic, spam, or abuse materially changes.
 - Complete a real production smoke submission and verify safe failure behavior.
 
 ## Cloudflare references

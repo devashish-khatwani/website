@@ -236,6 +236,7 @@ test("HubSpot success and failure events update safe inline status without redir
   await expect(page.getByRole("status")).toContainText(
     "Your demo request was received",
   );
+  await expect(page.getByRole("status")).not.toContainText("two business days");
   await expect(page.locator("#contact-form-status")).toBeFocused();
   expect(page.url()).toBe(initialUrl);
 

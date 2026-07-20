@@ -47,8 +47,10 @@ test.describe("legal draft routes", () => {
     await expect(main).toContainText("processing-only");
     await expect(main).toContainText("Preview submissions");
     await expect(main).toContainText("www.glauxagent.com");
-    await expect(main).toContainText("365 days");
-    await expect(main).toContainText("privacy@glauxagent.com");
+    await expect(main).toContainText(
+      "owner-approved retention and deletion rule",
+    );
+    await expect(main).toContainText("monitored privacy/deletion contact");
     await expect(main).toContainText("standard HubSpot DPA coverage");
   });
 
@@ -68,7 +70,8 @@ test.describe("legal draft routes", () => {
     await expect(main).toContainText("contact-form infrastructure only");
     await expect(main).toContainText("feeds HubSpot CRM");
     await expect(main).toContainText("processing-only consent");
-    await expect(main).toContainText("365-day inactivity deletion target");
+    await expect(main).toContainText("owner-approved retention/deletion rule");
+    await expect(main).toContainText("monitored privacy/deletion contact");
     await expect(page.locator("script[src*=hubspot]")).toHaveCount(0);
     await expect(page.locator("script[src*=hsforms]")).toHaveCount(0);
   });
@@ -87,6 +90,8 @@ test.describe("legal draft routes", () => {
       expect(text).not.toMatch(/published terms of service/i);
       expect(text).not.toMatch(/HubSpot tracking code is approved/i);
       expect(text).not.toMatch(/final privacy policy/i);
+      expect(text).not.toMatch(/365 days/i);
+      expect(text).not.toMatch(/privacy@glauxagent\.com/i);
     }
   });
 

@@ -30,7 +30,7 @@ const processorBoundaries = [
 
 const contactDefaults = [
   "Contacts are non-marketing by default.",
-  "The form consent text is processing-only: Glaux may process the submission to respond to the request.",
+  "The required processing-only consent text is exactly: I agree that Glaux may store and process this information to respond to my demo request.",
   "Preview submissions are intended to stay disabled.",
   "Production form loading is intended only for www.glauxagent.com.",
 ] as const;
@@ -147,12 +147,14 @@ const contactDefaults = [
     <section class="admin-section" aria-labelledby="retention-heading">
       <div class="section-heading section-heading--compact">
         <p class="plain-label">Retention and deletion</p>
-        <h2 id="retention-heading">Deletion requests have a direct mailbox.</h2>
+        <h2 id="retention-heading">
+          Retention and deletion need an approved rule.
+        </h2>
         <p>
-          The current launch target is to delete inactive HubSpot CRM contact
-          records after 365 days. Visitors can request deletion at
-          privacy@glauxagent.com. The Project owner handles those requests until
-          a durable privacy owner is assigned.
+          Before production, Glaux must document an owner-approved retention and
+          deletion rule for HubSpot CRM contact records and publish a monitored
+          privacy/deletion contact. The Project owner handles those requests
+          until a durable privacy owner is assigned.
         </p>
       </div>
 
