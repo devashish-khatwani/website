@@ -2,6 +2,10 @@
 import { getEntry } from "astro:content";
 import Button from "../components/Button.astro";
 import SiteLayout from "../components/SiteLayout.astro";
+import {
+  getHubSpotDemoFormAvailability,
+  hubSpotFormsRuntimeHostname,
+} from "../lib/contact-form";
 import { buildPageHeadMetadata } from "../lib/site";
 
 const contactEntry = await getEntry("pages", "contact");
@@ -11,6 +15,17 @@ if (!contactEntry) {
 }
 
 const pageHead = buildPageHeadMetadata(contactEntry.data);
+const hubSpotAvailability = getHubSpotDemoFormAvailability(import.meta.env);
+const isHubSpotBuildAvailable = hubSpotAvailability.status === "available";
+const heroLede = isHubSpotBuildAvailable
+  ? `Share enough context for a useful governance conversation. Online demo requests are available on ${hubSpotFormsRuntimeHostname}; preview, local, and unknown hosts remain closed.`
+  : "Share enough context for a useful governance conversation. Online demo requests stay unavailable until the approved HubSpot form, privacy review, and production release controls are ready.";
+const requestStatusHeading = isHubSpotBuildAvailable
+  ? "Available on production"
+  : "Prepared, not open";
+const requestStatusCopy = isHubSpotBuildAvailable
+  ? `The secure form can load on ${hubSpotFormsRuntimeHostname} for this production build. Preview, local, and unknown hosts remain closed.`
+  : "The secure form loads only on the production hostname after the explicit release switch is enabled. Preview, local, and unknown hosts remain closed.";
 ---
 
 <SiteLayout
@@ -30,11 +45,7 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
         <h1 id="contact-heading" class="product-title">
           Tell us what your team wants AI to help with.
         </h1>
-        <p class="product-lede">
-          Share enough context for a useful governance conversation. Online demo
-          requests stay unavailable until the approved HubSpot form, privacy
-          review, and production release controls are ready.
-        </p>
+        <p class="product-lede">{heroLede}</p>
         <div class="product-actions" aria-label="Contact page actions">
           <Button href="/product/" variant="ghost">Explore the product</Button>
           <Button href="/security/" variant="ghost">Review security</Button>
@@ -43,12 +54,8 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
 
       <aside class="surface company-status-card contact-note">
         <span class="badge">Request status</span>
-        <h2>Prepared, not open</h2>
-        <p>
-          The secure form loads only on the production hostname after the
-          explicit release switch is enabled. Preview, local, and unknown hosts
-          remain closed.
-        </p>
+        <h2>{requestStatusHeading}</h2>
+        <p>{requestStatusCopy}</p>
       </aside>
     </section>
 
