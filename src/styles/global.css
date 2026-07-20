@@ -283,8 +283,8 @@ a {
 .product-title {
   max-width: 11ch;
   font-size: var(--text-hero);
-  font-weight: 720;
-  letter-spacing: -0.065em;
+  font-weight: 600;
+  letter-spacing: -0.04em;
 }
 
 .product-title {

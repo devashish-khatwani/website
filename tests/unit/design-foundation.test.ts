@@ -114,4 +114,10 @@ describe("W-03 global CSS contract", () => {
     expect(css).toMatch(/\.brand-logo/u);
     expect(css).toMatch(/min-inline-size:\s*44px/u);
   });
+
+  it("keeps page-level display headings lighter and comfortably tracked", () => {
+    expect(css).toMatch(
+      /\.home-title,\s*\.product-title\s*\{[^}]*font-weight:\s*600;[^}]*letter-spacing:\s*-0\.04em;/su,
+    );
+  });
 });
