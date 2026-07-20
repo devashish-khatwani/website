@@ -55,14 +55,30 @@ describe("contact form validation contract", () => {
     });
   });
 
+  it("accepts blank qualification fields and omits them from the submission", () => {
+    const result = validateContactForm({
+      ...validInput,
+      deploymentStage: "",
+      expectedUsers: "",
+    });
+
+    expect(result.status).toBe("valid");
+    if (result.status !== "valid") {
+      throw new Error("Expected blank qualification fields to be valid.");
+    }
+
+    expect(result.submission).not.toHaveProperty("deploymentStage");
+    expect(result.submission).not.toHaveProperty("expectedUsers");
+  });
+
   it("returns field-specific validation errors and first invalid field", () => {
     const result = validateContactForm({
       workEmail: "not-an-email",
       name: "",
       company: "",
       role: "",
-      deploymentStage: "",
-      expectedUsers: "",
+      deploymentStage: "Already deployed",
+      expectedUsers: "Thousands",
       message: "x".repeat(2001),
       consent: false,
     });
@@ -77,8 +93,8 @@ describe("contact form validation contract", () => {
       name: expect.stringMatching(/name/u),
       company: expect.stringMatching(/company/u),
       role: expect.stringMatching(/role/u),
-      deploymentStage: expect.stringMatching(/deployment stage/u),
-      expectedUsers: expect.stringMatching(/expected number/u),
+      deploymentStage: expect.stringMatching(/from the list/u),
+      expectedUsers: expect.stringMatching(/from the list/u),
       message: expect.stringMatching(/2,000/u),
       consent: expect.stringMatching(/does not send/u),
     });

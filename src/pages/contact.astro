@@ -140,14 +140,11 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
           </div>
 
           <div class="field-group">
-            <label for="deploymentStage">
-              Deployment stage <span>Required</span>
-            </label>
+            <label for="deploymentStage">Deployment stage (optional)</label>
             <select
               id="deploymentStage"
               name="deploymentStage"
               aria-describedby="deploymentStage-error"
-              required
             >
               <option value="">Choose one</option>
               {
@@ -160,14 +157,11 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
           </div>
 
           <div class="field-group">
-            <label for="expectedUsers">
-              Expected users <span>Required</span>
-            </label>
+            <label for="expectedUsers">Expected users (optional)</label>
             <select
               id="expectedUsers"
               name="expectedUsers"
               aria-describedby="expectedUsers-error"
-              required
             >
               <option value="">Choose one</option>
               {

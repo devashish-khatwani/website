@@ -46,8 +46,8 @@ export type ContactFormSubmission = Readonly<{
   name: string;
   company: string;
   role: string;
-  deploymentStage: DeploymentStage;
-  expectedUsers: ExpectedUsers;
+  deploymentStage?: DeploymentStage;
+  expectedUsers?: ExpectedUsers;
   message?: string;
   consent: true;
 }>;
@@ -134,6 +134,8 @@ export function validateContactForm(
   const name = normalizeText(input.name);
   const company = normalizeText(input.company);
   const role = normalizeText(input.role);
+  const deploymentStage = input.deploymentStage.trim();
+  const expectedUsers = input.expectedUsers.trim();
   const message = input.message.trim();
 
   addRequiredTextError(
@@ -156,22 +158,12 @@ export function validateContactForm(
       "Work email needs a valid format, like name@company.com.";
   }
 
-  if (
-    input.deploymentStage &&
-    !isOption(deploymentStageOptions, input.deploymentStage)
-  ) {
+  if (deploymentStage && !isOption(deploymentStageOptions, deploymentStage)) {
     errors.deploymentStage = "Choose a deployment stage from the list.";
-  } else if (!input.deploymentStage) {
-    errors.deploymentStage = "Choose a deployment stage.";
   }
 
-  if (
-    input.expectedUsers &&
-    !isOption(expectedUsersOptions, input.expectedUsers)
-  ) {
+  if (expectedUsers && !isOption(expectedUsersOptions, expectedUsers)) {
     errors.expectedUsers = "Choose an expected user range from the list.";
-  } else if (!input.expectedUsers) {
-    errors.expectedUsers = "Choose the expected number of users.";
   }
 
   if (message.length > 2000) {
@@ -194,8 +186,12 @@ export function validateContactForm(
       name,
       company,
       role,
-      deploymentStage: input.deploymentStage as DeploymentStage,
-      expectedUsers: input.expectedUsers as ExpectedUsers,
+      ...(deploymentStage
+        ? { deploymentStage: deploymentStage as DeploymentStage }
+        : {}),
+      ...(expectedUsers
+        ? { expectedUsers: expectedUsers as ExpectedUsers }
+        : {}),
       ...(message ? { message } : {}),
       consent: true,
     },

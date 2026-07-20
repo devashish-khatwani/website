@@ -44,13 +44,25 @@ test("contact page renders the W-10 noindexed form fields and route metadata", a
     /Name/u,
     /Company/u,
     /Role/u,
-    /Deployment stage/u,
-    /Expected users/u,
+    /Deployment stage \(optional\)/u,
+    /Expected users \(optional\)/u,
     /Optional message/u,
     /I understand this form/u,
   ]) {
     await expect(page.getByLabel(label)).toBeVisible();
   }
+  await expect(page.locator('label[for="deploymentStage"]')).not.toContainText(
+    "Required",
+  );
+  await expect(page.locator('label[for="expectedUsers"]')).not.toContainText(
+    "Required",
+  );
+  await expect(
+    page.getByLabel(/Deployment stage \(optional\)/u),
+  ).not.toHaveAttribute("required");
+  await expect(
+    page.getByLabel(/Expected users \(optional\)/u),
+  ).not.toHaveAttribute("required");
   await expect(page.getByLabel(/Primary governance concern/u)).toHaveCount(0);
   await expect(page.getByLabel(/Primary use case or team/u)).toHaveCount(0);
 
@@ -80,6 +92,27 @@ test("contact form reports field errors, focuses the first invalid field, and pr
   await expect(page.locator("#name-error")).toContainText("name");
   await expect(page.locator("#company-error")).toBeHidden();
   await expect(page.getByLabel(/Company/u)).toHaveValue("Example Company");
+});
+
+test("contact form allows blank qualification fields while preserving the disabled processor state", async ({
+  page,
+}) => {
+  await page.goto("/contact/");
+  await page.getByLabel(/Work email/u).fill("operator@example.com");
+  await page.getByLabel(/Name/u).fill("Ada Lovelace");
+  await page.getByLabel(/Company/u).fill("Example Company");
+  await page.getByLabel(/Role/u).fill("Security lead");
+  await page
+    .getByLabel(/Optional message/u)
+    .fill("We want to understand approval paths.");
+  await page.getByLabel(/I understand this form/u).check();
+  await page.getByRole("button", { name: "Check request" }).click();
+
+  await expect(page.locator("#deploymentStage-error")).toBeHidden();
+  await expect(page.locator("#expectedUsers-error")).toBeHidden();
+  await expect(page.getByRole("status")).toContainText(
+    "Online demo requests are not open yet",
+  );
 });
 
 test("contact form corrects errors and reaches the safe unavailable processor state", async ({
