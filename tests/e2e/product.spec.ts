@@ -20,7 +20,7 @@ test("product page renders the W-07 employee and admin story", async ({
 
   await expect(
     page.getByRole("heading", {
-      name: "Useful work, with the rules built in.",
+      name: "From question to useful outcome.",
     }),
   ).toBeVisible();
   await expect(
@@ -29,6 +29,12 @@ test("product page renders the W-07 employee and admin story", async ({
   await expect(
     page.getByLabel("Product work preview").getByText("Q3 launch brief"),
   ).toBeVisible();
+  const productPhoto = page.getByRole("img", {
+    name: "Colleagues reviewing work together",
+  });
+  await expect(productPhoto).toBeVisible();
+  await expect(productPhoto).toHaveAttribute("srcset", /w=640 640w/u);
+  await expect(productPhoto).toHaveAttribute("sizes", /50vw/u);
 
   for (const workMode of [
     "Ask",

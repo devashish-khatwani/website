@@ -40,6 +40,12 @@ test("company page renders W-09 mission, maturity status, and contact path", asy
   await expect(page.getByLabel("Company status")).toContainText(
     "not currently offered through self-serve signup",
   );
+  const companyPhoto = page.getByRole("img", {
+    name: "Team collaborating around a laptop",
+  });
+  await expect(companyPhoto).toBeVisible();
+  await expect(companyPhoto).toHaveAttribute("srcset", /w=640 640w/u);
+  await expect(companyPhoto).toHaveAttribute("sizes", /50vw/u);
   await expect(page.getByLabel("Company page actions")).toContainText(
     "Book a demo",
   );

@@ -1,11 +1,11 @@
 ---
-title: "Glaux | AI your whole team can work with"
+title: "Glaux | Useful AI. Visible rules."
 description: "Glaux helps teams research, create, and automate with approved company knowledge and tools while keeping governance visible."
 canonicalPath: "/"
 og:
-  title: "Glaux | AI your whole team can work with"
+  title: "Glaux | Useful AI. Visible rules."
   description: "Glaux helps teams research, create, and automate with approved company knowledge and tools while keeping governance visible."
-  imageAlt: "Monochrome Glaux homepage product preview."
+  imageAlt: "Glaux product preview showing governed enterprise work."
 launchState: "draft"
 publicationState: "draft"
 claimReviewStatus: "draft"

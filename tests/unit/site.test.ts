@@ -7,7 +7,6 @@ import {
   getAppOrigin,
   getCanonicalSiteOrigin,
   isSearchIndexingAllowed,
-  legalNavigation,
   primaryNavigation,
   publishedRoutes,
 } from "../../src/lib/site";
@@ -22,11 +21,6 @@ describe("site shell navigation contract", () => {
     expect(primaryNavigation.map((item) => item.label)).not.toContain(
       "Resources",
     );
-    expect(legalNavigation.map((item) => item.label)).toEqual([
-      "Privacy",
-      "Cookie policy",
-      "Terms",
-    ]);
   });
 
   it("builds the sign-in handoff from an HTTPS app origin only", () => {
@@ -56,11 +50,11 @@ describe("site discoverability metadata", () => {
   const description =
     "Glaux helps teams research, create, and automate with approved company knowledge and tools while keeping governance visible.";
   const homeMetadata = {
-    title: "Glaux | AI your whole team can work with",
+    title: "Glaux | Useful AI. Visible rules.",
     description,
     canonicalPath: "/",
     og: {
-      title: "Glaux | AI your whole team can work with",
+      title: "Glaux | Useful AI. Visible rules.",
       description,
       imageAlt: "Monochrome Glaux homepage product preview.",
     },
@@ -90,11 +84,11 @@ describe("site discoverability metadata", () => {
   it("builds page canonical and Open Graph metadata from W-04 page data", () => {
     const pageHead = buildPageHeadMetadata(homeMetadata);
 
-    expect(pageHead.title).toBe("Glaux | AI your whole team can work with");
+    expect(pageHead.title).toBe("Glaux | Useful AI. Visible rules.");
     expect(pageHead.description).toBe(description);
     expect(pageHead.canonicalUrl).toBe("https://www.glauxagent.com/");
     expect(pageHead.og).toMatchObject({
-      title: "Glaux | AI your whole team can work with",
+      title: "Glaux | Useful AI. Visible rules.",
       description,
       url: "https://www.glauxagent.com/",
       type: "website",

@@ -2,11 +2,7 @@
 import "../styles/global.css";
 import BrandLogo from "./BrandLogo.astro";
 import Button from "./Button.astro";
-import {
-  buildAppLoginUrl,
-  legalNavigation,
-  primaryNavigation,
-} from "../lib/site";
+import { buildAppLoginUrl, primaryNavigation } from "../lib/site";
 
 interface Props {
   title: string;
@@ -110,13 +106,6 @@ const signInUrl = buildAppLoginUrl();
             }
             <a href={signInUrl}>Sign in</a>
             <a href="/contact/">Book a demo</a>
-          </nav>
-          <nav class="site-footer__legal" aria-label="Legal">
-            {
-              legalNavigation.map((item) => (
-                <a href={item.href}>{item.label}</a>
-              ))
-            }
           </nav>
         </div>
       </footer>

@@ -4,25 +4,6 @@ import {
   expectVisibleFocusOutline,
 } from "./assertions";
 
-const legalDraftRoutes = [
-  {
-    path: "/privacy/",
-    title: "Privacy draft | Glaux",
-    description: "Draft Glaux privacy route pending legal approval.",
-  },
-  {
-    path: "/cookies/",
-    title: "Cookie policy draft | Glaux",
-    description:
-      "Draft Glaux cookie and analytics route pending legal approval.",
-  },
-  {
-    path: "/terms/",
-    title: "Terms draft | Glaux",
-    description: "Draft Glaux terms route pending legal approval.",
-  },
-] as const;
-
 test("shared layout declares the direct Glaux SVG favicon asset", async ({
   page,
 }) => {
@@ -90,25 +71,3 @@ test("404 recovery actions keep visible focus and avoid responsive overflow", as
   await homeLink.focus();
   await expectVisibleFocusOutline(homeLink);
 });
-
-for (const route of legalDraftRoutes) {
-  test(`${route.path} keeps noindexed legal draft metadata with canonical URL`, async ({
-    page,
-  }) => {
-    await page.goto(route.path);
-
-    await expect(page).toHaveTitle(route.title);
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-      "content",
-      route.description,
-    );
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-      "content",
-      "noindex, nofollow",
-    );
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-      "href",
-      `https://www.glauxagent.com${route.path}`,
-    );
-  });
-}

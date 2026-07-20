@@ -14,12 +14,6 @@ export const primaryNavigation = [
   { label: "Company", href: "/company/" },
 ] as const;
 
-export const legalNavigation = [
-  { label: "Privacy", href: "/privacy/" },
-  { label: "Cookie policy", href: "/cookies/" },
-  { label: "Terms", href: "/terms/" },
-] as const;
-
 type PageMetadataForHead = Pick<
   PageMetadata,
   "title" | "description" | "canonicalPath" | "og"

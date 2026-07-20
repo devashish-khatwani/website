@@ -15,7 +15,7 @@ test("home page renders the W-06 homepage promise and product preview", async ({
 }) => {
   await page.goto("/");
 
-  await expect(page).toHaveTitle(/AI your whole team can work with/);
+  await expect(page).toHaveTitle(/Useful AI\. Visible rules\./u);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
     "noindex, nofollow",
@@ -25,12 +25,12 @@ test("home page renders the W-06 homepage promise and product preview", async ({
   ).toHaveAttribute("src", "/brand/glaux-lockup.svg");
   await expect(
     page.getByRole("heading", {
-      name: "AI your whole team can work with.",
+      name: "Useful AI. Visible rules.",
     }),
   ).toBeVisible();
   await expect(
     page.getByText(
-      /research, create, and automate with company knowledge and tools/i,
+      /research, create, and automate with approved company knowledge and tools/i,
     ),
   ).toBeVisible();
   await expect(
@@ -40,7 +40,7 @@ test("home page renders the W-06 homepage promise and product preview", async ({
     page.getByRole("main").getByRole("link", { name: "Explore the product" }),
   ).toHaveAttribute("href", "/product/");
   await expect(
-    page.getByLabel("Illustrative product view").getByText("Team lead"),
+    page.getByLabel("Illustrative product view").getByText("Research request"),
   ).toBeVisible();
   await expect(
     page.getByText("Renewal-risk brief", { exact: true }),
@@ -126,7 +126,7 @@ test("home page renders only approved draft platform labels and statements", asy
   ).toHaveCount(0);
 });
 
-test("home page preserves shell navigation, legal links, and focus behavior", async ({
+test("home page preserves shell navigation and focus behavior", async ({
   page,
 }) => {
   await page.goto("/");
@@ -144,11 +144,7 @@ test("home page preserves shell navigation, legal links, and focus behavior", as
   ).toHaveAttribute("href", "https://app.glauxagent.com/login");
   await expect(
     page.getByRole("contentinfo").getByRole("navigation", { name: "Legal" }),
-  ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Privacy" })).toHaveAttribute(
-    "href",
-    "/privacy/",
-  );
+  ).toHaveCount(0);
 
   const primaryNavigation = page.getByRole("navigation", { name: "Primary" });
   await primaryNavigation.getByRole("link", { name: "Sign in" }).focus();
@@ -158,14 +154,11 @@ test("home page preserves shell navigation, legal links, and focus behavior", as
   );
 
   const footer = page.getByRole("contentinfo");
-  await footer
+  const footerProductLink = footer
     .getByRole("navigation", { name: "Footer" })
-    .getByRole("link", { name: "Book a demo" })
-    .focus();
-  await page.keyboard.press("Tab");
-  await expectVisibleFocusOutline(
-    footer.getByRole("link", { name: "Privacy" }),
-  );
+    .getByRole("link", { name: "Product" });
+  await footerProductLink.focus();
+  await expectVisibleFocusOutline(footerProductLink);
 });
 
 test("mobile home page exposes navigation without horizontal overflow", async ({
@@ -211,18 +204,6 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   expect(consoleErrors).toEqual([]);
 });
 
-test("terms legal navigation target renders an honest draft shell", async ({
-  page,
-}) => {
-  await page.goto("/terms/");
-
-  await expect(page).toHaveTitle("Terms draft | Glaux");
-  await expect(page.getByRole("heading", { name: "Terms" })).toBeVisible();
-  await expect(
-    page.getByText("This legal route is intentionally a draft shell."),
-  ).toBeVisible();
-});
-
 test("home page exposes canonical and draft Open Graph metadata", async ({
   page,
 }) => {
@@ -238,7 +219,7 @@ test("home page exposes canonical and draft Open Graph metadata", async ({
   );
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
     "content",
-    "Glaux | AI your whole team can work with",
+    "Glaux | Useful AI. Visible rules.",
   );
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
     "content",

@@ -12,7 +12,16 @@ const approvedPalette = new Set([
   "#737373",
   "#E5E5E5",
   "#F2F2F2",
+  "#F5F5F5",
+  "#FAFAFA",
   "#FFFFFF",
+  "#2563EB",
+  "#1D4ED8",
+  "#DBEAFE",
+  "#EFF6FF",
+  "#1E3A8A",
+  "#525252",
+  "#60A5FA",
 ]);
 const hexColorPattern = /#[0-9A-Fa-f]{6}/gu;
 const assetFileNames = [
@@ -41,13 +50,14 @@ describe("W-03 design token contract", () => {
     "utf8",
   );
 
-  it("defines the approved monochrome production palette as CSS tokens", () => {
+  it("defines the approved Glaux production palette as CSS tokens", () => {
     expect(css).toMatch(/--color-graphite:\s*#0a0a0a;/u);
     expect(css).toMatch(/--color-carbon:\s*#171717;/u);
     expect(css).toMatch(/--color-concrete:\s*#737373;/u);
     expect(css).toMatch(/--color-hairline:\s*#e5e5e5;/u);
     expect(css).toMatch(/--color-mist:\s*#f2f2f2;/u);
     expect(css).toMatch(/--color-chalk:\s*#ffffff;/u);
+    expect(css).toMatch(/--color-primary:\s*#2563eb;/u);
   });
 
   it("keeps runtime brand assets limited to rendering fields", async () => {
@@ -90,7 +100,7 @@ describe("W-03 global CSS contract", () => {
     expect(css).toMatch(/scroll-behavior:\s*auto/u);
   });
 
-  it("does not introduce gradients or decorative chromatic colors", () => {
+  it("uses only approved colors and no gradients", () => {
     expect(css).not.toMatch(/linear-gradient|radial-gradient|conic-gradient/u);
     const cssColors = css
       .match(hexColorPattern)
