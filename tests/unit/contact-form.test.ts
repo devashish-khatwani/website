@@ -6,7 +6,6 @@ import {
   deploymentStageOptions,
   expectedUsersOptions,
   firstInvalidContactField,
-  governanceConcernOptions,
   inputFromFormData,
   submitContactForm,
   validateContactForm,
@@ -20,7 +19,6 @@ const validInput = {
   role: " Security lead ",
   deploymentStage: deploymentStageOptions[0],
   expectedUsers: expectedUsersOptions[1],
-  governanceConcern: governanceConcernOptions[0],
   message: "We want to understand approval paths.",
   consent: true,
 } as const;
@@ -34,7 +32,6 @@ describe("contact form validation contract", () => {
       "role",
       "deploymentStage",
       "expectedUsers",
-      "governanceConcern",
       "message",
       "consent",
     ]);
@@ -52,7 +49,6 @@ describe("contact form validation contract", () => {
         role: "Security lead",
         deploymentStage: deploymentStageOptions[0],
         expectedUsers: expectedUsersOptions[1],
-        governanceConcern: governanceConcernOptions[0],
         message: "We want to understand approval paths.",
         consent: true,
       },
@@ -67,7 +63,6 @@ describe("contact form validation contract", () => {
       role: "",
       deploymentStage: "",
       expectedUsers: "",
-      governanceConcern: "",
       message: "x".repeat(2001),
       consent: false,
     });
@@ -84,7 +79,6 @@ describe("contact form validation contract", () => {
       role: expect.stringMatching(/role/u),
       deploymentStage: expect.stringMatching(/deployment stage/u),
       expectedUsers: expect.stringMatching(/expected number/u),
-      governanceConcern: expect.stringMatching(/governance concern/u),
       message: expect.stringMatching(/2,000/u),
       consent: expect.stringMatching(/does not send/u),
     });
@@ -99,7 +93,6 @@ describe("contact form validation contract", () => {
     formData.set("role", "IT");
     formData.set("deploymentStage", deploymentStageOptions[1]);
     formData.set("expectedUsers", expectedUsersOptions[0]);
-    formData.set("governanceConcern", governanceConcernOptions[1]);
     formData.set("message", "");
     formData.set("consent", "yes");
 

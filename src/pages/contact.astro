@@ -5,7 +5,6 @@ import SiteLayout from "../components/SiteLayout.astro";
 import {
   deploymentStageOptions,
   expectedUsersOptions,
-  governanceConcernOptions,
 } from "../lib/contact-form";
 import { buildPageHeadMetadata } from "../lib/site";
 
@@ -179,29 +178,6 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
             </select>
             <p id="expectedUsers-error" class="field-error" hidden></p>
           </div>
-        </div>
-
-        <div class="field-group">
-          <label for="governanceConcern">
-            Primary governance concern <span>Required</span>
-          </label>
-          <select
-            id="governanceConcern"
-            name="governanceConcern"
-            aria-describedby="governanceConcern-hint governanceConcern-error"
-            required
-          >
-            <option value="">Choose one</option>
-            {
-              governanceConcernOptions.map((option) => (
-                <option value={option}>{option}</option>
-              ))
-            }
-          </select>
-          <p id="governanceConcern-hint" class="field-hint">
-            Choose the one topic that most shapes your evaluation.
-          </p>
-          <p id="governanceConcern-error" class="field-error" hidden></p>
         </div>
 
         <div class="field-group">

@@ -14,9 +14,6 @@ async function fillValidDemoRequest(page: import("@playwright/test").Page) {
   await page.getByLabel(/Deployment stage/u).selectOption("Planning a pilot");
   await page.getByLabel(/Expected users/u).selectOption("26-100");
   await page
-    .getByLabel(/Primary governance concern/u)
-    .selectOption("Approvals and access");
-  await page
     .getByLabel(/Optional message/u)
     .fill("We want to understand approval paths.");
   await page.getByLabel(/I understand this form/u).check();
@@ -49,12 +46,13 @@ test("contact page renders the W-10 noindexed form fields and route metadata", a
     /Role/u,
     /Deployment stage/u,
     /Expected users/u,
-    /Primary governance concern/u,
     /Optional message/u,
     /I understand this form/u,
   ]) {
     await expect(page.getByLabel(label)).toBeVisible();
   }
+  await expect(page.getByLabel(/Primary governance concern/u)).toHaveCount(0);
+  await expect(page.getByLabel(/Primary use case or team/u)).toHaveCount(0);
 
   await expect(page.getByRole("form")).toHaveAttribute(
     "data-processor-enabled",

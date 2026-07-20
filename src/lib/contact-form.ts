@@ -7,7 +7,6 @@ export const contactFormFields = [
   "role",
   "deploymentStage",
   "expectedUsers",
-  "governanceConcern",
   "message",
   "consent",
 ] as const;
@@ -28,17 +27,8 @@ export const expectedUsersOptions = [
   "500+",
 ] as const;
 
-export const governanceConcernOptions = [
-  "Approvals and access",
-  "Connecting company tools",
-  "Visibility into agent activity",
-  "Skill and MCP governance",
-  "Model and data boundaries",
-] as const;
-
 export type DeploymentStage = (typeof deploymentStageOptions)[number];
 export type ExpectedUsers = (typeof expectedUsersOptions)[number];
-export type GovernanceConcern = (typeof governanceConcernOptions)[number];
 
 export type ContactFormInput = Readonly<{
   workEmail: string;
@@ -47,7 +37,6 @@ export type ContactFormInput = Readonly<{
   role: string;
   deploymentStage: string;
   expectedUsers: string;
-  governanceConcern: string;
   message: string;
   consent: boolean;
 }>;
@@ -59,7 +48,6 @@ export type ContactFormSubmission = Readonly<{
   role: string;
   deploymentStage: DeploymentStage;
   expectedUsers: ExpectedUsers;
-  governanceConcern: GovernanceConcern;
   message?: string;
   consent: true;
 }>;
@@ -133,7 +121,6 @@ export function inputFromFormData(formData: FormData): ContactFormInput {
     role: String(formData.get("role") ?? ""),
     deploymentStage: String(formData.get("deploymentStage") ?? ""),
     expectedUsers: String(formData.get("expectedUsers") ?? ""),
-    governanceConcern: String(formData.get("governanceConcern") ?? ""),
     message: String(formData.get("message") ?? ""),
     consent: formData.get("consent") === "yes",
   };
@@ -187,15 +174,6 @@ export function validateContactForm(
     errors.expectedUsers = "Choose the expected number of users.";
   }
 
-  if (
-    input.governanceConcern &&
-    !isOption(governanceConcernOptions, input.governanceConcern)
-  ) {
-    errors.governanceConcern = "Choose a primary governance concern.";
-  } else if (!input.governanceConcern) {
-    errors.governanceConcern = "Choose a primary governance concern.";
-  }
-
   if (message.length > 2000) {
     errors.message = "Keep the optional message under 2,000 characters.";
   }
@@ -218,7 +196,6 @@ export function validateContactForm(
       role,
       deploymentStage: input.deploymentStage as DeploymentStage,
       expectedUsers: input.expectedUsers as ExpectedUsers,
-      governanceConcern: input.governanceConcern as GovernanceConcern,
       ...(message ? { message } : {}),
       consent: true,
     },
