@@ -83,6 +83,15 @@ async function dispatchHubSpotEvent(
   );
 }
 
+async function expectDemoFormReady(page: Page) {
+  await expect(page.locator("#hubspot-demo-form-host iframe")).toHaveAttribute(
+    "title",
+    "Glaux demo request form",
+  );
+  await expect(page.locator("#contact-form-status")).toBeHidden();
+  await expect(page.locator("#contact-form-status")).toHaveText("");
+}
+
 test("contact page renders noindexed HubSpot shell without local form fields", async ({
   page,
 }) => {
@@ -102,14 +111,16 @@ test("contact page renders noindexed HubSpot shell without local form fields", a
       name: "Tell us what your team wants AI to help with.",
     }),
   ).toBeVisible();
-  await expect(page.getByText("Available on production")).toBeVisible();
+  await expect(page.getByText("A focused conversation.")).toBeVisible();
   await expect(page.locator(".product-lede")).toContainText(
-    "Online demo requests are available on www.glauxagent.com",
+    "Share a little about your team, the work you want to improve",
   );
   await expect(page.locator(".contact-note")).toContainText(
-    "Preview, local, and unknown hosts remain closed",
+    "We’ll learn about your goals, current workflows, and requirements",
   );
-  await expect(page.locator("body")).not.toContainText("Prepared, not open");
+  await expect(page.locator(".contact-page")).not.toContainText(
+    /available on production|production build|preview, local|unknown hosts|production hostname|release switch|request status|demo request form is ready/u,
+  );
 
   await expect(page.locator("form")).toHaveCount(0);
   await expect(page.locator(".contact-form.surface")).toHaveCount(1);
@@ -129,7 +140,7 @@ test("contact page renders noindexed HubSpot shell without local form fields", a
     0,
   );
   await expect(page.getByRole("status")).toContainText(
-    "Demo requests are not available online yet",
+    "Demo requests are temporarily unavailable",
   );
 });
 
@@ -143,15 +154,13 @@ test("production hostname loads the native HubSpot embed and reaches ready state
   await expect(page.locator(`script[src="${hubSpotScriptUrl}"]`)).toHaveCount(
     1,
   );
-  await expect(page.getByRole("status")).toContainText(
-    "Demo request form is ready",
-  );
+  await expectDemoFormReady(page);
   await expect(
     page.locator("#hubspot-demo-form-host .hubspot-form-skeleton"),
   ).toHaveCount(0);
   await expect(page.locator("#hubspot-demo-form-host iframe")).toHaveAttribute(
     "title",
-    "Glaux demo request HubSpot form",
+    "Glaux demo request form",
   );
   await expect
     .poll(() => page.evaluate(() => window.__hubspotCreateArgs ?? []))
@@ -182,7 +191,7 @@ test("preview and local hostnames do not load HubSpot even when build config is 
     0,
   );
   await expect(page.getByRole("status")).toContainText(
-    "Demo requests are not available online yet",
+    "Demo requests are temporarily unavailable",
   );
   expect(scriptRequests).toEqual([]);
 });
@@ -201,7 +210,7 @@ test("HubSpot load failure exposes one retry control and retry does not duplicat
     await route.fulfill({
       contentType: "application/javascript",
       body: buildHubSpotReadyProviderScript({
-        iframeTitle: "Glaux demo request HubSpot form",
+        iframeTitle: "Glaux demo request form",
         includeSubmitButton: false,
       }),
     });
@@ -210,15 +219,13 @@ test("HubSpot load failure exposes one retry control and retry does not duplicat
   await page.goto(productionContactUrl);
 
   await expect(page.getByRole("status")).toContainText(
-    "The demo request form could not load",
+    "We couldn’t load the demo request form",
   );
   await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
 
   await page.getByRole("button", { name: "Try again" }).click();
 
-  await expect(page.getByRole("status")).toContainText(
-    "Demo request form is ready",
-  );
+  await expectDemoFormReady(page);
   await expect(page.locator(`script[src="${hubSpotScriptUrl}"]`)).toHaveCount(
     1,
   );
@@ -233,9 +240,7 @@ test("HubSpot success and failure events update safe inline status without redir
 }) => {
   await installHubSpotReadyStub(page);
   await page.goto(productionContactUrl);
-  await expect(page.getByRole("status")).toContainText(
-    "Demo request form is ready",
-  );
+  await expectDemoFormReady(page);
 
   const initialUrl = page.url();
   await page.locator("[data-testid='hubspot-submit']").focus();
@@ -262,9 +267,7 @@ test("HubSpot submission failure shows safe inline recovery copy while ready", a
 }) => {
   await installHubSpotReadyStub(page);
   await page.goto(productionContactUrl);
-  await expect(page.getByRole("status")).toContainText(
-    "Demo request form is ready",
-  );
+  await expectDemoFormReady(page);
 
   const initialUrl = page.url();
   await page.locator("[data-testid='hubspot-submit']").focus();
@@ -274,7 +277,7 @@ test("HubSpot submission failure shows safe inline recovery copy while ready", a
   await dispatchHubSpotEvent(page, "hs-form-event:on-submission:failed");
 
   await expect(page.getByRole("status")).toContainText(
-    "The form could not complete the submission",
+    "We couldn’t send your request",
   );
   await expect(page.locator("#contact-form-status")).toBeFocused();
   expect(page.url()).toBe(initialUrl);
@@ -305,13 +308,13 @@ test("stale HubSpot ready events do not recover a blocked script state", async (
 
   await page.goto(productionContactUrl);
   await expect(page.getByRole("status")).toContainText(
-    "The demo request form could not load",
+    "We couldn’t load the demo request form",
   );
 
   await dispatchHubSpotEvent(page, "hs-form-event:on-ready");
 
   await expect(page.getByRole("status")).toContainText(
-    "The demo request form could not load",
+    "We couldn’t load the demo request form",
   );
   await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
   await expect(page.locator("#hubspot-demo-form-host iframe")).toHaveCount(0);
@@ -320,18 +323,14 @@ test("stale HubSpot ready events do not recover a blocked script state", async (
 test("events for other HubSpot forms are ignored", async ({ page }) => {
   await installHubSpotReadyStub(page);
   await page.goto(productionContactUrl);
-  await expect(page.getByRole("status")).toContainText(
-    "Demo request form is ready",
-  );
+  await expectDemoFormReady(page);
 
   await dispatchHubSpotEvent(
     page,
     "hs-form-event:on-submission:success",
     "11111111-1111-4111-8111-111111111111",
   );
-  await expect(page.getByRole("status")).toContainText(
-    "Demo request form is ready",
-  );
+  await expectDemoFormReady(page);
 });
 
 test("HubSpot remains contact-only and no launch analytics trackers run", async ({
@@ -353,9 +352,7 @@ test("HubSpot remains contact-only and no launch analytics trackers run", async 
 
   await installHubSpotReadyStub(page);
   await page.goto(productionContactUrl);
-  await expect(page.getByRole("status")).toContainText(
-    "Demo request form is ready",
-  );
+  await expectDemoFormReady(page);
 
   expect(observedTrackedRequests).toEqual([hubSpotScriptUrl]);
   const cookies = await page.context().cookies();
@@ -371,9 +368,7 @@ test("contact build exposes no private HubSpot credentials or provider internals
 }) => {
   await installHubSpotReadyStub(page);
   await page.goto(productionContactUrl);
-  await expect(page.getByRole("status")).toContainText(
-    "Demo request form is ready",
-  );
+  await expectDemoFormReady(page);
 
   await expect(page.locator("body")).not.toContainText(
     /PRIVATE_HUBSPOT|HUBSPOT_ACCESS_TOKEN|HUBSPOT_API_KEY|client_secret|authorization|bearer|__SECRET_INTERNAL_DO_NOT_USE/u,
