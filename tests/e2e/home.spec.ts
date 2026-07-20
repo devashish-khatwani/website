@@ -215,14 +215,16 @@ test("legal navigation targets render honest noindexed draft shells", async ({
   page,
 }) => {
   for (const [path, heading] of [
-    ["/privacy/", "Privacy"],
-    ["/cookies/", "Cookie policy"],
+    ["/privacy/", "How the public website is intended to handle contact data."],
+    ["/cookies/", "The launch website keeps analytics narrow."],
     ["/terms/", "Terms"],
   ] as const) {
     await page.goto(path);
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
     await expect(
-      page.getByText(/route is intentionally a draft shell|route is ready/u),
+      page.getByText(
+        /route is intentionally a draft shell|route is ready|noindex and unpublished/u,
+      ),
     ).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
       "content",

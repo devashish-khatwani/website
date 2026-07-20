@@ -1,11 +1,184 @@
 ---
-import RouteStub from "../components/RouteStub.astro";
+import SiteLayout from "../components/SiteLayout.astro";
+import { buildPageHeadMetadata } from "../lib/site";
+
+const pageHead = buildPageHeadMetadata({
+  title: "Privacy draft | Glaux",
+  description: "Draft Glaux privacy route pending legal approval.",
+  canonicalPath: "/privacy/",
+  og: {
+    title: "Privacy draft | Glaux",
+    description: "Draft Glaux privacy route pending legal approval.",
+    imageAlt: "Monochrome Glaux privacy draft social preview.",
+  },
+});
+
+const processorBoundaries = [
+  {
+    title: "Contact and demo requests",
+    body: "The intended launch configuration uses a native HubSpot form embedded on the public contact page. Submissions feed HubSpot CRM so Glaux can respond to demo and design-partner inquiries.",
+  },
+  {
+    title: "No custom form processor",
+    body: "The website is not intended to run a custom Cloudflare form processor, a custom Forms API integration, or a site-side submission API for launch.",
+  },
+  {
+    title: "No site-wide HubSpot tracking",
+    body: "HubSpot is intended only for the operational contact form embed. HubSpot site-wide tracking code is not approved for launch.",
+  },
+] as const;
+
+const contactDefaults = [
+  "Contacts are non-marketing by default.",
+  "The form consent text is processing-only: Glaux may process the submission to respond to the request.",
+  "Preview submissions are intended to stay disabled.",
+  "Production form loading is intended only for www.glauxagent.com.",
+] as const;
 ---
 
-<RouteStub
-  title="Privacy draft | Glaux"
-  description="Draft Glaux privacy route pending legal approval."
-  canonicalPath="/privacy/"
-  heading="Privacy"
-  body="This legal route is intentionally a draft shell. Privacy copy must be approved by the legal owner before publication."
-/>
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  noindex
+  og={pageHead.og}
+>
+  <div class="product-page">
+    <section class="product-hero" aria-labelledby="privacy-heading">
+      <div class="product-hero__copy">
+        <p class="plain-label">Privacy draft</p>
+        <h1 id="privacy-heading" class="product-title">
+          How the public website is intended to handle contact data.
+        </h1>
+        <p class="product-lede">
+          This page is draft legal text for the Glaux public website. It remains
+          noindex and unpublished until the Project owner records final
+          publication approval.
+        </p>
+      </div>
+
+      <aside class="surface approval-preview" aria-label="Publication status">
+        <div>
+          <span class="badge">Draft / noindex</span>
+          <h2>Pending approval</h2>
+          <p>
+            This is not a published privacy policy, terms page, or compliance
+            statement. It records the intended launch boundaries that still need
+            Project-owner approval.
+          </p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="product-work-section" aria-labelledby="processor-heading">
+      <div class="section-heading">
+        <p class="plain-label">Processors and scope</p>
+        <h2 id="processor-heading">The launch processor boundary is narrow.</h2>
+        <p>
+          The public website is intended to collect only the contact details and
+          request context a visitor chooses to submit through the contact form.
+          Those submissions are for follow-up, not marketing enrollment by
+          default.
+        </p>
+      </div>
+
+      <div class="work-mode-grid">
+        {
+          processorBoundaries.map((item) => (
+            <article>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="governance-section" aria-labelledby="analytics-heading">
+      <div class="section-heading section-heading--compact">
+        <p class="plain-label">Analytics</p>
+        <h2 id="analytics-heading">
+          Cloudflare Web Analytics is the only launch analytics surface.
+        </h2>
+        <p>
+          Launch analytics are intended to stay limited to aggregate public-page
+          traffic and performance through Cloudflare Web Analytics. Google
+          Analytics, Google Tag Manager, Plausible, session replay, custom CTA
+          funnels, and authenticated-app analytics are outside the approved
+          launch boundary.
+        </p>
+      </div>
+
+      <div class="surface approval-preview" aria-label="Analytics boundary">
+        <div>
+          <span class="badge">Public site only</span>
+          <h3>Marketing analytics stop before sign-in.</h3>
+          <p>
+            Public website analytics are not approved to run inside the
+            authenticated Glaux app without a separate product, privacy, and
+            security review.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="decision-section" aria-labelledby="defaults-heading">
+      <div class="section-heading">
+        <p class="plain-label">Contact form defaults</p>
+        <h2 id="defaults-heading">
+          Form handling stays request-focused by default.
+        </h2>
+      </div>
+
+      <div class="preview-list__items">
+        {
+          contactDefaults.map((item) => (
+            <article class="preview-row decision-row">
+              <div>
+                <span class="badge">Launch default</span>
+              </div>
+              <p>{item}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="retention-heading">
+      <div class="section-heading section-heading--compact">
+        <p class="plain-label">Retention and deletion</p>
+        <h2 id="retention-heading">Deletion requests have a direct mailbox.</h2>
+        <p>
+          The current launch target is to delete inactive HubSpot CRM contact
+          records after 365 days. Visitors can request deletion at
+          privacy@glauxagent.com. The Project owner handles those requests until
+          a durable privacy owner is assigned.
+        </p>
+      </div>
+
+      <div class="preview-list__items" aria-label="Approval items">
+        <article class="preview-row decision-row">
+          <div>
+            <span class="badge">DPA coverage</span>
+            <h3>HubSpot processing</h3>
+          </div>
+          <p>
+            Publication still needs the Project owner to record approval for the
+            HubSpot privacy, cookie, and form-processing copy, including
+            standard HubSpot DPA coverage for the CRM processing boundary.
+          </p>
+        </article>
+        <article class="preview-row decision-row">
+          <div>
+            <span class="badge">Not published</span>
+            <h3>Other legal surfaces</h3>
+          </div>
+          <p>
+            Any additional legal page or data commitment planned for launch
+            needs separate approval or must stay excluded from publication.
+          </p>
+        </article>
+      </div>
+    </section>
+  </div>
+</SiteLayout>
