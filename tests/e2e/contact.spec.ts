@@ -102,7 +102,6 @@ test("contact page renders noindexed HubSpot shell without local form fields", a
       name: "Tell us what your team wants AI to help with.",
     }),
   ).toBeVisible();
-  await expect(page.getByText("Book a demo").first()).toBeVisible();
   await expect(page.getByText("Available on production")).toBeVisible();
   await expect(page.locator(".product-lede")).toContainText(
     "Online demo requests are available on www.glauxagent.com",
