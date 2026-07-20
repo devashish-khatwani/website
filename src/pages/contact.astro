@@ -2,10 +2,6 @@
 import { getEntry } from "astro:content";
 import Button from "../components/Button.astro";
 import SiteLayout from "../components/SiteLayout.astro";
-import {
-  deploymentStageOptions,
-  expectedUsersOptions,
-} from "../lib/contact-form";
 import { buildPageHeadMetadata } from "../lib/site";
 
 const contactEntry = await getEntry("pages", "contact");
@@ -36,8 +32,8 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
         </h1>
         <p class="product-lede">
           Share enough context for a useful governance conversation. Online demo
-          requests are not open yet, so this page does not send your information
-          until online request handling is open.
+          requests stay unavailable until the approved HubSpot form, privacy
+          review, and production release controls are ready.
         </p>
         <div class="product-actions" aria-label="Contact page actions">
           <Button href="/product/" variant="ghost">Explore the product</Button>
@@ -49,9 +45,9 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
         <span class="badge">Request status</span>
         <h2>Prepared, not open</h2>
         <p>
-          The form validates the details we expect to need. It will not submit
-          anything until online request handling, data terms, misuse protection,
-          and response expectations are decided.
+          The secure form loads only on the production hostname after the
+          explicit release switch is enabled. Preview, local, and unknown hosts
+          remain closed.
         </p>
       </aside>
     </section>
@@ -59,159 +55,40 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     <section class="contact-section" aria-labelledby="demo-form-heading">
       <div class="section-heading section-heading--compact">
         <p class="plain-label">Demo request</p>
-        <h2 id="demo-form-heading">Prepare your request</h2>
+        <h2 id="demo-form-heading">Book a demo</h2>
         <p>
-          Use a work email and avoid confidential details, credentials, or
-          sensitive architecture information.
+          Use the embedded form when it is available. Avoid confidential
+          details, credentials, or sensitive architecture information.
         </p>
       </div>
 
-      <form
-        id="contact-demo-form"
+      <div
         class="contact-form surface"
-        aria-label="Demo request"
-        data-processor-enabled="false"
-        novalidate
+        aria-labelledby="demo-form-heading"
+        aria-busy="false"
+        data-hubspot-demo-form
+        data-state="unavailable"
       >
         <div
           id="contact-form-status"
           class="form-status"
           role="status"
           aria-live="polite"
+          tabindex="-1"
         >
-          Complete the form to prepare a demo request.
+          Demo requests are not available online yet.
         </div>
 
-        <div class="form-grid">
-          <div class="field-group">
-            <label for="workEmail">Work email <span>Required</span></label>
-            <input
-              id="workEmail"
-              name="workEmail"
-              type="email"
-              inputmode="email"
-              autocomplete="email"
-              aria-describedby="workEmail-hint workEmail-error"
-              required
-            />
-            <p id="workEmail-hint" class="field-hint">
-              Use your company email address.
-            </p>
-            <p id="workEmail-error" class="field-error" hidden></p>
+        <div id="hubspot-demo-form-host" class="hubspot-form-host">
+          <div class="hubspot-form-skeleton" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
-
-          <div class="field-group">
-            <label for="name">Name <span>Required</span></label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              autocomplete="name"
-              aria-describedby="name-error"
-              required
-            />
-            <p id="name-error" class="field-error" hidden></p>
-          </div>
-
-          <div class="field-group">
-            <label for="company">Company <span>Required</span></label>
-            <input
-              id="company"
-              name="company"
-              type="text"
-              autocomplete="organization"
-              aria-describedby="company-error"
-              required
-            />
-            <p id="company-error" class="field-error" hidden></p>
-          </div>
-
-          <div class="field-group">
-            <label for="role">Role <span>Required</span></label>
-            <input
-              id="role"
-              name="role"
-              type="text"
-              autocomplete="organization-title"
-              aria-describedby="role-error"
-              required
-            />
-            <p id="role-error" class="field-error" hidden></p>
-          </div>
-
-          <div class="field-group">
-            <label for="deploymentStage">Deployment stage (optional)</label>
-            <select
-              id="deploymentStage"
-              name="deploymentStage"
-              aria-describedby="deploymentStage-error"
-            >
-              <option value="">Choose one</option>
-              {
-                deploymentStageOptions.map((option) => (
-                  <option value={option}>{option}</option>
-                ))
-              }
-            </select>
-            <p id="deploymentStage-error" class="field-error" hidden></p>
-          </div>
-
-          <div class="field-group">
-            <label for="expectedUsers">Expected users (optional)</label>
-            <select
-              id="expectedUsers"
-              name="expectedUsers"
-              aria-describedby="expectedUsers-error"
-            >
-              <option value="">Choose one</option>
-              {
-                expectedUsersOptions.map((option) => (
-                  <option value={option}>{option}</option>
-                ))
-              }
-            </select>
-            <p id="expectedUsers-error" class="field-error" hidden></p>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="message">Optional message</label>
-          <textarea
-            id="message"
-            name="message"
-            rows="5"
-            aria-describedby="message-hint message-error"></textarea>
-          <p id="message-hint" class="field-hint">
-            Share the work you want to support. Do not include confidential
-            information, credentials, or sensitive architecture details.
-          </p>
-          <p id="message-error" class="field-error" hidden></p>
-        </div>
-
-        <div class="consent-field">
-          <input
-            id="consent"
-            name="consent"
-            type="checkbox"
-            value="yes"
-            aria-describedby="consent-error"
-            required
-          />
-          <label for="consent">
-            I understand this form is for preparation only, does not send my
-            information yet, and should not include confidential information.
-          </label>
-          <p id="consent-error" class="field-error" hidden></p>
         </div>
 
         <div class="form-actions">
-          <button
-            id="contact-form-check"
-            class="button button--primary"
-            type="button"
-          >
-            Check request
-          </button>
           <button
             id="contact-form-retry"
             class="button button--ghost"
@@ -221,51 +98,54 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
             Try again
           </button>
         </div>
-      </form>
+      </div>
     </section>
   </div>
 </SiteLayout>
 
 <script>
   import {
-    contactFormFields,
-    contactSubmissionStateCopy,
-    firstInvalidContactField,
-    inputFromFormData,
-    submitContactForm,
-    validateContactForm,
+    getHubSpotDemoFormAvailability,
+    hubSpotFormsEmbedScriptSrc,
+    isHubSpotDemoRuntimeHost,
   } from "../lib/contact-form";
 
-  const form = document.querySelector<HTMLFormElement>("#contact-demo-form");
+  type HubSpotFormEvent = CustomEvent<{ formId?: string }>;
+  type HubSpotFormsApi = {
+    forms?: {
+      create?: (config: {
+        region: string;
+        portalId: string;
+        formId: string;
+        target: string;
+      }) => void;
+    };
+  };
+  type HubSpotClientState =
+    | "unavailable"
+    | "loading"
+    | "ready"
+    | "load-failed"
+    | "provider-failed"
+    | "success";
+
+  const loadTimeoutMs = 8000;
+  const targetSelector = "#hubspot-demo-form-host";
+  const iframeTitle = "Glaux demo request HubSpot form";
+  const shell = document.querySelector<HTMLElement>("[data-hubspot-demo-form]");
+  const host = document.querySelector<HTMLElement>(targetSelector);
   const statusRegion = document.querySelector<HTMLElement>(
     "#contact-form-status",
-  );
-  const checkButton = document.querySelector<HTMLButtonElement>(
-    "#contact-form-check",
   );
   const retryButton = document.querySelector<HTMLButtonElement>(
     "#contact-form-retry",
   );
-
-  function setFieldError(field: string, message: string | undefined) {
-    const control = form?.elements.namedItem(field) as
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
-    const error = document.querySelector<HTMLElement>(`#${field}-error`);
-
-    if (!control || !error) {
-      return;
-    }
-
-    if (message) {
-      control.setAttribute("aria-invalid", "true");
-      error.textContent = message;
-      error.hidden = false;
-    } else {
-      control.removeAttribute("aria-invalid");
-      error.textContent = "";
-      error.hidden = true;
-    }
-  }
+  const availability = getHubSpotDemoFormAvailability(import.meta.env);
+  let currentScript: HTMLScriptElement | undefined;
+  let currentState: HubSpotClientState = "unavailable";
+  let loadTimer: number | undefined;
+  let listenersRegistered = false;
+  let lastFocusWasInsideHost = false;
 
   function setStatus(message: string) {
     if (statusRegion) {
@@ -273,60 +153,216 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     }
   }
 
-  function clearErrors() {
-    for (const field of contactFormFields) {
-      setFieldError(field, undefined);
+  function setState(state: HubSpotClientState, isBusy: boolean) {
+    currentState = state;
+    if (shell) {
+      shell.dataset.state = state;
+      shell.setAttribute("aria-busy", String(isBusy));
     }
   }
 
   function setRetryVisible(isVisible: boolean) {
-    retryButton?.toggleAttribute("hidden", !isVisible);
+    if (retryButton) {
+      retryButton.hidden = !isVisible;
+    }
   }
 
-  async function checkRequest() {
-    if (!form) {
+  function clearLoadTimer() {
+    if (loadTimer !== undefined) {
+      window.clearTimeout(loadTimer);
+      loadTimer = undefined;
+    }
+  }
+
+  function removeLoaderScript() {
+    currentScript?.remove();
+    currentScript = undefined;
+
+    for (const script of document.querySelectorAll<HTMLScriptElement>(
+      "script[data-hubspot-demo-form-loader]",
+    )) {
+      script.remove();
+    }
+  }
+
+  function resetHostSkeleton() {
+    if (host) {
+      host.innerHTML = [
+        '<div class="hubspot-form-skeleton" aria-hidden="true">',
+        "<span></span>",
+        "<span></span>",
+        "<span></span>",
+        "<span></span>",
+        "</div>",
+      ].join("");
+    }
+  }
+
+  function setIframeTitles() {
+    for (const iframe of host?.querySelectorAll("iframe") ?? []) {
+      iframe.setAttribute("title", iframeTitle);
+    }
+  }
+
+  function restoreFocusIfNeeded() {
+    if (!lastFocusWasInsideHost || !statusRegion) {
       return;
     }
 
-    setStatus(contactSubmissionStateCopy.validating);
-    setRetryVisible(false);
-    clearErrors();
-
-    const result = validateContactForm(inputFromFormData(new FormData(form)));
-
-    if (result.status === "validation-error") {
-      setStatus(contactSubmissionStateCopy["validation-error"]);
-
-      for (const [field, message] of Object.entries(result.errors)) {
-        setFieldError(field, message);
-      }
-
-      const firstInvalid = firstInvalidContactField(result.errors);
-      const firstInvalidControl = firstInvalid
-        ? (form.elements.namedItem(firstInvalid) as HTMLElement | null)
-        : null;
-      firstInvalidControl?.focus();
-      return;
+    const activeElement = document.activeElement;
+    if (
+      !activeElement ||
+      activeElement === document.body ||
+      host?.contains(activeElement)
+    ) {
+      statusRegion.focus({ preventScroll: true });
     }
+    lastFocusWasInsideHost = false;
+  }
 
-    setStatus(contactSubmissionStateCopy.submitting);
-    const submissionState = await submitContactForm(result.submission);
-    setStatus(submissionState.message);
-
-    setRetryVisible(
-      "canRetry" in submissionState && submissionState.canRetry === true,
+  function eventIsForDemoForm(event: Event): event is HubSpotFormEvent {
+    return (
+      availability.status === "available" &&
+      (event as HubSpotFormEvent).detail?.formId === availability.config.formId
     );
   }
 
-  if (form && checkButton) {
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      void checkRequest();
-    });
-    checkButton.type = "submit";
+  function markLoadFailed() {
+    clearLoadTimer();
+    removeLoaderScript();
+    resetHostSkeleton();
+    setState("load-failed", false);
+    setStatus(
+      "The demo request form could not load. Check browser script blocking and try again.",
+    );
+    setRetryVisible(true);
   }
 
-  retryButton?.addEventListener("click", () => {
-    void checkRequest();
-  });
+  function registerHubSpotEventListeners() {
+    if (listenersRegistered) {
+      return;
+    }
+    listenersRegistered = true;
+
+    document.addEventListener("focusin", (event) => {
+      lastFocusWasInsideHost =
+        event.target instanceof Node && host?.contains(event.target) === true;
+    });
+
+    window.addEventListener("hs-form-event:on-ready", (event) => {
+      if (!eventIsForDemoForm(event) || currentState !== "loading") {
+        return;
+      }
+      clearLoadTimer();
+      setState("ready", false);
+      setRetryVisible(false);
+      setIframeTitles();
+      setStatus("Demo request form is ready.");
+    });
+
+    window.addEventListener("hs-form-event:on-submission:success", (event) => {
+      if (!eventIsForDemoForm(event) || currentState !== "ready") {
+        return;
+      }
+      clearLoadTimer();
+      setState("success", false);
+      setRetryVisible(false);
+      setIframeTitles();
+      setStatus(
+        "Your demo request was received. We will respond within two business days.",
+      );
+      restoreFocusIfNeeded();
+    });
+
+    window.addEventListener("hs-form-event:on-submission:failed", (event) => {
+      if (!eventIsForDemoForm(event) || currentState !== "ready") {
+        return;
+      }
+      clearLoadTimer();
+      setState("provider-failed", false);
+      setRetryVisible(false);
+      setIframeTitles();
+      setStatus(
+        "The form could not complete the submission. Check the highlighted fields and try again.",
+      );
+      restoreFocusIfNeeded();
+    });
+  }
+
+  function createHubSpotForm() {
+    if (availability.status !== "available" || currentState !== "loading") {
+      return;
+    }
+
+    const hbspt = (window as Window & { hbspt?: HubSpotFormsApi }).hbspt;
+    const create = hbspt?.forms?.create;
+
+    if (!create) {
+      markLoadFailed();
+      return;
+    }
+
+    try {
+      create({
+        region: availability.config.region,
+        portalId: availability.config.portalId,
+        formId: availability.config.formId,
+        target: targetSelector,
+      });
+    } catch {
+      markLoadFailed();
+    }
+  }
+
+  function loadHubSpotForm() {
+    if (!shell || !host) {
+      return;
+    }
+
+    if (
+      availability.status !== "available" ||
+      !isHubSpotDemoRuntimeHost(window.location.hostname)
+    ) {
+      clearLoadTimer();
+      removeLoaderScript();
+      resetHostSkeleton();
+      setState("unavailable", false);
+      setStatus("Demo requests are not available online yet.");
+      setRetryVisible(false);
+      return;
+    }
+
+    clearLoadTimer();
+    removeLoaderScript();
+    resetHostSkeleton();
+    registerHubSpotEventListeners();
+    setState("loading", true);
+    setStatus("Loading secure demo request form.");
+    setRetryVisible(false);
+
+    const script = document.createElement("script");
+    currentScript = script;
+    script.src = hubSpotFormsEmbedScriptSrc;
+    script.async = true;
+    script.dataset.hubspotDemoFormLoader = "true";
+    script.onload = () => {
+      if (currentScript === script && currentState === "loading") {
+        createHubSpotForm();
+      }
+    };
+    script.onerror = () => {
+      if (currentScript === script && currentState === "loading") {
+        markLoadFailed();
+      }
+    };
+    loadTimer = window.setTimeout(() => {
+      if (currentScript === script && currentState === "loading") {
+        markLoadFailed();
+      }
+    }, loadTimeoutMs);
+    document.head.append(script);
+  }
+
+  retryButton?.addEventListener("click", loadHubSpotForm);
+  loadHubSpotForm();
 </script>

@@ -7,6 +7,9 @@ export default defineConfig({
   reporter: [["list"]],
   use: {
     baseURL: "http://127.0.0.1:4321",
+    launchOptions: {
+      args: ["--host-resolver-rules=MAP www.glauxagent.com 127.0.0.1"],
+    },
     trace: "on-first-retry",
   },
   webServer: {

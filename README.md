@@ -45,6 +45,22 @@ an HTTPS origin only, without a path, query string, or fragment. Crawling is
 allowed only for an explicit Cloudflare Pages build of the `main` branch;
 preview, local, CI, and unknown builds render `robots.txt` with `Disallow: /`.
 
+The `/contact/` route uses a native HubSpot form embed only after all of these
+public build-time settings are present in the production Pages environment:
+
+- `PUBLIC_HUBSPOT_DEMO_FORM_ENABLED=true`
+- `PUBLIC_HUBSPOT_PORTAL_ID`
+- `PUBLIC_HUBSPOT_DEMO_FORM_ID`
+- `PUBLIC_HUBSPOT_REGION` copied from the HubSpot embed code
+
+These values are public identifiers, not private tokens. Leave the kill switch
+off in preview, CI, and local builds. The client runtime also checks the exact
+hostname and will not load or submit the HubSpot embed unless the page is on
+`www.glauxagent.com`. Roll back contact submissions by setting
+`PUBLIC_HUBSPOT_DEMO_FORM_ENABLED=false` and redeploying. Do not add custom form
+processors, Forms REST API calls, site-wide HubSpot tracking, or real account
+IDs in Git. W-13 still controls production publication.
+
 Content authors should run `npm run validate:content` before requesting release
 review. The claim workflow and evidence classes are documented in
 [`docs/content/claim-workflow.md`](docs/content/claim-workflow.md).
@@ -64,6 +80,6 @@ the reviewed settings, access controls, verification, and rollback steps.
 
 ## Scope guardrails
 
-The current route remains a placeholder. It does not include analytics, a form
-backend, auth logic, production credentials, React islands, upstream Hermes
-branding, or public product claims.
+The current route remains closed by default. It does not include analytics, a
+custom form backend, auth logic, production credentials, React islands, upstream
+Hermes branding, or public product claims.

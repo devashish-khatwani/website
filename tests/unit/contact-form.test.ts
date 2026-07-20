@@ -1,150 +1,113 @@
 import { describe, expect, it } from "vitest";
 import {
-  contactFormFields,
-  contactFormProcessorEnabled,
-  contactSubmissionStateCopy,
-  deploymentStageOptions,
-  expectedUsersOptions,
-  firstInvalidContactField,
-  inputFromFormData,
-  submitContactForm,
-  validateContactForm,
-  type ContactSubmissionState,
+  approvedHubSpotDemoFields,
+  getHubSpotDemoFormAvailability,
+  hubSpotDemoConsentText,
+  hubSpotFormsEmbedScriptSrc,
+  hubSpotFormsRuntimeHostname,
+  isHubSpotDemoRuntimeHost,
 } from "../../src/lib/contact-form";
 
-const validInput = {
-  workEmail: "Operator@Example.COM",
-  name: "  Ada  Lovelace ",
-  company: " Example Company ",
-  role: " Security lead ",
-  deploymentStage: deploymentStageOptions[0],
-  expectedUsers: expectedUsersOptions[1],
-  message: "We want to understand approval paths.",
-  consent: true,
+const validEnvironment = {
+  PUBLIC_HUBSPOT_DEMO_FORM_ENABLED: "true",
+  PUBLIC_HUBSPOT_PORTAL_ID: "123456",
+  PUBLIC_HUBSPOT_DEMO_FORM_ID: "00000000-0000-4000-8000-000000000000",
+  PUBLIC_HUBSPOT_REGION: "na1",
 } as const;
 
-describe("contact form validation contract", () => {
-  it("keeps the PRD field list explicit and ordered", () => {
-    expect(contactFormFields).toEqual([
-      "workEmail",
-      "name",
-      "company",
-      "role",
-      "deploymentStage",
-      "expectedUsers",
-      "message",
-      "consent",
-    ]);
+describe("HubSpot demo form configuration", () => {
+  it("keeps the native embed unavailable by default", () => {
+    const availability = getHubSpotDemoFormAvailability({});
+
+    expect(availability).toMatchObject({
+      status: "unavailable",
+      reason: "kill-switch-off",
+    });
+    expect(hubSpotFormsEmbedScriptSrc).toBe(
+      "https://js.hsforms.net/forms/embed/v2.js",
+    );
+    expect(hubSpotFormsRuntimeHostname).toBe("www.glauxagent.com");
   });
 
-  it("normalizes a valid contact form submission", () => {
-    const result = validateContactForm(validInput);
-
-    expect(result.status).toBe("valid");
-    expect(result).toMatchObject({
-      submission: {
-        workEmail: "operator@example.com",
-        name: "Ada Lovelace",
-        company: "Example Company",
-        role: "Security lead",
-        deploymentStage: deploymentStageOptions[0],
-        expectedUsers: expectedUsersOptions[1],
-        message: "We want to understand approval paths.",
-        consent: true,
+  it("accepts bounded public HubSpot account identifiers without assuming region inventory", () => {
+    expect(getHubSpotDemoFormAvailability(validEnvironment)).toMatchObject({
+      status: "available",
+      config: {
+        region: "na1",
+        portalId: "123456",
+        formId: "00000000-0000-4000-8000-000000000000",
       },
     });
-  });
-
-  it("accepts blank qualification fields and omits them from the submission", () => {
-    const result = validateContactForm({
-      ...validInput,
-      deploymentStage: "",
-      expectedUsers: "",
+    expect(
+      getHubSpotDemoFormAvailability({
+        ...validEnvironment,
+        PUBLIC_HUBSPOT_REGION: "na2",
+      }),
+    ).toMatchObject({
+      status: "available",
+      config: { region: "na2" },
     });
 
-    expect(result.status).toBe("valid");
-    if (result.status !== "valid") {
-      throw new Error("Expected blank qualification fields to be valid.");
-    }
-
-    expect(result.submission).not.toHaveProperty("deploymentStage");
-    expect(result.submission).not.toHaveProperty("expectedUsers");
+    expect(
+      getHubSpotDemoFormAvailability({
+        ...validEnvironment,
+        PUBLIC_HUBSPOT_REGION: "NA2",
+      }),
+    ).toMatchObject({ status: "unavailable", reason: "invalid-config" });
+    expect(
+      getHubSpotDemoFormAvailability({
+        ...validEnvironment,
+        PUBLIC_HUBSPOT_REGION: "na2.example.com",
+      }),
+    ).toMatchObject({ status: "unavailable", reason: "invalid-config" });
+    expect(
+      getHubSpotDemoFormAvailability({
+        ...validEnvironment,
+        PUBLIC_HUBSPOT_PORTAL_ID: "portal-123",
+      }),
+    ).toMatchObject({ status: "unavailable", reason: "invalid-config" });
+    expect(
+      getHubSpotDemoFormAvailability({
+        ...validEnvironment,
+        PUBLIC_HUBSPOT_DEMO_FORM_ID: "not-a-form-id",
+      }),
+    ).toMatchObject({ status: "unavailable", reason: "invalid-config" });
+    expect(
+      getHubSpotDemoFormAvailability({
+        ...validEnvironment,
+        PUBLIC_HUBSPOT_PORTAL_ID: "123456",
+        PUBLIC_HUBSPOT_DEMO_FORM_ID: "",
+      }),
+    ).toMatchObject({ status: "unavailable", reason: "invalid-config" });
+    expect(
+      getHubSpotDemoFormAvailability({
+        ...validEnvironment,
+        PUBLIC_HUBSPOT_DEMO_FORM_ENABLED: "TRUE",
+      }),
+    ).toMatchObject({ status: "unavailable", reason: "kill-switch-off" });
   });
 
-  it("returns field-specific validation errors and first invalid field", () => {
-    const result = validateContactForm({
-      workEmail: "not-an-email",
-      name: "",
-      company: "",
-      role: "",
-      deploymentStage: "Already deployed",
-      expectedUsers: "Thousands",
-      message: "x".repeat(2001),
-      consent: false,
-    });
-
-    expect(result.status).toBe("validation-error");
-    if (result.status !== "validation-error") {
-      throw new Error("Expected validation errors.");
-    }
-
-    expect(result.errors).toMatchObject({
-      workEmail: expect.stringMatching(/valid format/u),
-      name: expect.stringMatching(/name/u),
-      company: expect.stringMatching(/company/u),
-      role: expect.stringMatching(/role/u),
-      deploymentStage: expect.stringMatching(/from the list/u),
-      expectedUsers: expect.stringMatching(/from the list/u),
-      message: expect.stringMatching(/2,000/u),
-      consent: expect.stringMatching(/does not send/u),
-    });
-    expect(firstInvalidContactField(result.errors)).toBe("workEmail");
+  it("requires the exact production runtime hostname even with valid build config", () => {
+    expect(isHubSpotDemoRuntimeHost("www.glauxagent.com")).toBe(true);
+    expect(isHubSpotDemoRuntimeHost("glauxagent.com")).toBe(false);
+    expect(isHubSpotDemoRuntimeHost("preview.glauxagent.com")).toBe(false);
+    expect(isHubSpotDemoRuntimeHost("127.0.0.1")).toBe(false);
+    expect(isHubSpotDemoRuntimeHost("localhost")).toBe(false);
   });
 
-  it("hydrates input from FormData with checkbox consent", () => {
-    const formData = new FormData();
-    formData.set("workEmail", "demo@example.com");
-    formData.set("name", "Demo User");
-    formData.set("company", "Example");
-    formData.set("role", "IT");
-    formData.set("deploymentStage", deploymentStageOptions[1]);
-    formData.set("expectedUsers", expectedUsersOptions[0]);
-    formData.set("message", "");
-    formData.set("consent", "yes");
-
-    expect(inputFromFormData(formData)).toMatchObject({
-      workEmail: "demo@example.com",
-      consent: true,
-    });
-  });
-
-  it("defines every required submission state without enabling production submission", async () => {
-    const expectedStates = [
-      "idle",
-      "validating",
-      "validation-error",
-      "submitting",
-      "success",
-      "retryable-failure",
-      "rate-limited",
-      "spam-blocked",
-      "unavailable",
-    ] satisfies ContactSubmissionState["status"][];
-
-    expect(Object.keys(contactSubmissionStateCopy).sort()).toEqual(
-      [...expectedStates].sort(),
+  it("documents only the approved account-side fields and consent text", () => {
+    expect(approvedHubSpotDemoFields).toEqual([
+      { label: "Work email", required: true },
+      { label: "Name", required: true },
+      { label: "Company", required: true },
+      { label: "Role", required: true },
+      { label: "Deployment stage", required: false },
+      { label: "Expected users", required: false },
+      { label: "Message", required: false },
+      { label: "Consent", required: true, processingOnly: true },
+    ]);
+    expect(hubSpotDemoConsentText).toBe(
+      "I agree that Glaux may store and process this information to respond to my demo request.",
     );
-    expect(contactFormProcessorEnabled).toBe(false);
-
-    const result = validateContactForm(validInput);
-    if (result.status !== "valid") {
-      throw new Error("Expected valid contact form input.");
-    }
-
-    await expect(submitContactForm(result.submission)).resolves.toMatchObject({
-      status: "unavailable",
-      canRetry: true,
-      message: expect.stringMatching(/not open yet/u),
-    });
   });
 });

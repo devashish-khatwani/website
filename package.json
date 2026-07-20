@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:e2e": "npm run build && playwright test"
+    "test:e2e": "PUBLIC_HUBSPOT_DEMO_FORM_ENABLED=true PUBLIC_HUBSPOT_PORTAL_ID=123456 PUBLIC_HUBSPOT_DEMO_FORM_ID=00000000-0000-4000-8000-000000000000 PUBLIC_HUBSPOT_REGION=na2 npm run build && playwright test"
   },
   "dependencies": {
     "@astrojs/mdx": "7.0.3",

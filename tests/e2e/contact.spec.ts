@@ -1,25 +1,72 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   expectNoHorizontalOverflow,
   expectVisibleFocusOutline,
 } from "./assertions";
 
 const canonicalUrl = "https://www.glauxagent.com/contact/";
+const hubSpotScriptUrl = "https://js.hsforms.net/forms/embed/v2.js";
+const productionContactUrl = "http://www.glauxagent.com:4321/contact/";
 
-async function fillValidDemoRequest(page: import("@playwright/test").Page) {
-  await page.getByLabel(/Work email/u).fill("operator@example.com");
-  await page.getByLabel(/Name/u).fill("Ada Lovelace");
-  await page.getByLabel(/Company/u).fill("Example Company");
-  await page.getByLabel(/Role/u).fill("Security lead");
-  await page.getByLabel(/Deployment stage/u).selectOption("Planning a pilot");
-  await page.getByLabel(/Expected users/u).selectOption("26-100");
-  await page
-    .getByLabel(/Optional message/u)
-    .fill("We want to understand approval paths.");
-  await page.getByLabel(/I understand this form/u).check();
+declare global {
+  interface Window {
+    __hubspotCreateArgs?: Array<{
+      region?: string;
+      portalId?: string;
+      formId?: string;
+      target?: string;
+    }>;
+  }
 }
 
-test("contact page renders the W-10 noindexed form fields and route metadata", async ({
+async function installHubSpotReadyStub(page: Page) {
+  await page.route(hubSpotScriptUrl, async (route) => {
+    await route.fulfill({
+      contentType: "application/javascript",
+      body: `
+        window.__hubspotCreateArgs = [];
+        window.hbspt = {
+          forms: {
+            create(config) {
+              window.__hubspotCreateArgs.push({
+                region: config.region,
+                portalId: config.portalId,
+                formId: config.formId,
+                target: config.target
+              });
+              const host = document.querySelector(config.target);
+              if (host) {
+                host.innerHTML = '<iframe title="" src="about:blank"></iframe><button type="button" data-testid="hubspot-submit">Submit demo request</button>';
+              }
+              window.dispatchEvent(new CustomEvent("hs-form-event:on-ready", {
+                detail: { formId: config.formId }
+              }));
+            }
+          }
+        };
+      `,
+    });
+  });
+}
+
+async function dispatchHubSpotEvent(
+  page: Page,
+  eventName: string,
+  formId = "00000000-0000-4000-8000-000000000000",
+) {
+  await page.evaluate(
+    ({ eventName, formId }) => {
+      window.dispatchEvent(
+        new CustomEvent(eventName, {
+          detail: { formId },
+        }),
+      );
+    },
+    { eventName, formId },
+  );
+}
+
+test("contact page renders noindexed HubSpot shell without local form fields", async ({
   page,
 }) => {
   await page.goto("/contact/");
@@ -39,168 +86,282 @@ test("contact page renders the W-10 noindexed form fields and route metadata", a
     }),
   ).toBeVisible();
 
-  for (const label of [
-    /Work email/u,
-    /Name/u,
-    /Company/u,
-    /Role/u,
-    /Deployment stage \(optional\)/u,
-    /Expected users \(optional\)/u,
-    /Optional message/u,
-    /I understand this form/u,
-  ]) {
-    await expect(page.getByLabel(label)).toBeVisible();
-  }
-  await expect(page.locator('label[for="deploymentStage"]')).not.toContainText(
-    "Required",
+  await expect(page.locator("form")).toHaveCount(0);
+  await expect(page.locator(".contact-form.surface")).toHaveCount(1);
+  await expect(page.locator("#contact-form-status")).toHaveAttribute(
+    "role",
+    "status",
   );
-  await expect(page.locator('label[for="expectedUsers"]')).not.toContainText(
-    "Required",
+  await expect(page.locator("#contact-form-status")).toHaveAttribute(
+    "aria-live",
+    "polite",
   );
   await expect(
-    page.getByLabel(/Deployment stage \(optional\)/u),
-  ).not.toHaveAttribute("required");
-  await expect(
-    page.getByLabel(/Expected users \(optional\)/u),
-  ).not.toHaveAttribute("required");
-  await expect(page.getByLabel(/Primary governance concern/u)).toHaveCount(0);
-  await expect(page.getByLabel(/Primary use case or team/u)).toHaveCount(0);
-
-  await expect(page.getByRole("form")).toHaveAttribute(
-    "data-processor-enabled",
-    "false",
+    page.locator("#contact-form-status + #hubspot-demo-form-host"),
+  ).toHaveCount(1);
+  await expect(page.getByLabel(/Work email/u)).toHaveCount(0);
+  await expect(page.locator(`script[src="${hubSpotScriptUrl}"]`)).toHaveCount(
+    0,
   );
-  await expect(
-    page.getByRole("button", { name: "Check request" }),
-  ).toHaveAttribute("type", "submit");
-  await expect(page.getByText(/does not send your information/u)).toBeVisible();
-});
-
-test("contact form reports field errors, focuses the first invalid field, and preserves input", async ({
-  page,
-}) => {
-  await page.goto("/contact/");
-  await page.getByLabel(/Work email/u).fill("not-an-email");
-  await page.getByLabel(/Company/u).fill("Example Company");
-  await page.getByLabel(/Work email/u).press("Enter");
-
   await expect(page.getByRole("status")).toContainText(
-    "Some fields need attention",
-  );
-  await expect(page.getByLabel(/Work email/u)).toBeFocused();
-  await expect(page.locator("#workEmail-error")).toContainText("valid format");
-  await expect(page.locator("#name-error")).toContainText("name");
-  await expect(page.locator("#company-error")).toBeHidden();
-  await expect(page.getByLabel(/Company/u)).toHaveValue("Example Company");
-});
-
-test("contact form allows blank qualification fields while preserving the disabled processor state", async ({
-  page,
-}) => {
-  await page.goto("/contact/");
-  await page.getByLabel(/Work email/u).fill("operator@example.com");
-  await page.getByLabel(/Name/u).fill("Ada Lovelace");
-  await page.getByLabel(/Company/u).fill("Example Company");
-  await page.getByLabel(/Role/u).fill("Security lead");
-  await page
-    .getByLabel(/Optional message/u)
-    .fill("We want to understand approval paths.");
-  await page.getByLabel(/I understand this form/u).check();
-  await page.getByRole("button", { name: "Check request" }).click();
-
-  await expect(page.locator("#deploymentStage-error")).toBeHidden();
-  await expect(page.locator("#expectedUsers-error")).toBeHidden();
-  await expect(page.getByRole("status")).toContainText(
-    "Online demo requests are not open yet",
+    "Demo requests are not available online yet",
   );
 });
 
-test("contact form corrects errors and reaches the safe unavailable processor state", async ({
+test("production hostname loads the native HubSpot embed and reaches ready state", async ({
   page,
 }) => {
-  await page.goto("/contact/");
+  await installHubSpotReadyStub(page);
 
-  await fillValidDemoRequest(page);
-  await page.getByRole("button", { name: "Check request" }).click();
+  await page.goto(productionContactUrl);
 
-  await expect(page.getByRole("status")).toContainText(
-    "Online demo requests are not open yet",
+  await expect(page.locator(`script[src="${hubSpotScriptUrl}"]`)).toHaveCount(
+    1,
   );
-  await expect(
-    page.getByText(/stack trace|provider|CRM|inbox|internal destination/u),
-  ).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
-
-  await page.getByRole("button", { name: "Try again" }).click();
   await expect(page.getByRole("status")).toContainText(
-    "Online demo requests are not open yet",
+    "Demo request form is ready",
   );
+  await expect(page.locator("#hubspot-demo-form-host iframe")).toHaveAttribute(
+    "title",
+    "Glaux demo request HubSpot form",
+  );
+  await expect
+    .poll(() => page.evaluate(() => window.__hubspotCreateArgs ?? []))
+    .toEqual([
+      {
+        region: "na2",
+        portalId: "123456",
+        formId: "00000000-0000-4000-8000-000000000000",
+        target: "#hubspot-demo-form-host",
+      },
+    ]);
 });
 
-test("contact form does not make a network submission or navigate", async ({
+test("preview and local hostnames do not load HubSpot even when build config is enabled", async ({
   page,
 }) => {
-  const attemptedSubmissions: string[] = [];
+  const scriptRequests: string[] = [];
   page.on("request", (request) => {
-    if (["fetch", "xhr"].includes(request.resourceType())) {
-      attemptedSubmissions.push(request.url());
+    if (request.url() === hubSpotScriptUrl) {
+      scriptRequests.push(request.url());
     }
   });
 
   await page.goto("/contact/");
   await page.waitForLoadState("networkidle");
-  attemptedSubmissions.length = 0;
-  const initialUrl = page.url();
-  await fillValidDemoRequest(page);
-  await page.getByRole("button", { name: "Check request" }).click();
+
+  await expect(page.locator(`script[src="${hubSpotScriptUrl}"]`)).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole("status")).toContainText(
+    "Demo requests are not available online yet",
+  );
+  expect(scriptRequests).toEqual([]);
+});
+
+test("HubSpot load failure exposes one retry control and retry does not duplicate embed state", async ({
+  page,
+}) => {
+  let scriptAttempts = 0;
+  await page.route(hubSpotScriptUrl, async (route) => {
+    scriptAttempts += 1;
+    if (scriptAttempts === 1) {
+      await route.abort("blockedbyclient");
+      return;
+    }
+
+    await route.fulfill({
+      contentType: "application/javascript",
+      body: `
+        window.__hubspotCreateArgs = [];
+        window.hbspt = {
+          forms: {
+            create(config) {
+              window.__hubspotCreateArgs.push({
+                region: config.region,
+                portalId: config.portalId,
+                formId: config.formId,
+                target: config.target
+              });
+              const host = document.querySelector(config.target);
+              if (host) {
+                host.innerHTML = '<iframe title="Glaux demo request HubSpot form" src="about:blank"></iframe>';
+              }
+              window.dispatchEvent(new CustomEvent("hs-form-event:on-ready", {
+                detail: { formId: config.formId }
+              }));
+            }
+          }
+        };
+      `,
+    });
+  });
+
+  await page.goto(productionContactUrl);
 
   await expect(page.getByRole("status")).toContainText(
-    "Online demo requests are not open yet",
+    "The demo request form could not load",
   );
-  expect(page.url()).toBe(initialUrl);
-  expect(attemptedSubmissions).toEqual([]);
+  await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Try again" }).click();
+
+  await expect(page.getByRole("status")).toContainText(
+    "Demo request form is ready",
+  );
+  await expect(page.locator(`script[src="${hubSpotScriptUrl}"]`)).toHaveCount(
+    1,
+  );
+  await expect(page.locator("#hubspot-demo-form-host iframe")).toHaveCount(1);
+  await expect
+    .poll(() => page.evaluate(() => window.__hubspotCreateArgs?.length ?? 0))
+    .toBe(1);
 });
 
-test.describe("without JavaScript", () => {
-  test.use({ javaScriptEnabled: false });
+test("HubSpot success and failure events update safe inline status without redirect", async ({
+  page,
+}) => {
+  await installHubSpotReadyStub(page);
+  await page.goto(productionContactUrl);
+  await expect(page.getByRole("status")).toContainText(
+    "Demo request form is ready",
+  );
 
-  test("contact form cannot submit or expose field values", async ({
-    page,
-  }) => {
-    const httpRequests: string[] = [];
-
-    page.on("request", (request) => {
-      if (["http:", "https:"].includes(new URL(request.url()).protocol)) {
-        httpRequests.push(
-          `${request.method()} ${request.resourceType()} ${request.url()}`,
-        );
-      }
-    });
-
-    await page.goto("/contact/");
-    await page.waitForLoadState("networkidle");
-    httpRequests.length = 0;
-    const initialUrl = page.url();
-    await expect(
-      page.getByRole("button", { name: "Check request" }),
-    ).toHaveAttribute("type", "button");
-    await page.getByLabel(/Work email/u).fill("operator@example.com");
-    await page.getByLabel(/Company/u).fill("Example Company");
-
-    await page
-      .getByRole("button", { name: "Check request" })
-      .click({ force: true });
-    await expect(page).toHaveURL(initialUrl);
-
-    await page.getByLabel(/Work email/u).press("Enter");
-    await expect(page).toHaveURL(initialUrl);
-
-    expect(new URL(page.url()).search).toBe("");
-    expect(httpRequests).toEqual([]);
+  const initialUrl = page.url();
+  await page.locator("[data-testid='hubspot-submit']").focus();
+  await page.locator("[data-testid='hubspot-submit']").evaluate((element) => {
+    element.remove();
   });
+  await dispatchHubSpotEvent(page, "hs-form-event:on-submission:success");
+
+  await expect(page.getByRole("status")).toContainText(
+    "Your demo request was received",
+  );
+  await expect(page.locator("#contact-form-status")).toBeFocused();
+  expect(page.url()).toBe(initialUrl);
+
+  await dispatchHubSpotEvent(page, "hs-form-event:on-submission:failed");
+  await expect(page.getByRole("status")).toContainText(
+    "Your demo request was received",
+  );
 });
 
-test("contact form keyboard focus remains visible and mobile/desktop layouts do not overflow", async ({
+test("HubSpot submission failure shows safe inline recovery copy while ready", async ({
+  page,
+}) => {
+  await installHubSpotReadyStub(page);
+  await page.goto(productionContactUrl);
+  await expect(page.getByRole("status")).toContainText(
+    "Demo request form is ready",
+  );
+
+  const initialUrl = page.url();
+  await page.locator("[data-testid='hubspot-submit']").focus();
+  await page.locator("[data-testid='hubspot-submit']").evaluate((element) => {
+    element.remove();
+  });
+  await dispatchHubSpotEvent(page, "hs-form-event:on-submission:failed");
+
+  await expect(page.getByRole("status")).toContainText(
+    "The form could not complete the submission",
+  );
+  await expect(page.locator("#contact-form-status")).toBeFocused();
+  expect(page.url()).toBe(initialUrl);
+  await expect(
+    page.getByText(
+      /js\.hsforms|portal|formId|00000000|123456|operator@example|stack trace|internal URL/u,
+    ),
+  ).toHaveCount(0);
+});
+
+test("stale HubSpot ready events do not recover a blocked script state", async ({
+  page,
+}) => {
+  await page.route(hubSpotScriptUrl, async (route) => {
+    await route.abort("blockedbyclient");
+  });
+
+  await page.goto(productionContactUrl);
+  await expect(page.getByRole("status")).toContainText(
+    "The demo request form could not load",
+  );
+
+  await dispatchHubSpotEvent(page, "hs-form-event:on-ready");
+
+  await expect(page.getByRole("status")).toContainText(
+    "The demo request form could not load",
+  );
+  await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
+  await expect(page.locator("#hubspot-demo-form-host iframe")).toHaveCount(0);
+});
+
+test("events for other HubSpot forms are ignored", async ({ page }) => {
+  await installHubSpotReadyStub(page);
+  await page.goto(productionContactUrl);
+  await expect(page.getByRole("status")).toContainText(
+    "Demo request form is ready",
+  );
+
+  await dispatchHubSpotEvent(
+    page,
+    "hs-form-event:on-submission:success",
+    "11111111-1111-4111-8111-111111111111",
+  );
+  await expect(page.getByRole("status")).toContainText(
+    "Demo request form is ready",
+  );
+});
+
+test("HubSpot remains contact-only and no launch analytics trackers run", async ({
+  page,
+}) => {
+  const observedTrackedRequests: string[] = [];
+  const trackerPattern =
+    /hubspot|hsforms|hs-scripts|hs-analytics|googletagmanager|google-analytics|plausible|segment|mixpanel|clarity|fullstory/u;
+
+  page.on("request", (request) => {
+    if (trackerPattern.test(request.url())) {
+      observedTrackedRequests.push(request.url());
+    }
+  });
+
+  await page.goto("/product/");
+  await page.waitForLoadState("networkidle");
+  expect(observedTrackedRequests).toEqual([]);
+
+  await installHubSpotReadyStub(page);
+  await page.goto(productionContactUrl);
+  await expect(page.getByRole("status")).toContainText(
+    "Demo request form is ready",
+  );
+
+  expect(observedTrackedRequests).toEqual([hubSpotScriptUrl]);
+  const cookies = await page.context().cookies();
+  expect(
+    cookies.filter((cookie) =>
+      /hubspot|hubspotutk|__hstc|__hssc|__hssrc|_ga|_gid/u.test(cookie.name),
+    ),
+  ).toEqual([]);
+});
+
+test("contact build exposes no private HubSpot credentials or provider internals", async ({
+  page,
+}) => {
+  await installHubSpotReadyStub(page);
+  await page.goto(productionContactUrl);
+  await expect(page.getByRole("status")).toContainText(
+    "Demo request form is ready",
+  );
+
+  await expect(page.locator("body")).not.toContainText(
+    /PRIVATE_HUBSPOT|HUBSPOT_ACCESS_TOKEN|HUBSPOT_API_KEY|client_secret|authorization|bearer|__SECRET_INTERNAL_DO_NOT_USE/u,
+  );
+  expect(await page.content()).not.toMatch(
+    /PRIVATE_HUBSPOT|HUBSPOT_ACCESS_TOKEN|HUBSPOT_API_KEY|client_secret|authorization|bearer|__SECRET_INTERNAL_DO_NOT_USE/u,
+  );
+});
+
+test("contact embed keyboard focus remains visible and mobile/desktop layouts do not overflow", async ({
   page,
 }) => {
   for (const viewport of [
@@ -215,12 +376,12 @@ test("contact form keyboard focus remains visible and mobile/desktop layouts do 
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/contact/");
-  const emailField = page.getByLabel(/Work email/u);
-  await emailField.focus();
-  await expectVisibleFocusOutline(emailField);
+  const productLink = page.getByRole("link", { name: "Explore the product" });
+  await productLink.focus();
+  await expectVisibleFocusOutline(productLink);
 });
 
-test("contact stays out of the sitemap while draft publication blockers remain", async ({
+test("contact stays out of the sitemap while W-13 blockers remain", async ({
   page,
 }) => {
   await page.goto("/sitemap.xml");

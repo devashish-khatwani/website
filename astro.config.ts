@@ -9,5 +9,8 @@ export default defineConfig({
   integrations: [mdx()],
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      allowedHosts: ["www.glauxagent.com"],
+    },
   },
 });

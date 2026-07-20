@@ -38,6 +38,22 @@ dashboard:
    environments when W-05 or W-12 begins consuming it. It is a non-secret,
    absolute HTTPS origin for the Glaux app; it must not include an invented
    post-login path.
+8. Keep the HubSpot demo form kill switch disabled until W-13 approval and
+   account setup are complete. Production may enable the native embed only with
+   these public, non-secret variables:
+
+   | Variable                           | Value before W-13            |
+   | ---------------------------------- | ---------------------------- |
+   | `PUBLIC_HUBSPOT_DEMO_FORM_ENABLED` | `false`                      |
+   | `PUBLIC_HUBSPOT_PORTAL_ID`         | unset                        |
+   | `PUBLIC_HUBSPOT_DEMO_FORM_ID`      | unset                        |
+   | `PUBLIC_HUBSPOT_REGION`            | unset; later copy from embed |
+
+   Do not set real IDs in Git. Do not add a private token, custom Cloudflare
+   form processor, Forms REST API integration, or site-wide HubSpot tracking.
+   The website runtime also requires the exact hostname `www.glauxagent.com`;
+   preview, local, CI, branch, and unknown hosts do not load the HubSpot script
+   even if these public variables leak into a build.
 
 Cloudflare injects these build variables automatically; do not add their values
 or any secrets to the repository:
@@ -75,6 +91,15 @@ release:
   the expected commit, build command, output directory, and public origin.
 - Review production access and custom-domain/DNS permissions before publishing
   or changing the domain.
+- For `/contact/`, verify the production deployment is on
+  `www.glauxagent.com` before enabling `PUBLIC_HUBSPOT_DEMO_FORM_ENABLED=true`.
+  If the embed must be rolled back, set
+  `PUBLIC_HUBSPOT_DEMO_FORM_ENABLED=false`, redeploy, and confirm the page shows
+  the unavailable state without requesting `https://js.hsforms.net/forms/embed/v2.js`.
+- Contact-specific CSP/header enforcement is not complete until W-15 adds the
+  Cloudflare route header policy for the native HubSpot form. Keep the policy
+  scoped to `/contact/` where possible and do not allow HubSpot site-wide
+  tracking sources.
 - Practice rollback from **Deployments** by selecting a previously verified
   production deployment and choosing **Rollback to this deployment**. Recheck
   the deployed commit and critical pages after rollback.
@@ -82,7 +107,41 @@ release:
 Repository configuration alone cannot prove these checks. Until an operator
 creates and connects the Pages project, GitHub App scope, branch controls,
 environment values, previews, production deployment, Access policy, custom
-domain, and rollback remain external W-14 verification gaps.
+domain, HubSpot account controls, and rollback remain external W-14 verification
+gaps.
+
+## HubSpot account checklist
+
+The account owner published the HubSpot form on 2026-07-20 and verified the
+public embed metadata outside Git. The published form has:
+
+- Form name `Glaux — Book a demo`.
+- Required fields: work email, name, company, role.
+- Optional fields: deployment stage, expected users, message.
+- A required processing-only consent checkbox with this text:
+  `I agree that Glaux may store and process this information to respond to my demo request.`
+- Contacts created as non-marketing by default.
+- CAPTCHA enabled.
+- Pre-population and form shortening disabled.
+- An inline success message with no redirect.
+
+HubSpot's native data-privacy block could not express processing-only consent
+without also adding communications consent in this account, so the published
+form uses a required custom single-checkbox property. Legal review must accept
+that implementation before production publication.
+
+These controls remain external release gaps and must be recorded by their
+owners before the production kill switch is enabled:
+
+- Restrict the trusted domain to `www.glauxagent.com` and verify the production
+  embed from that host.
+- Route notifications to a `Demo Requests` team and a backup administrator.
+- Confirm the two-business-day response process.
+- Configure and evidence the 365-day inactivity-deletion process.
+- Provision and monitor `privacy@glauxagent.com`.
+- Make the standard DPA available.
+- Schedule the rate-risk review for 30 days after launch.
+- Complete a real production smoke submission and verify safe failure behavior.
 
 ## Cloudflare references
 
