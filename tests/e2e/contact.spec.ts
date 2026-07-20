@@ -46,9 +46,7 @@ function buildHubSpotReadyProviderScript({
           });
           const host = document.querySelector(config.target);
           if (host) {
-            const template = document.createElement("template");
-            template.innerHTML = ${JSON.stringify(hostMarkup)};
-            host.append(...template.content.childNodes);
+            host.insertAdjacentHTML("beforeend", ${JSON.stringify(hostMarkup)});
           }
           window.dispatchEvent(new CustomEvent("hs-form-event:on-ready", {
             detail: { formId: config.formId }
