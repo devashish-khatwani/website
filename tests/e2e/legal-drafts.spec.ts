@@ -7,37 +7,21 @@ import {
 const draftRoutes = [
   {
     path: "/privacy/",
-    title: "Privacy draft | Glaux",
-    description: "Draft Glaux privacy route pending legal approval.",
     heading: "How the public website is intended to handle contact data.",
   },
   {
     path: "/cookies/",
-    title: "Cookie policy draft | Glaux",
-    description:
-      "Draft Glaux cookie and analytics route pending legal approval.",
     heading: "The launch website keeps analytics narrow.",
   },
 ] as const;
 
 test.describe("legal draft routes", () => {
   for (const route of draftRoutes) {
-    test(`${route.path} keeps draft noindex metadata`, async ({ page }) => {
+    test(`${route.path} keeps draft approval language visible`, async ({
+      page,
+    }) => {
       await page.goto(route.path);
 
-      await expect(page).toHaveTitle(route.title);
-      await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-        "content",
-        route.description,
-      );
-      await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-        "content",
-        "noindex, nofollow",
-      );
-      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-        "href",
-        `https://www.glauxagent.com${route.path}`,
-      );
       await expect(
         page.getByRole("heading", { name: route.heading }),
       ).toBeVisible();

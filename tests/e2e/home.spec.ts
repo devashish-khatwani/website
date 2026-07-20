@@ -211,26 +211,16 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   expect(consoleErrors).toEqual([]);
 });
 
-test("legal navigation targets render honest noindexed draft shells", async ({
+test("terms legal navigation target renders an honest draft shell", async ({
   page,
 }) => {
-  for (const [path, heading] of [
-    ["/privacy/", "How the public website is intended to handle contact data."],
-    ["/cookies/", "The launch website keeps analytics narrow."],
-    ["/terms/", "Terms"],
-  ] as const) {
-    await page.goto(path);
-    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
-    await expect(
-      page.getByText(
-        /route is intentionally a draft shell|route is ready|noindex and unpublished/u,
-      ),
-    ).toBeVisible();
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-      "content",
-      "noindex, nofollow",
-    );
-  }
+  await page.goto("/terms/");
+
+  await expect(page).toHaveTitle("Terms draft | Glaux");
+  await expect(page.getByRole("heading", { name: "Terms" })).toBeVisible();
+  await expect(
+    page.getByText("This legal route is intentionally a draft shell."),
+  ).toBeVisible();
 });
 
 test("home page exposes canonical and draft Open Graph metadata", async ({

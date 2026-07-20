@@ -14,15 +14,6 @@ const pageHead = buildPageHeadMetadata({
   },
 });
 
-const excludedAnalytics = [
-  "Google Analytics",
-  "Google Tag Manager",
-  "Plausible",
-  "session replay",
-  "HubSpot site-wide tracking",
-  "custom CTA or form funnel tracking",
-] as const;
-
 const hubspotControls = [
   "The native HubSpot form is intended only for the public contact page.",
   "Preview submissions are intended to stay disabled.",
@@ -89,28 +80,6 @@ const hubspotControls = [
             funnels, and custom form funnel tracking.
           </p>
         </div>
-      </div>
-    </section>
-
-    <section class="decision-section" aria-labelledby="excluded-heading">
-      <div class="section-heading">
-        <p class="plain-label">Not approved for launch</p>
-        <h2 id="excluded-heading">No extra marketing trackers by default.</h2>
-        <p>
-          These tools and behaviors are not part of the approved launch
-          measurement boundary:
-        </p>
-      </div>
-
-      <div class="work-mode-grid">
-        {
-          excludedAnalytics.map((item) => (
-            <article>
-              <h3>{item}</h3>
-              <p>Not included in the intended launch website configuration.</p>
-            </article>
-          ))
-        }
       </div>
     </section>
 
