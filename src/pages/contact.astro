@@ -334,7 +334,6 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     currentScript = script;
     script.src = hubSpotFormsEmbedScriptSrc;
     script.async = true;
-    script.dataset.hubspotDemoFormLoader = "true";
     script.onload = () => {
       if (currentScript === script && currentState === "loading") {
         createHubSpotForm();
