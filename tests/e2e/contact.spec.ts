@@ -19,32 +19,49 @@ declare global {
   }
 }
 
+function buildHubSpotReadyProviderScript({
+  iframeTitle = "",
+  includeSubmitButton = true,
+}: {
+  iframeTitle?: string;
+  includeSubmitButton?: boolean;
+} = {}) {
+  const hostMarkup = [
+    `<iframe title="${iframeTitle}" src="about:blank"></iframe>`,
+    includeSubmitButton
+      ? '<button type="button" data-testid="hubspot-submit">Submit demo request</button>'
+      : "",
+  ].join("");
+
+  return `
+    window.__hubspotCreateArgs = [];
+    window.hbspt = {
+      forms: {
+        create(config) {
+          window.__hubspotCreateArgs.push({
+            region: config.region,
+            portalId: config.portalId,
+            formId: config.formId,
+            target: config.target
+          });
+          const host = document.querySelector(config.target);
+          if (host) {
+            host.innerHTML = ${JSON.stringify(hostMarkup)};
+          }
+          window.dispatchEvent(new CustomEvent("hs-form-event:on-ready", {
+            detail: { formId: config.formId }
+          }));
+        }
+      }
+    };
+  `;
+}
+
 async function installHubSpotReadyStub(page: Page) {
   await page.route(hubSpotScriptUrl, async (route) => {
     await route.fulfill({
       contentType: "application/javascript",
-      body: `
-        window.__hubspotCreateArgs = [];
-        window.hbspt = {
-          forms: {
-            create(config) {
-              window.__hubspotCreateArgs.push({
-                region: config.region,
-                portalId: config.portalId,
-                formId: config.formId,
-                target: config.target
-              });
-              const host = document.querySelector(config.target);
-              if (host) {
-                host.innerHTML = '<iframe title="" src="about:blank"></iframe><button type="button" data-testid="hubspot-submit">Submit demo request</button>';
-              }
-              window.dispatchEvent(new CustomEvent("hs-form-event:on-ready", {
-                detail: { formId: config.formId }
-              }));
-            }
-          }
-        };
-      `,
+      body: buildHubSpotReadyProviderScript(),
     });
   });
 }
@@ -172,28 +189,10 @@ test("HubSpot load failure exposes one retry control and retry does not duplicat
 
     await route.fulfill({
       contentType: "application/javascript",
-      body: `
-        window.__hubspotCreateArgs = [];
-        window.hbspt = {
-          forms: {
-            create(config) {
-              window.__hubspotCreateArgs.push({
-                region: config.region,
-                portalId: config.portalId,
-                formId: config.formId,
-                target: config.target
-              });
-              const host = document.querySelector(config.target);
-              if (host) {
-                host.innerHTML = '<iframe title="Glaux demo request HubSpot form" src="about:blank"></iframe>';
-              }
-              window.dispatchEvent(new CustomEvent("hs-form-event:on-ready", {
-                detail: { formId: config.formId }
-              }));
-            }
-          }
-        };
-      `,
+      body: buildHubSpotReadyProviderScript({
+        iframeTitle: "Glaux demo request HubSpot form",
+        includeSubmitButton: false,
+      }),
     });
   });
 
@@ -267,6 +266,17 @@ test("HubSpot submission failure shows safe inline recovery copy while ready", a
   );
   await expect(page.locator("#contact-form-status")).toBeFocused();
   expect(page.url()).toBe(initialUrl);
+
+  await dispatchHubSpotEvent(page, "hs-form-event:on-submission:success");
+  await expect(page.getByRole("status")).toContainText(
+    "Your demo request was received",
+  );
+
+  await dispatchHubSpotEvent(page, "hs-form-event:on-submission:failed");
+  await expect(page.getByRole("status")).toContainText(
+    "Your demo request was received",
+  );
+
   await expect(
     page.getByText(
       /js\.hsforms|portal|formId|00000000|123456|operator@example|stack trace|internal URL/u,

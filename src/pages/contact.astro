@@ -141,6 +141,7 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     "#contact-form-retry",
   );
   const availability = getHubSpotDemoFormAvailability(import.meta.env);
+  const initialHostMarkup = host?.innerHTML ?? "";
   let currentScript: HTMLScriptElement | undefined;
   let currentState: HubSpotClientState = "unavailable";
   let loadTimer: number | undefined;
@@ -187,14 +188,7 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
 
   function resetHostSkeleton() {
     if (host) {
-      host.innerHTML = [
-        '<div class="hubspot-form-skeleton" aria-hidden="true">',
-        "<span></span>",
-        "<span></span>",
-        "<span></span>",
-        "<span></span>",
-        "</div>",
-      ].join("");
+      host.innerHTML = initialHostMarkup;
     }
   }
 
@@ -225,6 +219,10 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
       availability.status === "available" &&
       (event as HubSpotFormEvent).detail?.formId === availability.config.formId
     );
+  }
+
+  function canAcceptProviderSubmissionEvent() {
+    return currentState === "ready" || currentState === "provider-failed";
   }
 
   function markLoadFailed() {
@@ -261,7 +259,7 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     });
 
     window.addEventListener("hs-form-event:on-submission:success", (event) => {
-      if (!eventIsForDemoForm(event) || currentState !== "ready") {
+      if (!eventIsForDemoForm(event) || !canAcceptProviderSubmissionEvent()) {
         return;
       }
       clearLoadTimer();
@@ -275,7 +273,7 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
     });
 
     window.addEventListener("hs-form-event:on-submission:failed", (event) => {
-      if (!eventIsForDemoForm(event) || currentState !== "ready") {
+      if (!eventIsForDemoForm(event) || !canAcceptProviderSubmissionEvent()) {
         return;
       }
       clearLoadTimer();

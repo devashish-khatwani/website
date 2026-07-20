@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  approvedHubSpotDemoFields,
   getHubSpotDemoFormAvailability,
-  hubSpotDemoConsentText,
   hubSpotFormsEmbedScriptSrc,
   hubSpotFormsRuntimeHostname,
   isHubSpotDemoRuntimeHost,
@@ -93,21 +91,5 @@ describe("HubSpot demo form configuration", () => {
     expect(isHubSpotDemoRuntimeHost("preview.glauxagent.com")).toBe(false);
     expect(isHubSpotDemoRuntimeHost("127.0.0.1")).toBe(false);
     expect(isHubSpotDemoRuntimeHost("localhost")).toBe(false);
-  });
-
-  it("documents only the approved account-side fields and consent text", () => {
-    expect(approvedHubSpotDemoFields).toEqual([
-      { label: "Work email", required: true },
-      { label: "Name", required: true },
-      { label: "Company", required: true },
-      { label: "Role", required: true },
-      { label: "Deployment stage", required: false },
-      { label: "Expected users", required: false },
-      { label: "Message", required: false },
-      { label: "Consent", required: true, processingOnly: true },
-    ]);
-    expect(hubSpotDemoConsentText).toBe(
-      "I agree that Glaux may store and process this information to respond to my demo request.",
-    );
   });
 });

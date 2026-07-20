@@ -988,9 +988,6 @@ img {
   margin: 0;
   font-size: var(--text-small);
   line-height: 1.5;
-}
-
-.form-status {
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-control);
   background: var(--color-mist);

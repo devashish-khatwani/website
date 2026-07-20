@@ -3,19 +3,6 @@ type PublicEnvironment = Readonly<Record<string, string | undefined>>;
 export const hubSpotFormsRuntimeHostname = "www.glauxagent.com";
 export const hubSpotFormsEmbedScriptSrc =
   "https://js.hsforms.net/forms/embed/v2.js";
-export const hubSpotDemoConsentText =
-  "I agree that Glaux may store and process this information to respond to my demo request.";
-
-export const approvedHubSpotDemoFields = [
-  { label: "Work email", required: true },
-  { label: "Name", required: true },
-  { label: "Company", required: true },
-  { label: "Role", required: true },
-  { label: "Deployment stage", required: false },
-  { label: "Expected users", required: false },
-  { label: "Message", required: false },
-  { label: "Consent", required: true, processingOnly: true },
-] as const;
 
 export type HubSpotDemoFormConfig = Readonly<{
   region: string;
