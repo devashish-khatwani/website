@@ -46,7 +46,9 @@ function buildHubSpotReadyProviderScript({
           });
           const host = document.querySelector(config.target);
           if (host) {
-            host.innerHTML = ${JSON.stringify(hostMarkup)};
+            const template = document.createElement("template");
+            template.innerHTML = ${JSON.stringify(hostMarkup)};
+            host.append(...template.content.childNodes);
           }
           window.dispatchEvent(new CustomEvent("hs-form-event:on-ready", {
             detail: { formId: config.formId }
@@ -146,6 +148,9 @@ test("production hostname loads the native HubSpot embed and reaches ready state
   await expect(page.getByRole("status")).toContainText(
     "Demo request form is ready",
   );
+  await expect(
+    page.locator("#hubspot-demo-form-host .hubspot-form-skeleton"),
+  ).toHaveCount(0);
   await expect(page.locator("#hubspot-demo-form-host iframe")).toHaveAttribute(
     "title",
     "Glaux demo request HubSpot form",

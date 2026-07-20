@@ -193,6 +193,13 @@ const requestStatusCopy = isHubSpotBuildAvailable
     }
   }
 
+  function removeHostSkeleton() {
+    for (const skeleton of host?.querySelectorAll(".hubspot-form-skeleton") ??
+      []) {
+      skeleton.remove();
+    }
+  }
+
   function setIframeTitles() {
     for (const iframe of host?.querySelectorAll("iframe") ?? []) {
       iframe.setAttribute("title", iframeTitle);
@@ -255,6 +262,7 @@ const requestStatusCopy = isHubSpotBuildAvailable
       clearLoadTimer();
       setState("ready", false);
       setRetryVisible(false);
+      removeHostSkeleton();
       setIframeTitles();
       setStatus("Demo request form is ready.");
     });
