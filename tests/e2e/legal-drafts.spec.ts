@@ -36,22 +36,25 @@ test.describe("legal draft routes", () => {
   }) => {
     await page.goto("/privacy/");
     const main = page.getByRole("main");
-
-    await expect(main).toContainText("native HubSpot form embedded");
-    await expect(main).toContainText("HubSpot CRM");
-    await expect(main).toContainText("No custom form processor");
-    await expect(main).toContainText("No site-wide HubSpot tracking");
-    await expect(main).toContainText("Cloudflare Web Analytics");
-    await expect(main).toContainText("only launch analytics surface");
-    await expect(main).toContainText("non-marketing by default");
-    await expect(main).toContainText("processing-only");
-    await expect(main).toContainText("Preview submissions");
-    await expect(main).toContainText("www.glauxagent.com");
-    await expect(main).toContainText(
+    const privacyBoundaryText = [
+      "native HubSpot form embedded",
+      "HubSpot CRM",
+      "No custom form processor",
+      "No site-wide HubSpot tracking",
+      "Cloudflare Web Analytics",
+      "only launch analytics surface",
+      "non-marketing by default",
+      "processing-only",
+      "Preview submissions",
+      "www.glauxagent.com",
       "owner-approved retention and deletion rule",
-    );
-    await expect(main).toContainText("monitored privacy/deletion contact");
-    await expect(main).toContainText("standard HubSpot DPA coverage");
+      "monitored privacy/deletion contact",
+      "standard HubSpot DPA coverage",
+    ];
+
+    for (const text of privacyBoundaryText) {
+      await expect(main).toContainText(text);
+    }
   });
 
   test("cookie draft keeps analytics and HubSpot tracking boundaries explicit", async ({
@@ -59,19 +62,24 @@ test.describe("legal draft routes", () => {
   }) => {
     await page.goto("/cookies/");
     const main = page.getByRole("main");
+    const cookieBoundaryText = [
+      "Cloudflare Web Analytics",
+      "only approved launch analytics",
+      "Google Analytics",
+      "Google Tag Manager",
+      "Plausible",
+      "session replay",
+      "HubSpot site-wide tracking",
+      "contact-form infrastructure only",
+      "feeds HubSpot CRM",
+      "processing-only consent",
+      "owner-approved retention/deletion rule",
+      "monitored privacy/deletion contact",
+    ];
 
-    await expect(main).toContainText("Cloudflare Web Analytics");
-    await expect(main).toContainText("only approved launch analytics");
-    await expect(main).toContainText("Google Analytics");
-    await expect(main).toContainText("Google Tag Manager");
-    await expect(main).toContainText("Plausible");
-    await expect(main).toContainText("session replay");
-    await expect(main).toContainText("HubSpot site-wide tracking");
-    await expect(main).toContainText("contact-form infrastructure only");
-    await expect(main).toContainText("feeds HubSpot CRM");
-    await expect(main).toContainText("processing-only consent");
-    await expect(main).toContainText("owner-approved retention/deletion rule");
-    await expect(main).toContainText("monitored privacy/deletion contact");
+    for (const text of cookieBoundaryText) {
+      await expect(main).toContainText(text);
+    }
     await expect(page.locator("script[src*=hubspot]")).toHaveCount(0);
     await expect(page.locator("script[src*=hsforms]")).toHaveCount(0);
   });

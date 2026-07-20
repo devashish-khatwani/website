@@ -178,12 +178,6 @@ const pageHead = buildPageHeadMetadata(contactEntry.data);
   function removeLoaderScript() {
     currentScript?.remove();
     currentScript = undefined;
-
-    for (const script of document.querySelectorAll<HTMLScriptElement>(
-      "script[data-hubspot-demo-form-loader]",
-    )) {
-      script.remove();
-    }
   }
 
   function resetHostSkeleton() {
