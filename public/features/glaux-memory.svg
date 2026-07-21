@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
+  <title id="title">Layered memory facets converging into retained context</title>
+  <g fill="none" stroke="#0a0a0a" stroke-width="14" stroke-linejoin="miter">
+    <path d="m168 190 146-84 146 84v168l-146 84-146-84z"/>
+    <path d="m340 158 146-84 146 84v168l-146 84-146-84z"/>
+    <path d="m252 274 146-84 146 84v168l-146 84-146-84z" fill="#fff"/>
+    <path d="m398 250 80 46v92l-80 46-80-46v-92z" fill="#0a0a0a"/>
+    <path d="M398 190V74M252 274l-84-84M544 274l88-116M252 442l-84 48M544 442l88 48" stroke="#2563eb"/>
+  </g>
+  <circle cx="398" cy="342" r="19" fill="#2563eb"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
+  <title id="title">A central agent connected to multiple work channels</title>
+  <g fill="none" stroke="#0a0a0a" stroke-width="14" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M400 300 174 150M400 300 626 150M400 300 174 450M400 300 626 450M400 300V92M400 300v208"/>
+    <path d="m400 198 88 51v102l-88 51-88-51V249z" fill="#0a0a0a"/>
+    <path d="m174 102 42 24v48l-42 24-42-24v-48zM626 102l42 24v48l-42 24-42-24v-48zM174 402l42 24v48l-42 24-42-24v-48zM626 402l42 24v48l-42 24-42-24v-48z" fill="#fff"/>
+    <path d="m400 44 42 24v48l-42 24-42-24V68zM400 460l42 24v48l-42 24-42-24v-48z" fill="#2563eb" stroke="#2563eb"/>
+  </g>
+  <circle cx="372" cy="292" r="14" fill="#fff"/><circle cx="428" cy="292" r="14" fill="#fff"/>
+</svg>

@@ -1,0 +1,433 @@
+---
+import { getEntry } from "astro:content";
+import Button from "../components/Button.astro";
+import SiteLayout from "../components/SiteLayout.astro";
+import { buildPageHeadMetadata } from "../lib/site";
+
+const installEntry = await getEntry("pages", "install");
+
+if (!installEntry) {
+  throw new Error("Missing install page metadata entry.");
+}
+
+const pageHead = buildPageHeadMetadata(installEntry.data);
+
+const downloads = [
+  {
+    platform: "macOS",
+    packageType: ".dmg package",
+    action: "Download for macOS",
+    href: "#macos-download",
+    id: "macos-download",
+  },
+  {
+    platform: "Windows",
+    packageType: ".msi installer",
+    action: "Download for Windows",
+    href: "#windows-download",
+    id: "windows-download",
+  },
+] as const;
+
+const capabilities = [
+  {
+    title: "Pick up anywhere",
+    body: "Move one conversation across the desktop app and the channels your team already uses.",
+    image: "/features/glaux-connect.svg",
+    alt: "A geometric agent connected to multiple work channels",
+  },
+  {
+    title: "Keep the context",
+    body: "Remember projects, preferences, past conversations, and the skills that worked.",
+    image: "/features/glaux-memory.svg",
+    alt: "Layered geometric facets converging into retained context",
+  },
+  {
+    title: "Run on schedule",
+    body: "Turn recurring reports, backups, and briefings into unattended routines.",
+    image: "/features/glaux-schedule.svg",
+    alt: "A precise clock inside a recurring automation orbit",
+  },
+  {
+    title: "Multiply the work",
+    body: "Send focused tasks to isolated subagents and run them in parallel.",
+    image: "/features/glaux-delegate.svg",
+    alt: "One agent delegating work to three focused agents",
+  },
+  {
+    title: "Reach beyond chat",
+    body: "Search the web, use the browser, understand images, generate media, and switch models.",
+    image: "/features/glaux-search.svg",
+    alt: "A search lens moving beyond a browser frame",
+  },
+  {
+    title: "Choose where it runs",
+    body: "Keep execution local or move it into Docker, SSH, Singularity, or Modal.",
+    image: "/features/glaux-isolation.svg",
+    alt: "A protected execution cube enclosed by a policy boundary",
+  },
+] as const;
+---
+
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  noindex
+  og={pageHead.og}
+>
+  <div class="install-page">
+    <section class="install-hero" aria-labelledby="install-heading">
+      <div class="install-hero__copy">
+        <p class="plain-label">Desktop app</p>
+        <h1 id="install-heading">Put Glaux to work.</h1>
+        <p>The AI coworker your team can use and your company can control.</p>
+      </div>
+
+      <aside
+        class="download-panel"
+        id="downloads"
+        aria-label="Glaux desktop app downloads"
+      >
+        <div class="download-panel__heading">
+          <h2>Get the desktop app</h2>
+          <span>macOS + Windows</span>
+        </div>
+        <div class="download-list">
+          {
+            downloads.map((download) => (
+              <a
+                class="download-card"
+                id={download.id}
+                href={download.href}
+                aria-label={download.action}
+              >
+                <span class="download-card__package">
+                  <strong>{download.platform}</strong>
+                  <span>{download.packageType}</span>
+                </span>
+                <span class="download-card__action">{download.action}</span>
+              </a>
+            ))
+          }
+        </div>
+      </aside>
+    </section>
+
+    <section class="install-capabilities" aria-labelledby="capability-heading">
+      <div class="install-capabilities__inner">
+        <div class="install-capabilities__heading">
+          <h2 id="capability-heading">
+            Built on Hermes. Ready for enterprise.
+          </h2>
+          <p>Every capability stays visible, policy-aware, and reviewable.</p>
+        </div>
+
+        <div class="install-capability-list">
+          {
+            capabilities.map((capability) => (
+              <article class="install-capability">
+                <figure class="install-capability__visual">
+                  <img
+                    src={capability.image}
+                    alt={capability.alt}
+                    width="800"
+                    height="600"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </figure>
+                <div class="install-capability__copy">
+                  <h3>{capability.title}</h3>
+                  <p>{capability.body}</p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="install-governance" aria-labelledby="governance-heading">
+      <div class="install-governance__heading">
+        <h2 id="governance-heading">Move fast. Keep the boundary.</h2>
+      </div>
+      <div class="install-governance__copy">
+        <p>
+          Control which models, tools, skills, memory, automations, and external
+          actions each team can use.
+        </p>
+        <Button href="/contact/" variant="primary"
+          >Talk to us about rollout</Button
+        >
+      </div>
+    </section>
+  </div>
+</SiteLayout>
+
+<style>
+  .install-page {
+    width: min(calc(100% - 2.5rem), var(--content-width));
+    margin-inline: auto;
+  }
+
+  .install-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.78fr) minmax(28rem, 1.22fr);
+    gap: clamp(var(--space-12), 8vw, var(--space-32));
+    align-items: center;
+    min-height: 42rem;
+    padding-block: clamp(var(--space-16), 9vw, var(--space-32));
+  }
+
+  .install-hero__copy {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+  }
+
+  .install-hero h1 {
+    max-width: 9ch;
+    font-size: var(--text-hero);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+  }
+
+  .install-hero__copy p:not(.plain-label) {
+    max-width: 31rem;
+    color: var(--color-body);
+    font-size: var(--text-lede);
+    line-height: 1.55;
+  }
+
+  .download-panel {
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-lg);
+    background: var(--color-chalk);
+  }
+
+  .download-panel__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    background: var(--color-primary);
+    color: var(--color-chalk);
+    padding: var(--space-5) var(--space-6);
+  }
+
+  .download-panel__heading h2 {
+    font-size: var(--text-h3);
+  }
+
+  .download-panel__heading span {
+    font-size: 0.75rem;
+    font-weight: 750;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  .download-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .download-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-8);
+    min-height: 13rem;
+    padding: var(--space-6);
+    transition: background-color 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .download-card + .download-card {
+    border-inline-start: 1px solid var(--color-hairline);
+  }
+
+  .download-card:hover {
+    background: var(--color-primary-wash);
+  }
+
+  .download-card__package {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .download-card__package strong {
+    font-size: var(--text-h3);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+
+  .download-card__package span {
+    color: var(--color-concrete);
+    font-size: 0.82rem;
+  }
+
+  .download-card__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 42px;
+    border-radius: var(--radius-sm);
+    background: var(--color-graphite);
+    color: var(--color-chalk);
+    padding: 0.65rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 750;
+    line-height: 1.2;
+  }
+
+  .install-capabilities {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    background: var(--color-primary);
+    padding-block: clamp(var(--space-8), 5vw, var(--space-16));
+  }
+
+  .install-capabilities__inner {
+    width: min(calc(100% - 2.5rem), var(--content-width));
+    margin-inline: auto;
+    border-radius: var(--radius-lg);
+    background: var(--color-chalk);
+    padding: clamp(var(--space-8), 5vw, var(--space-16));
+  }
+
+  .install-capabilities__heading {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(var(--space-8), 5vw, var(--space-16));
+    align-items: end;
+    margin-block-end: clamp(var(--space-8), 5vw, var(--space-12));
+  }
+
+  .install-capabilities__heading h2 {
+    max-width: 12ch;
+    font-size: clamp(2.5rem, 1.85rem + 2.4vw, 4.6rem);
+    font-weight: 600;
+  }
+
+  .install-capabilities__heading p {
+    max-width: 39rem;
+    color: var(--color-body);
+    font-size: var(--text-body);
+  }
+
+  .install-capability-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-8) var(--space-6);
+  }
+
+  .install-capability {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--space-4);
+    border-bottom: 1px solid var(--color-hairline);
+    padding-bottom: var(--space-8);
+  }
+
+  .install-capability__visual {
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    margin: 0;
+    border: 1px solid var(--color-hairline);
+    background: var(--color-soft);
+  }
+
+  .install-capability__visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: var(--space-5);
+  }
+
+  .install-capability__copy {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .install-capability h3 {
+    font-size: var(--text-h3);
+  }
+
+  .install-capability p {
+    color: var(--color-body);
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .install-governance {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(var(--space-12), 8vw, var(--space-24));
+    align-items: start;
+    padding-block: clamp(var(--space-16), 9vw, var(--space-32));
+  }
+
+  .install-governance h2 {
+    max-width: 10ch;
+    font-size: var(--text-h2);
+  }
+
+  .install-governance__copy {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+  }
+
+  .install-governance__copy p {
+    max-width: 42rem;
+    color: var(--color-body);
+  }
+
+  @media (max-width: 56rem) {
+    .install-hero,
+    .install-capabilities__heading,
+    .install-governance {
+      grid-template-columns: 1fr;
+    }
+
+    .install-hero {
+      min-height: auto;
+    }
+
+    .install-capability-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .install-page,
+    .install-capabilities__inner {
+      width: min(calc(100% - 1.5rem), var(--content-width));
+    }
+
+    .install-hero h1 {
+      font-size: clamp(3rem, 13vw, 4rem);
+    }
+
+    .download-panel__heading span {
+      white-space: normal;
+    }
+
+    .download-list,
+    .install-capability-list {
+      grid-template-columns: 1fr;
+    }
+
+    .download-card {
+      min-height: 10rem;
+    }
+
+    .download-card + .download-card {
+      border-block-start: 1px solid var(--color-hairline);
+      border-inline-start: 0;
+    }
+  }
+</style>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
+  <title id="title">A protected execution cube enclosed by a policy boundary</title>
+  <g fill="none" stroke="#0a0a0a" stroke-width="14" stroke-linejoin="miter">
+    <path d="m400 48 226 130v244L400 552 174 422V178z"/>
+    <path d="m400 136 150 86v172l-150 86-150-86V222z" stroke="#2563eb"/>
+    <path d="m400 216 82 47v94l-82 47-82-47v-94z" fill="#0a0a0a"/>
+    <path d="M174 178l76 44M626 178l-76 44M174 422l76-28M626 422l-76-28M400 48v88M400 552v-72"/>
+  </g>
+  <circle cx="372" cy="304" r="13" fill="#fff"/><circle cx="428" cy="304" r="13" fill="#fff"/>
+</svg>
