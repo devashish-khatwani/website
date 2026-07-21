@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectNoHorizontalOverflow } from "./assertions";
 
 test("how it works explains the governed work path", async ({ page }) => {
   await page.goto("/how-it-works/");
@@ -65,11 +66,22 @@ test("how it works keeps preview capabilities labeled and public copy claim-safe
   ).toHaveCount(0);
 });
 
-test("how it works is in desktop and mobile navigation without overflow", async ({
+test("how it works is active in desktop and mobile navigation", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/how-it-works/");
+
+  const desktopNavigation = page.getByRole("navigation", { name: "Primary" });
+  await desktopNavigation.locator("summary", { hasText: "Product" }).click();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Product sections" })
+      .getByRole("link", { name: /How it works/u }),
+  ).toHaveAttribute("aria-current", "page");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
 
   await page.getByLabel("Open navigation").click();
   await expect(
@@ -77,9 +89,18 @@ test("how it works is in desktop and mobile navigation without overflow", async 
       .getByRole("navigation", { name: "Mobile primary" })
       .getByRole("link", { name: "How it works" }),
   ).toHaveAttribute("aria-current", "page");
-
-  const hasHorizontalOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > window.innerWidth,
-  );
-  expect(hasHorizontalOverflow).toBe(false);
 });
+
+for (const viewport of [
+  { width: 390, height: 844 },
+  { width: 768, height: 1024 },
+  { width: 1440, height: 1000 },
+] as const) {
+  test(`how it works has no horizontal overflow at ${viewport.width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/how-it-works/");
+    await expectNoHorizontalOverflow(page);
+  });
+}

@@ -28,6 +28,8 @@ export const productNavigation = [
 ] as const;
 
 export const primaryNavigation = [
+  { label: "Install", href: "/install/" },
+  { label: "Plans", href: "/plans/" },
   { label: "Company", href: "/company/" },
 ] as const;
 

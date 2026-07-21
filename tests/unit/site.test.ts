@@ -4,6 +4,7 @@ import {
   buildAppLoginUrl,
   buildRobotsTxt,
   buildSitemapXml,
+  footerNavigation,
   getAppOrigin,
   getCanonicalSiteOrigin,
   isSearchIndexingAllowed,
@@ -14,12 +15,29 @@ import {
 
 describe("site shell navigation contract", () => {
   it("keeps the primary navigation to the approved launch items", () => {
-    expect(productNavigation.map((item) => item.label)).toEqual([
-      "Product overview",
-      "How it works",
-      "Security",
+    expect(productNavigation).toEqual([
+      expect.objectContaining({ label: "Product overview", href: "/product/" }),
+      expect.objectContaining({
+        label: "How it works",
+        href: "/how-it-works/",
+      }),
+      expect.objectContaining({ label: "Security", href: "/security/" }),
     ]);
-    expect(primaryNavigation.map((item) => item.label)).toEqual(["Company"]);
+    expect(primaryNavigation).toEqual([
+      { label: "Install", href: "/install/" },
+      { label: "Plans", href: "/plans/" },
+      { label: "Company", href: "/company/" },
+    ]);
+    expect(
+      footerNavigation.map(({ label, href }) => ({ label, href })),
+    ).toEqual([
+      { label: "Product", href: "/product/" },
+      { label: "How it works", href: "/how-it-works/" },
+      { label: "Security", href: "/security/" },
+      { label: "Install", href: "/install/" },
+      { label: "Plans", href: "/plans/" },
+      { label: "Company", href: "/company/" },
+    ]);
     expect(primaryNavigation.map((item) => item.label)).not.toContain(
       "Resources",
     );
