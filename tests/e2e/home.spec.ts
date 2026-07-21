@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { expectVisibleFocusOutline } from "./assertions";
+import {
+  expectNoHorizontalOverflow,
+  expectVisibleFocusOutline,
+} from "./assertions";
 
 const canonicalUrl = "https://www.glauxagent.com/";
 const isProductionPagesBuild =
@@ -10,12 +13,12 @@ const expectedRobotsDirective = isProductionPagesBuild
   ? "Allow: /"
   : "Disallow: /";
 
-test("home page renders the W-06 homepage promise and product preview", async ({
+test("home page renders the approved homepage promise and product concept", async ({
   page,
 }) => {
   await page.goto("/");
 
-  await expect(page).toHaveTitle(/Useful AI\. Visible rules\./u);
+  await expect(page).toHaveTitle(/AI coworkers\. Enterprise control\./u);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
     "noindex, nofollow",
@@ -25,47 +28,60 @@ test("home page renders the W-06 homepage promise and product preview", async ({
   ).toHaveAttribute("src", "/brand/glaux-lockup.svg");
   await expect(
     page.getByRole("heading", {
-      name: "Useful AI. Visible rules.",
+      name: "AI coworkers. Enterprise control.",
     }),
   ).toBeVisible();
   await expect(
     page.getByText(
-      /research, create, and automate with approved company knowledge and tools/i,
+      "Employees move faster. Security controls what AI can know, do, and share.",
+      { exact: true },
     ),
   ).toBeVisible();
   await expect(
-    page.getByRole("banner").getByRole("link", { name: "Book a demo" }),
+    page.getByRole("main").getByRole("link", { name: "See Glaux in action" }),
+  ).toHaveAttribute("href", "#product");
+  await expect(
+    page.getByRole("main").getByRole("link", { name: "Book a demo" }),
   ).toHaveAttribute("href", "/contact/");
+
+  const productWindow = page.getByLabel("Illustrative Glaux product concept");
   await expect(
-    page.getByRole("main").getByRole("link", { name: "Explore the product" }),
-  ).toHaveAttribute("href", "/product/");
-  await expect(
-    page.getByLabel("Illustrative product view").getByText("Research request"),
+    productWindow
+      .locator(".product-window__bar")
+      .getByText("Renewal-risk brief", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Renewal-risk brief", { exact: true }),
-  ).toBeVisible();
+    productWindow.getByRole("tab", { name: "Employee" }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(productWindow.getByText("Renewal-risk briefing")).toBeVisible();
+  await expect(productWindow.getByText("Rules applied")).toBeVisible();
 });
 
-test("home page uses plain-language benefits and governance outcomes", async ({
+test("home page keeps the concept concise without concept-only chrome", async ({
   page,
 }) => {
   await page.goto("/");
 
+  await expect(
+    page.getByRole("heading", {
+      name: "One task. Two views. No lost context.",
+    }),
+  ).toBeVisible();
   for (const label of [
-    "Work with your knowledge",
-    "Take useful action",
-    "Stay in control",
-    "Research",
-    "Automation",
-    "Administration",
+    "Ask for work",
+    "Bring approved context",
+    "Act within policy",
+    "Return work and evidence",
+    "Policy before action",
+    "Authority stays server-owned",
+    "Activity after result",
   ]) {
     await expect(page.getByRole("heading", { name: label })).toBeVisible();
   }
 
   await expect(
     page.getByRole("heading", {
-      name: "Set the rules once. Glaux carries them into the work.",
+      name: "Control that appears where the work happens.",
     }),
   ).toBeVisible();
   for (const outcome of [
@@ -76,8 +92,56 @@ test("home page uses plain-language benefits and governance outcomes", async ({
   ]) {
     await expect(page.getByRole("heading", { name: outcome })).toBeVisible();
   }
-  await expect(page.getByText(/flowchart/i)).toHaveCount(0);
-  await expect(page.getByRole("main").locator("svg")).toHaveCount(0);
+
+  await expect(page.getByText(/Proposed homepage direction/u)).toHaveCount(0);
+  await expect(page.getByRole("main").getByText(/Install|Plans/u)).toHaveCount(
+    0,
+  );
+  await expect(page.getByText(/Powered by Hermes|Hermes Agent/u)).toHaveCount(
+    0,
+  );
+});
+
+test("product concept tabs update visible state with mouse and keyboard", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const productWindow = page.getByLabel("Illustrative Glaux product concept");
+  const employeeTab = productWindow.getByRole("tab", { name: "Employee" });
+  const controlTab = productWindow.getByRole("tab", { name: "Control" });
+  const employeePanel = page.locator("#employee-view");
+  const controlPanel = page.locator("#control-view");
+
+  await expect(employeeTab).toHaveAttribute("aria-selected", "true");
+  await expect(employeePanel).toBeVisible();
+  await expect(controlPanel).toBeHidden();
+
+  await controlTab.click();
+  await expect(controlTab).toHaveAttribute("aria-selected", "true");
+  await expect(controlPanel).toBeVisible();
+  await expect(employeePanel).toBeHidden();
+  await expect(productWindow.getByText("Recent decisions")).toBeVisible();
+  await expect(
+    productWindow.getByText("Customer summary", { exact: true }),
+  ).toBeVisible();
+
+  await controlTab.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(employeeTab).toHaveAttribute("aria-selected", "true");
+  await expect(employeeTab).toBeFocused();
+  await expect(employeePanel).toBeVisible();
+  await expect(controlPanel).toBeHidden();
+
+  await page.keyboard.press("End");
+  await expect(controlTab).toHaveAttribute("aria-selected", "true");
+  await expect(controlTab).toBeFocused();
+  await expect(controlPanel).toBeVisible();
+
+  await page.keyboard.press("Home");
+  await expect(employeeTab).toHaveAttribute("aria-selected", "true");
+  await expect(employeeTab).toBeFocused();
+  await expect(employeePanel).toBeVisible();
 });
 
 test("home page renders only approved draft platform labels and statements", async ({
@@ -121,7 +185,7 @@ test("home page renders only approved draft platform labels and statements", asy
 
   await expect(
     page.getByText(
-      /Laminar|Inkling|Tinker|Powered by Hermes|Hermes Agent|draft claim registry|certification claims|governed Hermes Agent/u,
+      /Laminar|Inkling|Tinker|draft claim registry|certification claims|governed Hermes Agent/u,
     ),
   ).toHaveCount(0);
 });
@@ -200,16 +264,20 @@ test("desktop navigation groups product sections in an accessible dropdown", asy
   await expect(productTrigger).toBeFocused();
 });
 
+test("home page stays within viewport across responsive widths", async ({
+  page,
+}) => {
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await expectNoHorizontalOverflow(page);
+  }
+});
+
 test("mobile home page exposes navigation without horizontal overflow", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  const consoleErrors: string[] = [];
-  page.on("console", (message) => {
-    if (message.type() === "error") {
-      consoleErrors.push(message.text());
-    }
-  });
   await page.goto("/");
 
   const menu = page.getByLabel("Open navigation");
@@ -238,12 +306,7 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   await expect(
     mobileNav.getByRole("link", { name: "Book a demo" }),
   ).toHaveAttribute("href", "/contact/");
-
-  const hasHorizontalOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > window.innerWidth,
-  );
-  expect(hasHorizontalOverflow).toBe(false);
-  expect(consoleErrors).toEqual([]);
+  await expectNoHorizontalOverflow(page);
 });
 
 test("home page exposes canonical and draft Open Graph metadata", async ({
@@ -261,11 +324,11 @@ test("home page exposes canonical and draft Open Graph metadata", async ({
   );
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
     "content",
-    "Glaux | Useful AI. Visible rules.",
+    "Glaux | AI coworkers. Enterprise control.",
   );
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
     "content",
-    /keeping governance visible/u,
+    /controls what AI can know, do, and share/u,
   );
   await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
     "content",

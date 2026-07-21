@@ -62,55 +62,63 @@ const platformCards = claimEntries.map(({ id, entry }) => {
   };
 });
 
-const benefits = [
+const architectureProof = [
   {
-    title: "Work with your knowledge",
-    body: "Ask questions across approved company context instead of starting from a blank prompt.",
+    label: "Boundary",
+    title: "Policy before action",
+    body: "Allowed capabilities and approvals shape what can happen next.",
   },
   {
-    title: "Take useful action",
-    body: "Research, write, browse, and create work with the tools your team has approved.",
+    label: "Authority",
+    title: "Authority stays server-owned",
+    body: "Clients request and display decisions; they do not grant themselves access.",
   },
   {
-    title: "Stay in control",
-    body: "Set access rules, approval points, and safe stops before work reaches sensitive systems.",
-  },
-] as const;
-
-const previews = [
-  {
-    title: "Research",
-    body: "Turn a messy question into sourced notes, next steps, and a clear handoff.",
-    label: "Employee view",
-  },
-  {
-    title: "Automation",
-    body: "Let repeated work run with the same approvals and boundaries as one-off requests.",
-    label: "Team workflow",
-  },
-  {
-    title: "Administration",
-    body: "Give owners one place to review access, requests, and recent decisions.",
-    label: "Control view",
+    label: "Record",
+    title: "Activity after result",
+    body: "Requests, decisions, and outcomes remain available for review.",
   },
 ] as const;
 
-const governanceOutcomes = [
+const workflowSteps = [
+  {
+    label: "Ask",
+    title: "Ask for work",
+    body: "Start with a brief, analysis, comparison, draft, or repeated workflow instead of a technical agent configuration.",
+  },
+  {
+    label: "Scope",
+    title: "Bring approved context",
+    body: "Glaux assembles the knowledge, models, tools, and skills allowed for that person, workspace, and task.",
+  },
+  {
+    label: "Act",
+    title: "Act within policy",
+    body: "The work continues, pauses for approval, or stops before a sensitive action crosses the boundary.",
+  },
+  {
+    label: "Return",
+    title: "Return work and evidence",
+    body: "The employee gets the useful artifact; the organization gets the decision and activity record.",
+  },
+] as const;
+
+const controlOutcomes = [
   {
     title: "Continue",
-    body: "The request fits the rules, so the work moves ahead.",
+    body: "The request fits the rules and the work carries on.",
   },
   {
     title: "Ask for approval",
-    body: "The work may be allowed, but the right person needs to approve it first.",
+    body: "The next step waits with its reason and task context attached.",
   },
   {
     title: "Stop safely",
-    body: "The request crosses a boundary, so Glaux blocks it before action is taken.",
+    body: "A request outside the boundary is blocked before the action.",
   },
   {
     title: "Explain why",
-    body: "People see a plain-language reason and the next useful step.",
+    body: "The employee and reviewer see the rule and the next useful option.",
   },
 ] as const;
 ---
@@ -122,87 +130,210 @@ const governanceOutcomes = [
   noindex
   og={pageHead.og}
 >
-  <div class="home-page">
+  <div class="home-page home-concept">
     <section class="home-hero" aria-labelledby="home-heading">
       <div class="home-hero__copy">
-        <p class="home-kicker">AI for everyday enterprise work</p>
-        <h1 id="home-heading" class="home-title">Useful AI. Visible rules.</h1>
+        <h1 id="home-heading" class="home-title">
+          AI coworkers. Enterprise control.
+        </h1>
         <p class="home-lede">
-          Glaux helps teams research, create, and automate with approved company
-          knowledge and tools while approvals and boundaries stay clear.
+          Employees move faster. Security controls what AI can know, do, and
+          share.
         </p>
         <div class="home-actions" aria-label="Primary home actions">
-          <Button href="/contact/" variant="primary">Book a demo</Button>
-          <Button href="/product/" variant="ghost">Explore the product</Button>
+          <Button href="#product" variant="primary">See Glaux in action</Button>
+          <Button href="/contact/" variant="ghost">Book a demo</Button>
         </div>
       </div>
 
-      <div class="work-preview" aria-label="Illustrative product view">
-        <div class="work-preview__bar">
-          <span>Research request</span>
-          <span class="status-pill">Completed safely</span>
+      <section
+        class="product-window"
+        id="product"
+        aria-label="Illustrative Glaux product concept"
+      >
+        <div class="product-window__bar">
+          <span>Renewal-risk brief</span>
+          <small>Illustrative product view</small>
+          <div class="view-tabs" role="tablist" aria-label="Product views">
+            <button
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="employee-view"
+              id="employee-tab"
+              tabindex="0"
+            >
+              Employee
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="control-view"
+              id="control-tab"
+              tabindex="-1"
+            >
+              Control
+            </button>
+          </div>
         </div>
-        <div class="conversation">
-          <p>
-            Summarize the renewal risks from the approved account notes and
-            draft the follow-up.
-          </p>
-        </div>
-        <div class="conversation conversation--agent">
-          <p>
-            I found three risks, prepared a short brief, and drafted the
-            follow-up. Sending externally needs approval.
-          </p>
-        </div>
-        <div class="completed-work">
-          <span>Completed work</span>
-          <strong>Renewal-risk brief</strong>
-          <p>Evidence, proposed next steps, and an approval-ready draft.</p>
-        </div>
-      </div>
-    </section>
 
-    <section class="benefit-strip" aria-label="Core benefits">
-      {
-        benefits.map((benefit) => (
-          <article>
-            <h2>{benefit.title}</h2>
-            <p>{benefit.body}</p>
-          </article>
-        ))
-      }
-    </section>
-
-    <section class="preview-list" aria-labelledby="preview-heading">
-      <div class="section-heading">
-        <h2 id="preview-heading">Useful work, clear boundaries.</h2>
-      </div>
-      <div class="preview-list__items">
-        {
-          previews.map((preview) => (
-            <article class="preview-row">
+        <div
+          class="product-view employee-view"
+          id="employee-view"
+          role="tabpanel"
+          aria-labelledby="employee-tab"
+          tabindex="0"
+        >
+          <div class="thread-panel">
+            <span class="ui-label">Work thread</span>
+            <div class="prompt">
+              Compare account signals with the approved renewal playbook and
+              prepare a briefing.
+            </div>
+            <div class="answer">
+              I found three renewal risks and prepared the review brief. Sending
+              the customer summary requires approval.
+            </div>
+            <div class="artifact">
+              <span class="ui-label">Created artifact</span>
+              <strong>Renewal-risk briefing</strong>
+              <p>Evidence, proposed actions, and customer summary draft.</p>
+            </div>
+          </div>
+          <aside class="rule-panel" aria-label="Rules applied in the task">
+            <span class="ui-label">Rules applied</span>
+            <div class="decision">
+              <span class="decision-dot" aria-hidden="true"></span>
               <div>
-                <span class="plain-label">{preview.label}</span>
-                <h3>{preview.title}</h3>
+                <strong>Knowledge allowed</strong>
+                <p>Customer-success workspace</p>
               </div>
-              <p>{preview.body}</p>
+            </div>
+            <div class="decision">
+              <span class="decision-dot" aria-hidden="true"></span>
+              <div>
+                <strong>Research continued</strong>
+                <p>Approved sources and browsing path</p>
+              </div>
+            </div>
+            <div class="decision">
+              <span class="decision-dot" aria-hidden="true"></span>
+              <div>
+                <strong>Approval requested</strong>
+                <p>Required before external sharing</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div
+          class="product-view control-view"
+          id="control-view"
+          role="tabpanel"
+          aria-labelledby="control-tab"
+          tabindex="0"
+          hidden
+        >
+          <aside
+            class="admin-panel admin-list"
+            aria-label="Control Tower areas"
+          >
+            <span class="ui-label">Control Tower</span>
+            <span class="admin-list__item admin-list__item--active"
+              >Activity</span
+            >
+            <span class="admin-list__item">Approvals</span>
+            <span class="admin-list__item">People and groups</span>
+            <span class="admin-list__item">Tools and skills</span>
+          </aside>
+          <div class="admin-panel">
+            <span class="ui-label">Recent decisions</span>
+            <div class="activity-list">
+              <div class="activity-row">
+                <span>10:42</span>
+                <strong>Renewal-risk brief</strong>
+                <b>Continued</b>
+              </div>
+              <div class="activity-row">
+                <span>10:47</span>
+                <strong>Customer summary</strong>
+                <b>Approval</b>
+              </div>
+              <div class="activity-row">
+                <span>11:03</span>
+                <strong>Data export</strong>
+                <b>Stopped</b>
+              </div>
+              <div class="activity-row">
+                <span>11:18</span>
+                <strong>Source changed</strong>
+                <b>Review</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="architecture-proof" aria-label="Architecture proof">
+      <div class="proof-inner">
+        <div class="proof-intro">
+          <span>Current architecture</span>
+          <strong>Governance is part of execution.</strong>
+        </div>
+        {
+          architectureProof.map((proof) => (
+            <article class="proof-item">
+              <span>{proof.label}</span>
+              <h2>{proof.title}</h2>
+              <p>{proof.body}</p>
             </article>
           ))
         }
       </div>
     </section>
 
-    <section class="governance-section" aria-labelledby="governance-heading">
-      <div class="section-heading section-heading--compact">
-        <h2 id="governance-heading">
-          Set the rules once. Glaux carries them into the work.
-        </h2>
-        <p>Just the four outcomes people need to recognize during real work.</p>
+    <section class="split-story" id="how" aria-labelledby="how-heading">
+      <div class="section-copy">
+        <h2 id="how-heading">One task. Two views. No lost context.</h2>
+        <p>
+          Employees stay focused on the outcome. Security and platform teams see
+          the boundaries that shaped it.
+        </p>
       </div>
-      <div class="governance-grid">
+      <div class="story-list">
         {
-          governanceOutcomes.map((outcome) => (
-            <article>
+          workflowSteps.map((step) => (
+            <article class="story-row">
+              <span>{step.label}</span>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section
+      class="control-section"
+      id="control"
+      aria-labelledby="control-heading"
+    >
+      <div class="control-section__copy">
+        <h2 id="control-heading">
+          Control that appears where the work happens.
+        </h2>
+        <p>
+          The rule is checked before the action. The record is written after the
+          result. Everyone sees a plain-language next step.
+        </p>
+      </div>
+      <div class="control-outcomes">
+        {
+          controlOutcomes.map((outcome) => (
+            <article class="control-outcome">
+              <span aria-hidden="true" />
               <h3>{outcome.title}</h3>
               <p>{outcome.body}</p>
             </article>
@@ -230,22 +361,593 @@ const governanceOutcomes = [
       </div>
     </section>
 
-    <section class="security-cta" aria-labelledby="security-heading">
-      <div>
-        <h2 id="security-heading">
-          Built for teams that need answers and control.
-        </h2>
-      </div>
-      <Button href="/security/" variant="ghost">Read security details</Button>
-    </section>
-
-    <section class="closing-cta" aria-labelledby="closing-heading">
-      <h2 id="closing-heading">See Glaux with your team’s work.</h2>
+    <section class="closing-cta" id="contact" aria-labelledby="closing-heading">
+      <h2 id="closing-heading">Bring one sensitive, repetitive workflow.</h2>
       <p>
-        Request a walkthrough of the product direction and how Glaux can fit
-        your team’s work.
+        We’ll map the useful work, the capability boundary, the approval point,
+        and the result your team would review.
       </p>
-      <Button href="/contact/" variant="primary">Book a demo</Button>
+      <Button href="/contact/" variant="primary"
+        >Book a focused walkthrough</Button
+      >
     </section>
   </div>
 </SiteLayout>
+
+<script>
+  const tablists = document.querySelectorAll<HTMLElement>(
+    '[role="tablist"][aria-label="Product views"]',
+  );
+
+  for (const tablist of tablists) {
+    const tabs = Array.from(
+      tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+    );
+
+    const selectTab = (selectedTab: HTMLButtonElement, shouldFocus = false) => {
+      for (const tab of tabs) {
+        const isSelected = tab === selectedTab;
+        const panelId = tab.getAttribute("aria-controls");
+        const panel = panelId ? document.getElementById(panelId) : null;
+
+        tab.setAttribute("aria-selected", String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+
+        if (panel) {
+          panel.hidden = !isSelected;
+        }
+      }
+
+      if (shouldFocus) {
+        selectedTab.focus();
+      }
+    };
+
+    for (const tab of tabs) {
+      tab.addEventListener("click", () => selectTab(tab));
+
+      tab.addEventListener("keydown", (event) => {
+        const currentIndex = tabs.indexOf(tab);
+        let nextIndex: number | undefined;
+
+        if (event.key === "ArrowRight") {
+          nextIndex = (currentIndex + 1) % tabs.length;
+        }
+
+        if (event.key === "ArrowLeft") {
+          nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+        }
+
+        if (event.key === "Home") {
+          nextIndex = 0;
+        }
+
+        if (event.key === "End") {
+          nextIndex = tabs.length - 1;
+        }
+
+        if (nextIndex !== undefined) {
+          const nextTab = tabs[nextIndex];
+
+          if (!nextTab) {
+            return;
+          }
+
+          event.preventDefault();
+          selectTab(nextTab, true);
+        }
+      });
+    }
+  }
+</script>
+
+<style>
+  .home-concept {
+    --home-window-line: #3a3a3a;
+    padding-block-end: clamp(var(--space-16), 9vw, var(--space-32));
+  }
+
+  .home-concept .home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.83fr) minmax(32rem, 1.17fr);
+    align-items: center;
+    justify-items: stretch;
+    gap: clamp(var(--space-12), 7vw, var(--space-24));
+    min-height: 48rem;
+    padding-block: clamp(var(--space-16), 9vw, var(--space-32));
+  }
+
+  .home-concept .home-hero__copy {
+    justify-items: start;
+    max-width: 39rem;
+    text-align: start;
+  }
+
+  .home-concept .home-title {
+    max-width: 9ch;
+  }
+
+  .home-concept .home-lede {
+    max-width: 36rem;
+  }
+
+  .product-window {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--color-carbon);
+    box-shadow: 0 8px 0 var(--color-primary-soft);
+    color: var(--color-chalk);
+  }
+
+  .product-window__bar {
+    display: grid;
+    grid-template-columns: minmax(8rem, 1fr) auto auto;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 3.5rem;
+    border-bottom: 1px solid var(--home-window-line);
+    padding: 0.8rem var(--space-4);
+    font-size: 0.78rem;
+    font-weight: 750;
+  }
+
+  .product-window__bar small {
+    color: #bdbdbd;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .view-tabs {
+    display: flex;
+    gap: var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  .view-tabs button {
+    min-height: 36px;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #d4d4d4;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .view-tabs button[aria-selected="true"] {
+    background: var(--color-chalk);
+    color: var(--color-graphite);
+  }
+
+  .product-view {
+    min-height: 31rem;
+    padding: clamp(var(--space-4), 2.6vw, var(--space-8));
+  }
+
+  .employee-view {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: var(--space-4);
+  }
+
+  .control-view {
+    display: grid;
+    grid-template-columns: 0.7fr 1.3fr;
+    gap: var(--space-4);
+  }
+
+  .thread-panel,
+  .rule-panel,
+  .admin-panel {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    border-radius: var(--radius-sm);
+    background: #222222;
+    padding: var(--space-4);
+  }
+
+  .ui-label {
+    color: #a3a3a3;
+    font-size: 0.68rem;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .prompt,
+  .answer {
+    border-radius: var(--radius-sm);
+    padding: 0.9rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .prompt {
+    max-width: 92%;
+    background: #303030;
+  }
+
+  .answer {
+    justify-self: end;
+    max-width: 95%;
+    background: var(--color-primary-wash);
+    color: var(--color-graphite);
+  }
+
+  .artifact {
+    display: grid;
+    gap: var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--color-chalk);
+    color: var(--color-graphite);
+    padding: var(--space-4);
+  }
+
+  .artifact .ui-label {
+    color: var(--color-concrete);
+  }
+
+  .artifact strong {
+    font-size: 1rem;
+  }
+
+  .artifact p {
+    color: var(--color-body);
+    font-size: 0.76rem;
+  }
+
+  .decision {
+    display: grid;
+    grid-template-columns: 0.7rem minmax(0, 1fr);
+    gap: var(--space-3);
+    border-top: 1px solid var(--home-window-line);
+    padding-block: 0.85rem;
+  }
+
+  .decision-dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-block-start: 0.2rem;
+    border-radius: 50%;
+    background: var(--color-primary-line);
+  }
+
+  .decision strong {
+    display: block;
+    font-size: 0.82rem;
+  }
+
+  .decision p {
+    color: #d4d4d4;
+    font-size: 0.72rem;
+  }
+
+  .admin-list {
+    gap: var(--space-2);
+  }
+
+  .admin-list__item {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    border-radius: 0.5rem;
+    color: #d4d4d4;
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+  }
+
+  .admin-list__item--active {
+    background: #303030;
+    color: var(--color-chalk);
+  }
+
+  .activity-list {
+    display: grid;
+    border-block: 1px solid var(--home-window-line);
+  }
+
+  .activity-row {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr) 5.5rem;
+    gap: var(--space-3);
+    padding-block: 0.9rem;
+    font-size: 0.75rem;
+  }
+
+  .activity-row + .activity-row {
+    border-top: 1px solid var(--home-window-line);
+  }
+
+  .activity-row span {
+    color: #bdbdbd;
+  }
+
+  .activity-row b {
+    color: #93c5fd;
+    text-align: right;
+  }
+
+  .architecture-proof,
+  .control-section {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+  }
+
+  .architecture-proof {
+    border-block: 1px solid var(--color-hairline);
+    background: var(--color-soft);
+  }
+
+  .proof-inner {
+    display: grid;
+    grid-template-columns: 0.8fr repeat(3, 1fr);
+    width: min(calc(100% - 2.5rem), var(--content-width));
+    margin-inline: auto;
+  }
+
+  .proof-intro,
+  .proof-item {
+    min-height: 9rem;
+    padding: var(--space-6);
+  }
+
+  .proof-intro {
+    padding-inline-start: 0;
+  }
+
+  .proof-intro span,
+  .proof-item span {
+    color: var(--color-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .proof-intro strong {
+    display: block;
+    max-width: 15rem;
+    margin-block-start: var(--space-2);
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+
+  .proof-item {
+    border-inline-start: 1px solid var(--color-hairline);
+  }
+
+  .proof-item h2 {
+    margin-block: var(--space-2);
+    font-size: 0.95rem;
+    letter-spacing: -0.02em;
+  }
+
+  .proof-item p {
+    color: var(--color-body);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .split-story {
+    display: grid;
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: clamp(var(--space-12), 8vw, var(--space-32));
+    padding-block: clamp(var(--space-20), 10vw, 9rem);
+  }
+
+  .section-copy {
+    display: grid;
+    align-content: start;
+    gap: var(--space-5);
+  }
+
+  .section-copy h2,
+  .control-section h2,
+  .closing-cta h2 {
+    max-width: 10ch;
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    font-weight: 620;
+  }
+
+  .section-copy p,
+  .control-section__copy p {
+    max-width: 35rem;
+    color: var(--color-body);
+  }
+
+  .story-list,
+  .control-outcomes {
+    border-block: 1px solid var(--color-hairline);
+  }
+
+  .story-row {
+    display: grid;
+    grid-template-columns: 4.5rem 0.75fr 1.25fr;
+    gap: var(--space-5);
+    padding-block: var(--space-8);
+  }
+
+  .story-row + .story-row {
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  .story-row > span {
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .story-row h3 {
+    font-size: 1.1rem;
+  }
+
+  .story-row p {
+    color: var(--color-body);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .control-section {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: clamp(var(--space-12), 8vw, var(--space-32));
+    background: var(--color-carbon);
+    color: var(--color-chalk);
+    padding: clamp(var(--space-20), 9vw, var(--space-32))
+      max(var(--space-5), calc((100vw - var(--content-width)) / 2));
+  }
+
+  .control-section__copy {
+    display: grid;
+    align-content: start;
+    gap: var(--space-5);
+  }
+
+  .control-section__copy p,
+  .control-outcome p {
+    color: #d4d4d4;
+  }
+
+  .control-outcomes {
+    border-color: #464646;
+  }
+
+  .control-outcome {
+    display: grid;
+    grid-template-columns: 0.8rem 0.6fr 1.4fr;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+  }
+
+  .control-outcome + .control-outcome {
+    border-top: 1px solid #464646;
+  }
+
+  .control-outcome > span {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-block-start: 0.25rem;
+    border-radius: 50%;
+    background: var(--color-primary-line);
+  }
+
+  .control-outcome h3 {
+    font-size: 1rem;
+  }
+
+  .control-outcome p {
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .platform-section {
+    padding-block: clamp(var(--space-16), 8vw, var(--space-24));
+  }
+
+  .home-concept .closing-cta {
+    margin-block: 0;
+    background: var(--color-primary);
+  }
+
+  .home-concept .closing-cta h2 {
+    max-width: 12ch;
+  }
+
+  .home-concept .closing-cta p {
+    color: #e5edff;
+  }
+
+  @media (max-width: 70rem) {
+    .home-concept .home-hero {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .home-concept .home-hero__copy {
+      max-width: 46rem;
+    }
+
+    .product-window {
+      width: 100%;
+    }
+
+    .proof-inner {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .proof-intro {
+      grid-column: 1 / -1;
+      padding-inline-start: var(--space-6);
+    }
+
+    .proof-item:nth-child(2) {
+      border-inline-start: 0;
+    }
+
+    .split-story,
+    .control-section {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 38rem) {
+    .product-window__bar,
+    .employee-view,
+    .control-view {
+      grid-template-columns: 1fr;
+    }
+
+    .product-window__bar {
+      align-items: start;
+    }
+
+    .product-view {
+      min-height: auto;
+    }
+
+    .proof-inner {
+      grid-template-columns: 1fr;
+      width: min(calc(100% - 1.5rem), var(--content-width));
+    }
+
+    .proof-item,
+    .proof-item:nth-child(2) {
+      border-top: 1px solid var(--color-hairline);
+      border-inline-start: 0;
+    }
+
+    .story-row {
+      grid-template-columns: 4.5rem 1fr;
+    }
+
+    .story-row p {
+      grid-column: 2;
+    }
+
+    .control-section {
+      padding-inline: var(--space-3);
+    }
+
+    .control-outcome {
+      grid-template-columns: 0.8rem 1fr;
+    }
+
+    .control-outcome p {
+      grid-column: 2;
+    }
+
+    .activity-row {
+      grid-template-columns: 4rem minmax(0, 1fr);
+    }
+
+    .activity-row b {
+      grid-column: 2;
+      text-align: left;
+    }
+  }
+</style>
