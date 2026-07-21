@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
   <title id="title">One agent delegating work to three focused agents</title>
   <g fill="none" stroke="#0a0a0a" stroke-width="14" stroke-linecap="square" stroke-linejoin="miter">
-    <path d="m400 58 92 53v106l-92 53-92-53V111z" fill="#0a0a0a"/>
-    <path d="M400 270v82M400 352H188v58M400 352h212v58M400 352v58"/>
-    <path d="m188 390 84 48v96l-84 48-84-48v-96zM400 390l84 48v96l-84 48-84-48v-96zM612 390l84 48v96l-84 48-84-48v-96z"/>
-    <path d="m160 476 28 16 28-16M372 476l28 16 28-16M584 476l28 16 28-16" stroke="#2563eb" stroke-width="18"/>
+    <path d="m400 54 84 48v96l-84 48-84-48v-96z" fill="#0a0a0a"/>
+    <path d="M400 246v64M200 310h400M200 310v40M400 310v40M600 310v40"/>
+    <path d="m200 350 82 47v94l-82 47-82-47v-94zM400 350l82 47v94l-82 47-82-47v-94zM600 350l82 47v94l-82 47-82-47v-94z"/>
+    <path d="m172 438 28 16 28-16M372 438l28 16 28-16M572 438l28 16 28-16" stroke="#2563eb" stroke-width="18"/>
   </g>
-  <circle cx="372" cy="154" r="14" fill="#fff"/><circle cx="428" cy="154" r="14" fill="#fff"/>
+  <circle cx="372" cy="150" r="14" fill="#fff"/><circle cx="428" cy="150" r="14" fill="#fff"/>
 </svg>

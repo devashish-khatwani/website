@@ -1,12 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
   <title id="title">A precise clock inside a recurring automation orbit</title>
   <g fill="none" stroke="#0a0a0a" stroke-width="14" stroke-linecap="square" stroke-linejoin="miter">
-    <path d="m400 72 198 114v228L400 528 202 414V186z"/>
-    <circle cx="400" cy="300" r="146"/>
-    <path d="M400 300V188M400 300l92 54" stroke-width="22"/>
-    <path d="M400 124V92M400 508v-32M224 300h32M544 300h32"/>
-    <path d="M226 158c-76 82-87 202-26 296M574 442c76-82 87-202 26-296" stroke="#2563eb"/>
-    <path d="m184 404 16 50 50-16M616 196l-16-50-50 16" stroke="#2563eb"/>
+    <path d="m400 70 200 115v230L400 530 200 415V185z"/>
+    <circle cx="400" cy="300" r="148"/>
+    <path d="M400 300V190M400 300l94 55" stroke-width="22"/>
+    <path d="M400 112v42M400 446v42M212 300h42M546 300h42" stroke="#2563eb" stroke-width="18"/>
   </g>
   <circle cx="400" cy="300" r="22" fill="#2563eb"/>
 </svg>
