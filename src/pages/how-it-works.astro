@@ -1,0 +1,228 @@
+---
+import { getEntry } from "astro:content";
+import Button from "../components/Button.astro";
+import SiteLayout from "../components/SiteLayout.astro";
+import { buildPageHeadMetadata } from "../lib/site";
+
+const pageEntry = await getEntry("pages", "how-it-works");
+
+if (!pageEntry) {
+  throw new Error("Missing how it works page metadata entry.");
+}
+
+const pageHead = buildPageHeadMetadata(pageEntry.data);
+
+const workflowSteps = [
+  {
+    number: "01",
+    title: "Ask for an outcome",
+    body: "Start with the work you need done: a brief, comparison, analysis, draft, or repeated workflow. The request and its reason stay together.",
+  },
+  {
+    number: "02",
+    title: "Assemble approved capabilities",
+    body: "Glaux brings in the knowledge, model, skills, browsing paths, and tools allowed for that person, workspace, and task.",
+  },
+  {
+    number: "03",
+    title: "Work through the task",
+    body: "The agent researches, reads, compares, writes, and uses allowed tools in one work thread. A sensitive next step can pause for approval or stop before action.",
+  },
+  {
+    number: "04",
+    title: "Return the result and record",
+    body: "The employee gets the useful artifact. The organization gets the activity, decisions, and source trail needed to understand how the work happened.",
+  },
+] as const;
+
+const decisions = [
+  {
+    title: "Continue",
+    body: "The request fits the rules and the work carries on.",
+  },
+  {
+    title: "Ask for approval",
+    body: "The next step waits with its reason and task context attached.",
+  },
+  {
+    title: "Stop safely",
+    body: "A request outside the boundary is blocked before the action.",
+  },
+] as const;
+
+const capabilitySpecs = [
+  ["skillhub-preview", "Enterprise SkillHub"],
+  ["enterprise-mcp-preview", "Enterprise connections"],
+  ["observability-preview", "Observability"],
+] as const;
+
+const previewCapabilities = await Promise.all(
+  capabilitySpecs.map(async ([id, title]) => {
+    const entry = await getEntry("claims", id);
+
+    if (!entry) {
+      throw new Error(`Missing how it works capability claim: ${id}.`);
+    }
+
+    if (entry.data.classification !== "preview") {
+      throw new Error(
+        `How it works capability ${entry.data.id} must be Preview.`,
+      );
+    }
+
+    return {
+      claimId: entry.data.id,
+      title,
+      body: entry.data.statement,
+    };
+  }),
+);
+---
+
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  noindex
+  og={pageHead.og}
+>
+  <div class="product-page how-page">
+    <section class="product-hero how-hero" aria-labelledby="how-heading">
+      <div class="product-hero__copy">
+        <p class="plain-label">How it works</p>
+        <h1 id="how-heading" class="product-title">
+          From request to reviewable result.
+        </h1>
+        <p class="product-lede">
+          Glaux combines an agent that can research, create, and use tools with
+          a control path the organization owns. Employees get useful work;
+          administrators keep the boundaries visible.
+        </p>
+        <div class="product-actions" aria-label="How it works page actions">
+          <Button href="/contact/" variant="primary">Book a demo</Button>
+          <Button href="/product/" variant="ghost">Explore the product</Button>
+        </div>
+      </div>
+
+      <div class="how-flow" aria-label="Example governed work path">
+        <div class="how-flow__topline">
+          <span>Renewal-risk brief</span>
+          <span class="status-pill">In progress</span>
+        </div>
+        <ol class="how-flow__track">
+          <li>
+            <span class="how-flow__index">01</span>
+            <div>
+              <strong>Request</strong>
+              <p>Compare account signals and prepare the review brief.</p>
+            </div>
+          </li>
+          <li>
+            <span class="how-flow__index">02</span>
+            <div>
+              <strong>Approved context</strong>
+              <p>Customer knowledge · browsing · workspace tools</p>
+            </div>
+          </li>
+          <li>
+            <span class="how-flow__index">03</span>
+            <div>
+              <strong>Governed work</strong>
+              <p>Research → compare → draft → policy check</p>
+            </div>
+          </li>
+          <li>
+            <span class="how-flow__index">04</span>
+            <div>
+              <strong>Reviewable result</strong>
+              <p>Brief · source trail · activity record</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="how-steps-section" aria-labelledby="steps-heading">
+      <div class="section-heading">
+        <p class="plain-label">One connected path</p>
+        <h2 id="steps-heading">The task stays intact from start to finish.</h2>
+        <p>
+          Context, tool use, approvals, and the final artifact remain part of
+          the same work—not separate tickets that lose the reason along the way.
+        </p>
+      </div>
+      <ol class="how-step-list">
+        {
+          workflowSteps.map((step) => (
+            <li>
+              <span class="how-step-list__number">{step.number}</span>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="how-control-section" aria-labelledby="control-heading">
+      <div class="how-control-section__intro">
+        <p class="plain-label">Control in the work path</p>
+        <h2 id="control-heading">The rule is checked before the action.</h2>
+        <p>
+          Identity, workspace, allowed capabilities, and approval requirements
+          shape what can happen next. The decision is carried into the activity
+          record so a reviewer can understand the result later.
+        </p>
+      </div>
+      <div class="how-decision-path" aria-label="Possible policy decisions">
+        {
+          decisions.map((decision) => (
+            <article>
+              <span aria-hidden="true" />
+              <div>
+                <h3>{decision.title}</h3>
+                <p>{decision.body}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="how-capabilities" aria-labelledby="capabilities-heading">
+      <div class="section-heading section-heading--compact">
+        <p class="plain-label">Capabilities around the work</p>
+        <h2 id="capabilities-heading">
+          Connect knowledge. Reuse good work. See what happened.
+        </h2>
+        <p>
+          These Glaux platform capabilities extend the core research, writing,
+          browsing, file, and tool workflow. Preview items are labeled clearly.
+        </p>
+      </div>
+      <div class="how-capability-list">
+        {
+          previewCapabilities.map((capability) => (
+            <article data-claim-id={capability.claimId}>
+              <div>
+                <span class="badge">Preview</span>
+                <h3>{capability.title}</h3>
+              </div>
+              <p>{capability.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="closing-cta" aria-labelledby="how-cta-heading">
+      <p class="plain-label">See it with your workflow</p>
+      <h2 id="how-cta-heading">Bring one real task.</h2>
+      <p>
+        We’ll walk through the useful work, the control point, and the result
+        your team would review.
+      </p>
+      <Button href="/contact/" variant="primary">Book a demo</Button>
+    </section>
+  </div>
+</SiteLayout>

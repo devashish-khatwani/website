@@ -7,17 +7,19 @@ import {
   getAppOrigin,
   getCanonicalSiteOrigin,
   isSearchIndexingAllowed,
+  productNavigation,
   primaryNavigation,
   publishedRoutes,
 } from "../../src/lib/site";
 
 describe("site shell navigation contract", () => {
   it("keeps the primary navigation to the approved launch items", () => {
-    expect(primaryNavigation.map((item) => item.label)).toEqual([
-      "Product",
+    expect(productNavigation.map((item) => item.label)).toEqual([
+      "Product overview",
+      "How it works",
       "Security",
-      "Company",
     ]);
+    expect(primaryNavigation.map((item) => item.label)).toEqual(["Company"]);
     expect(primaryNavigation.map((item) => item.label)).not.toContain(
       "Resources",
     );

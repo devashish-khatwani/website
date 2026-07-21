@@ -2,7 +2,12 @@
 import "../styles/global.css";
 import BrandLogo from "./BrandLogo.astro";
 import Button from "./Button.astro";
-import { buildAppLoginUrl, primaryNavigation } from "../lib/site";
+import {
+  buildAppLoginUrl,
+  footerNavigation,
+  primaryNavigation,
+  productNavigation,
+} from "../lib/site";
 
 interface Props {
   title: string;
@@ -21,6 +26,10 @@ interface Props {
 
 const { title, description, canonicalUrl, noindex = false, og } = Astro.props;
 const signInUrl = buildAppLoginUrl();
+const currentPath = Astro.url.pathname;
+const isProductSection = productNavigation.some(
+  (item) => item.href === currentPath,
+);
 ---
 
 <!doctype html>
@@ -57,9 +66,65 @@ const signInUrl = buildAppLoginUrl();
 
         <nav class="site-nav site-nav--desktop" aria-label="Primary">
           <div class="site-nav__pages">
+            <details class="nav-dropdown" data-nav-dropdown>
+              <summary
+                class:list={[
+                  "site-nav__link",
+                  "nav-dropdown__trigger",
+                  { "nav-dropdown__trigger--active": isProductSection },
+                ]}
+              >
+                Product
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 12 8"
+                  width="12"
+                  height="8"
+                >
+                  <path d="M1 1.5 6 6.5l5-5"></path>
+                </svg>
+              </summary>
+              <div class="nav-dropdown__panel">
+                <nav
+                  class="nav-dropdown__content"
+                  aria-label="Product sections"
+                >
+                  <a
+                    class="nav-dropdown__featured"
+                    href={productNavigation[0].href}
+                    aria-current={currentPath === productNavigation[0].href
+                      ? "page"
+                      : undefined}
+                  >
+                    <strong>{productNavigation[0].label}</strong>
+                    <p>{productNavigation[0].description}</p>
+                    <span>Explore product</span>
+                  </a>
+                  <div class="nav-dropdown__links">
+                    {
+                      productNavigation.slice(1).map((item) => (
+                        <a
+                          href={item.href}
+                          aria-current={
+                            currentPath === item.href ? "page" : undefined
+                          }
+                        >
+                          <strong>{item.label}</strong>
+                          <p>{item.description}</p>
+                        </a>
+                      ))
+                    }
+                  </div>
+                </nav>
+              </div>
+            </details>
             {
               primaryNavigation.map((item) => (
-                <a class="site-nav__link" href={item.href}>
+                <a
+                  class="site-nav__link"
+                  href={item.href}
+                  aria-current={currentPath === item.href ? "page" : undefined}
+                >
                   {item.label}
                 </a>
               ))
@@ -76,9 +141,29 @@ const signInUrl = buildAppLoginUrl();
             Menu
           </summary>
           <nav class="mobile-nav__panel" aria-label="Mobile primary">
+            <div class="mobile-nav__section">
+              <span class="mobile-nav__label">Product</span>
+              {
+                productNavigation.map((item) => (
+                  <a
+                    class="site-nav__link"
+                    href={item.href}
+                    aria-current={
+                      currentPath === item.href ? "page" : undefined
+                    }
+                  >
+                    {item.label}
+                  </a>
+                ))
+              }
+            </div>
             {
               primaryNavigation.map((item) => (
-                <a class="site-nav__link" href={item.href}>
+                <a
+                  class="site-nav__link"
+                  href={item.href}
+                  aria-current={currentPath === item.href ? "page" : undefined}
+                >
                   {item.label}
                 </a>
               ))
@@ -97,10 +182,11 @@ const signInUrl = buildAppLoginUrl();
         <div class="site-footer__inner">
           <div class="site-footer__brand">
             <BrandLogo alt="Glaux" />
+            <p>Useful AI for work. Visible control for the organization.</p>
           </div>
           <nav class="site-footer__nav" aria-label="Footer">
             {
-              primaryNavigation.map((item) => (
+              footerNavigation.map((item) => (
                 <a href={item.href}>{item.label}</a>
               ))
             }
@@ -110,5 +196,29 @@ const signInUrl = buildAppLoginUrl();
         </div>
       </footer>
     </div>
+
+    <script>
+      const navigationDropdowns = document.querySelectorAll<HTMLDetailsElement>(
+        "[data-nav-dropdown]",
+      );
+
+      for (const dropdown of navigationDropdowns) {
+        const trigger = dropdown.querySelector<HTMLElement>("summary");
+
+        document.addEventListener("click", (event) => {
+          if (dropdown.open && !dropdown.contains(event.target as Node)) {
+            dropdown.open = false;
+          }
+        });
+
+        dropdown.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && dropdown.open) {
+            event.preventDefault();
+            dropdown.open = false;
+            trigger?.focus();
+          }
+        });
+      }
+    </script>
   </body>
 </html>

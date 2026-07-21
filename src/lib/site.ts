@@ -8,10 +8,34 @@ const productionBranch = "main";
 
 export const publishedRoutes = [] as const;
 
+export const productNavigation = [
+  {
+    label: "Product overview",
+    href: "/product/",
+    description: "What employees and administrators can do with Glaux.",
+  },
+  {
+    label: "How it works",
+    href: "/how-it-works/",
+    description:
+      "Follow a request from approved context to a reviewable result.",
+  },
+  {
+    label: "Security",
+    href: "/security/",
+    description: "See how rules, access, approvals, and activity stay visible.",
+  },
+] as const;
+
 export const primaryNavigation = [
-  { label: "Product", href: "/product/" },
-  { label: "Security", href: "/security/" },
   { label: "Company", href: "/company/" },
+] as const;
+
+export const footerNavigation = [
+  { label: "Product", href: "/product/" },
+  { label: "How it works", href: "/how-it-works/" },
+  { label: "Security", href: "/security/" },
+  ...primaryNavigation,
 ] as const;
 
 type PageMetadataForHead = Pick<

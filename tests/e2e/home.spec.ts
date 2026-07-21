@@ -132,8 +132,15 @@ test("home page preserves shell navigation and focus behavior", async ({
   await page.goto("/");
 
   await expect(
-    page.getByRole("navigation", { name: "Primary" }).getByRole("link"),
-  ).toHaveText(["Product", "Security", "Company", "Sign in", "Book a demo"]);
+    page
+      .getByRole("navigation", { name: "Primary" })
+      .locator("summary", { hasText: "Product" }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: "Company" }),
+  ).toHaveAttribute("href", "/company/");
   await expect(
     page
       .getByRole("navigation", { name: "Primary" })
@@ -161,6 +168,38 @@ test("home page preserves shell navigation and focus behavior", async ({
   await expectVisibleFocusOutline(footerProductLink);
 });
 
+test("desktop navigation groups product sections in an accessible dropdown", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const primaryNavigation = page.getByRole("navigation", { name: "Primary" });
+  const productTrigger = primaryNavigation.locator("summary", {
+    hasText: "Product",
+  });
+  const productSections = page.getByRole("navigation", {
+    name: "Product sections",
+  });
+
+  await expect(productSections).toBeHidden();
+  await productTrigger.click();
+  await expect(productSections).toBeVisible();
+  await expect(productSections.getByRole("link")).toHaveCount(3);
+  await expect(
+    productSections.getByRole("link", { name: /Product overview/u }),
+  ).toHaveAttribute("href", "/product/");
+  await expect(
+    productSections.getByRole("link", { name: /How it works/u }),
+  ).toHaveAttribute("href", "/how-it-works/");
+  await expect(
+    productSections.getByRole("link", { name: /Security/u }),
+  ).toHaveAttribute("href", "/security/");
+
+  await page.keyboard.press("Escape");
+  await expect(productSections).toBeHidden();
+  await expect(productTrigger).toBeFocused();
+});
+
 test("mobile home page exposes navigation without horizontal overflow", async ({
   page,
 }) => {
@@ -182,8 +221,11 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   await menu.click();
   const mobileNav = page.getByRole("navigation", { name: "Mobile primary" });
   await expect(
-    mobileNav.getByRole("link", { name: "Product" }),
+    mobileNav.getByRole("link", { name: "Product overview" }),
   ).toHaveAttribute("href", "/product/");
+  await expect(
+    mobileNav.getByRole("link", { name: "How it works" }),
+  ).toHaveAttribute("href", "/how-it-works/");
   await expect(
     mobileNav.getByRole("link", { name: "Security" }),
   ).toHaveAttribute("href", "/security/");
