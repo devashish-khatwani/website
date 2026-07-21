@@ -185,7 +185,7 @@ const plans = [
 <style>
   .plans-page {
     --plans-page-width: min(calc(100% - 2.5rem), 84rem);
-    background: var(--color-primary);
+    background: var(--color-chalk);
     color: var(--color-graphite);
     padding-block-end: clamp(var(--space-16), 8vw, var(--space-24));
   }
@@ -196,13 +196,13 @@ const plans = [
     gap: var(--space-5);
     width: var(--plans-page-width);
     margin-inline: auto;
-    color: var(--color-chalk);
+    color: var(--color-graphite);
     padding-block: var(--space-24) var(--space-20);
     text-align: center;
   }
 
   .plans-label {
-    color: var(--color-chalk);
+    color: var(--color-primary);
     font-size: 0.86rem;
     font-weight: 700;
     letter-spacing: 0;
@@ -218,7 +218,7 @@ const plans = [
 
   .plans-hero p:not(.plans-label) {
     max-width: 43rem;
-    color: var(--color-primary-soft);
+    color: var(--color-body);
     font-size: 1.2rem;
     line-height: 1.55;
   }
@@ -230,8 +230,9 @@ const plans = [
   .plans-shell {
     width: var(--plans-page-width);
     margin-inline: auto;
+    border: 1px solid var(--color-hairline);
     border-radius: 0.5rem;
-    background: var(--color-chalk);
+    background: var(--color-soft);
     padding: var(--space-10);
   }
 
@@ -354,7 +355,7 @@ const plans = [
   }
 
   .plan-card--featured .plan-card__period {
-    color: var(--color-primary-soft);
+    color: var(--color-chalk);
   }
 
   .plan-card__visual {

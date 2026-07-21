@@ -285,13 +285,15 @@ const capabilities = [
   .install-capabilities {
     width: 100vw;
     margin-inline: calc(50% - 50vw);
-    background: var(--color-primary);
+    border-block: 1px solid var(--color-hairline);
+    background: var(--color-soft);
     padding-block: clamp(var(--space-8), 5vw, var(--space-16));
   }
 
   .install-capabilities__inner {
     width: min(calc(100% - 2.5rem), var(--content-width));
     margin-inline: auto;
+    border: 1px solid var(--color-hairline);
     border-radius: var(--radius-lg);
     background: var(--color-chalk);
     padding: clamp(var(--space-8), 5vw, var(--space-16));

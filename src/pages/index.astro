@@ -851,7 +851,7 @@ const controlOutcomes = [
 
   .home-concept .closing-cta {
     margin-block: 0;
-    background: var(--color-primary);
+    background: var(--color-graphite);
   }
 
   .home-concept .closing-cta h2 {
@@ -859,7 +859,16 @@ const controlOutcomes = [
   }
 
   .home-concept .closing-cta p {
-    color: #e5edff;
+    color: var(--color-hairline);
+  }
+
+  .home-concept .closing-cta :global(.button--primary) {
+    background: var(--color-primary);
+    color: var(--color-chalk);
+  }
+
+  .home-concept .closing-cta :global(.button--primary:hover) {
+    background: var(--color-primary-hover);
   }
 
   @media (max-width: 70rem) {
