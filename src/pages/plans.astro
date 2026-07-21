@@ -1,0 +1,549 @@
+---
+import { getEntry } from "astro:content";
+import Button from "../components/Button.astro";
+import SiteLayout from "../components/SiteLayout.astro";
+import { buildAppLoginUrl, buildPageHeadMetadata } from "../lib/site";
+
+const plansEntry = await getEntry("pages", "plans");
+
+if (!plansEntry) {
+  throw new Error("Missing plans page metadata entry.");
+}
+
+const pageHead = buildPageHeadMetadata(plansEntry.data);
+const signInUrl = buildAppLoginUrl();
+
+const plans = [
+  {
+    id: "core-plan",
+    name: "Core",
+    price: "$0",
+    period: "platform fee / month",
+    visual: "/plans/plan-core.svg",
+    visualAlt: "A structured personal workspace with one active agent workflow",
+    features: [
+      "Glaux desktop app",
+      "Personal memory and skills",
+      "Approved models and tools",
+    ],
+    cta: "Choose Core",
+    featured: false,
+  },
+  {
+    id: "team-plan",
+    name: "Team",
+    price: "$20",
+    period: "platform fee / month",
+    visual: "/plans/plan-team.svg",
+    visualAlt: "Connected workstreams sharing one governed team workspace",
+    features: [
+      "Everything in Core",
+      "Shared workspaces",
+      "Managed tools and skills",
+      "Approval requests",
+    ],
+    cta: "Choose Team",
+    featured: true,
+  },
+  {
+    id: "business-plan",
+    name: "Business",
+    price: "$100",
+    period: "platform fee / month",
+    visual: "/plans/plan-business.svg",
+    visualAlt: "A central policy control plane governing connected workspaces",
+    features: [
+      "Everything in Team",
+      "Central Control Tower",
+      "Group and workspace policies",
+      "Activity review",
+    ],
+    cta: "Choose Business",
+    featured: false,
+  },
+  {
+    id: "enterprise-plan",
+    name: "Enterprise",
+    price: "$200",
+    period: "platform fee / month",
+    visual: "/plans/plan-enterprise.svg",
+    visualAlt: "Layered identity, policy, and deployment boundaries",
+    features: [
+      "Everything in Business",
+      "Identity and access integration",
+      "Custom deployment controls",
+      "Rollout support",
+    ],
+    cta: "Contact sales",
+    featured: false,
+  },
+] as const;
+---
+
+<SiteLayout
+  title={pageHead.title}
+  description={pageHead.description}
+  canonicalUrl={pageHead.canonicalUrl}
+  noindex
+  og={pageHead.og}
+>
+  <div class="plans-page">
+    <section class="plans-hero" aria-labelledby="plans-title">
+      <p class="plans-label">Glaux plans</p>
+      <h1 id="plans-title">Start focused. Scale with control.</h1>
+      <p>
+        Choose the level of control your organization needs. Pay the underlying
+        cost of the models your team uses.
+      </p>
+    </section>
+
+    <section class="plans-stage" aria-label="Plan options">
+      <div class="plans-shell">
+        <div class="plans-toolbar">
+          <p class="billing-note">
+            <span>
+              <strong>Platform subscription.</strong> LLM usage is metered and billed
+              separately at provider cost.
+            </span>
+          </p>
+          <p class="account-row">
+            <span>Already have an account?</span>
+            <a href={signInUrl}>Sign in</a>
+          </p>
+        </div>
+
+        <div class="plans-grid">
+          {
+            plans.map((plan) => (
+              <article
+                id={plan.id}
+                class:list={[
+                  "plan-card",
+                  { "plan-card--featured": plan.featured },
+                ]}
+              >
+                <div class="plan-card__header">
+                  <div class="plan-card__labels">
+                    <h2>{plan.name}</h2>
+                    {plan.featured && (
+                      <span class="plan-card__badge">Recommended</span>
+                    )}
+                  </div>
+                  <div>
+                    <p class="plan-card__price">{plan.price}</p>
+                    <p class="plan-card__period">{plan.period}</p>
+                  </div>
+                </div>
+
+                <div class="plan-card__visual">
+                  <img
+                    src={plan.visual}
+                    alt={plan.visualAlt}
+                    width="320"
+                    height="192"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+
+                <ul class="plan-card__features">
+                  {plan.features.map((feature) => (
+                    <li>{feature}</li>
+                  ))}
+                </ul>
+
+                <Button
+                  href="/contact/"
+                  variant={plan.featured ? "primary" : "ghost"}
+                  class="plan-card__action"
+                >
+                  {plan.cta}
+                </Button>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="plans-note" aria-labelledby="plans-note-title">
+      <h2 id="plans-note-title">Not sure where to start?</h2>
+      <div>
+        <p>
+          Bring one workflow and the boundary it needs. We will help map the
+          smallest plan that gives the team useful work and gives administrators
+          the right control.
+        </p>
+        <Button href="/contact/" variant="ghost" class="plans-note__action"
+          >Talk to us</Button
+        >
+      </div>
+    </section>
+  </div>
+</SiteLayout>
+
+<style>
+  .plans-page {
+    --plans-page-width: min(calc(100% - 2.5rem), 84rem);
+    background: var(--color-primary);
+    color: var(--color-graphite);
+    padding-block-end: clamp(var(--space-16), 8vw, var(--space-24));
+  }
+
+  .plans-hero {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-5);
+    width: var(--plans-page-width);
+    margin-inline: auto;
+    color: var(--color-chalk);
+    padding-block: var(--space-24) var(--space-20);
+    text-align: center;
+  }
+
+  .plans-label {
+    color: var(--color-chalk);
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+
+  .plans-hero h1 {
+    max-width: 12ch;
+    font-size: 5.5rem;
+    font-weight: 620;
+    letter-spacing: 0;
+  }
+
+  .plans-hero p:not(.plans-label) {
+    max-width: 43rem;
+    color: var(--color-primary-soft);
+    font-size: 1.2rem;
+    line-height: 1.55;
+  }
+
+  .plans-stage {
+    padding-block-end: var(--space-20);
+  }
+
+  .plans-shell {
+    width: var(--plans-page-width);
+    margin-inline: auto;
+    border-radius: 0.5rem;
+    background: var(--color-chalk);
+    padding: var(--space-10);
+  }
+
+  .plans-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    min-block-size: 4.5rem;
+    margin-block-end: var(--space-4);
+  }
+
+  .billing-note {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-body);
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .billing-note::before {
+    width: 0.65rem;
+    height: 0.65rem;
+    flex: none;
+    background: var(--color-primary);
+    content: "";
+    transform: rotate(45deg);
+  }
+
+  .billing-note strong {
+    color: var(--color-graphite);
+  }
+
+  .account-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    color: var(--color-body);
+    font-size: 0.86rem;
+    line-height: 1.45;
+    white-space: nowrap;
+  }
+
+  .account-row a {
+    color: var(--color-primary-ink);
+    font-weight: 750;
+  }
+
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: var(--space-4);
+    padding-block-start: var(--space-3);
+  }
+
+  .plan-card {
+    display: flex;
+    min-width: 0;
+    min-height: 38rem;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    border-radius: 0.5rem;
+    background: var(--color-chalk);
+  }
+
+  .plan-card--featured {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-chalk);
+    transform: translateY(-0.75rem);
+  }
+
+  .plan-card__header {
+    display: grid;
+    gap: var(--space-4);
+    min-block-size: 13rem;
+    padding: var(--space-6);
+  }
+
+  .plan-card__labels {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .plan-card h2 {
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .plan-card__badge {
+    border: 1px solid currentColor;
+    padding: 0.25rem 0.45rem;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .plan-card__price {
+    align-self: end;
+    font-size: 4rem;
+    font-weight: 620;
+    letter-spacing: 0;
+    line-height: 0.95;
+  }
+
+  .plan-card__period {
+    color: var(--color-concrete);
+    font-size: 0.76rem;
+    font-weight: 650;
+  }
+
+  .plan-card--featured .plan-card__period {
+    color: var(--color-primary-soft);
+  }
+
+  .plan-card__visual {
+    position: relative;
+    flex: 0 0 10.5rem;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: var(--color-soft);
+    margin-inline: var(--space-5);
+  }
+
+  .plan-card--featured .plan-card__visual {
+    background: var(--color-chalk);
+  }
+
+  .plan-card__visual img {
+    position: absolute;
+    inset: var(--space-4);
+    width: calc(100% - var(--space-8));
+    height: calc(100% - var(--space-8));
+    object-fit: contain;
+  }
+
+  .plan-card__features {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    color: var(--color-body);
+    font-size: 0.92rem;
+    line-height: 1.45;
+    list-style: none;
+  }
+
+  .plan-card--featured .plan-card__features {
+    color: var(--color-primary-wash);
+  }
+
+  .plan-card__features li {
+    display: grid;
+    grid-template-columns: 1rem 1fr;
+    gap: var(--space-2);
+  }
+
+  .plan-card__features li::before {
+    color: var(--color-primary);
+    content: "\2713";
+    font-weight: 900;
+  }
+
+  .plan-card--featured .plan-card__features li::before {
+    color: var(--color-chalk);
+  }
+
+  .plans-page :global(.plan-card__action) {
+    margin: auto var(--space-6) var(--space-6);
+  }
+
+  .plan-card--featured :global(.plan-card__action) {
+    box-shadow: inset 0 0 0 1px var(--color-chalk);
+    background: var(--color-chalk);
+    color: var(--color-graphite);
+  }
+
+  .plan-card--featured :global(.plan-card__action:hover) {
+    background: var(--color-primary-wash);
+  }
+
+  .plans-note {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: var(--space-24);
+    width: var(--plans-page-width);
+    margin-inline: auto;
+    border-radius: 0.5rem;
+    background: var(--color-graphite);
+    color: var(--color-chalk);
+    padding: var(--space-20);
+  }
+
+  .plans-note h2 {
+    max-width: 11ch;
+    font-size: 3.5rem;
+    font-weight: 620;
+    letter-spacing: 0;
+  }
+
+  .plans-note div {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--space-5);
+  }
+
+  .plans-note p {
+    max-width: 38rem;
+    color: var(--color-hairline);
+  }
+
+  .plans-note :global(.plans-note__action) {
+    background: var(--color-chalk);
+    color: var(--color-graphite);
+  }
+
+  .plans-note :global(.plans-note__action:hover) {
+    background: var(--color-soft);
+  }
+
+  @media (max-width: 70rem) {
+    .plans-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .plans-hero h1 {
+      font-size: 4.5rem;
+    }
+
+    .plan-card--featured {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 54rem) {
+    .plans-page {
+      --plans-page-width: min(calc(100% - 2rem), 84rem);
+    }
+
+    .plans-hero {
+      padding-block: var(--space-20) var(--space-16);
+    }
+
+    .plans-toolbar {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding-block: var(--space-4);
+    }
+
+    .billing-note {
+      align-items: flex-start;
+    }
+
+    .account-row {
+      justify-content: flex-start;
+      white-space: normal;
+    }
+
+    .plans-note {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+      padding: var(--space-12);
+    }
+
+    .plans-note h2 {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (max-width: 38rem) {
+    .plans-page {
+      --plans-page-width: min(calc(100% - 1.5rem), 84rem);
+    }
+
+    .plans-hero h1 {
+      font-size: 3.25rem;
+    }
+
+    .plans-hero p:not(.plans-label) {
+      font-size: 1.05rem;
+    }
+
+    .plans-shell {
+      padding: var(--space-5);
+    }
+
+    .plans-grid,
+    .plans-note {
+      grid-template-columns: 1fr;
+    }
+
+    .plan-card {
+      min-height: 34rem;
+    }
+
+    .plan-card__header {
+      min-block-size: 11rem;
+    }
+
+    .plans-note {
+      padding: var(--space-8);
+    }
+  }
+</style>

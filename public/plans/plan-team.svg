@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 192" role="img" aria-labelledby="title desc">
+  <title id="title">Team workspace</title>
+  <desc id="desc">Connected workstreams sharing one governed team workspace.</desc>
+  <rect width="320" height="192" rx="12" fill="#F4F4F5"/>
+  <path d="M82 56h70l16 16h70M82 136h70l16-16h70" fill="none" stroke="#0A0A0A" stroke-width="3"/>
+  <path d="M82 96h156" stroke="#2563EB" stroke-width="4"/>
+  <rect x="48" y="42" width="34" height="28" rx="3" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <rect x="48" y="82" width="34" height="28" rx="3" fill="#FFFFFF" stroke="#2563EB" stroke-width="3"/>
+  <rect x="48" y="122" width="34" height="28" rx="3" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <rect x="238" y="42" width="34" height="28" rx="3" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <rect x="238" y="82" width="34" height="28" rx="3" fill="#2563EB"/>
+  <rect x="238" y="122" width="34" height="28" rx="3" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <path d="M136 72l24-14 24 14v48l-24 14-24-14z" fill="#0A0A0A"/>
+  <path d="M148 84h24M148 96h24M148 108h16" stroke="#FFFFFF" stroke-width="4"/>
+  <path d="M184 83l12 7-12 7z" fill="#2563EB"/>
+</svg>

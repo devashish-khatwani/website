@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 192" role="img" aria-labelledby="title desc">
+  <title id="title">Business control</title>
+  <desc id="desc">A central policy control plane governing four connected workspaces.</desc>
+  <rect width="320" height="192" rx="12" fill="#F4F4F5"/>
+  <path d="M160 53V31M160 161v-22M117 96H81M239 96h-36" stroke="#0A0A0A" stroke-width="3"/>
+  <path d="M127 63L99 47M193 63l28-16M127 129l-28 16M193 129l28 16" stroke="#2563EB" stroke-width="3"/>
+  <rect x="143" y="20" width="34" height="22" rx="2" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <rect x="143" y="150" width="34" height="22" rx="2" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <rect x="48" y="85" width="34" height="22" rx="2" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <rect x="238" y="85" width="34" height="22" rx="2" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <circle cx="160" cy="96" r="47" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <circle cx="160" cy="96" r="34" fill="#2563EB"/>
+  <path d="M141 79h38v34h-38z" fill="#FFFFFF"/>
+  <path d="M149 88h22M149 96h22M149 104h14" stroke="#0A0A0A" stroke-width="4"/>
+  <path d="M218 37h14v14h-14zM88 37h14v14H88zm0 104h14v14H88zm130 0h14v14h-14z" fill="#2563EB"/>
+</svg>

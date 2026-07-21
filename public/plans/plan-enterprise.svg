@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 192" role="img" aria-labelledby="title desc">
+  <title id="title">Enterprise governance</title>
+  <desc id="desc">Layered identity, policy, and deployment boundaries around enterprise workflows.</desc>
+  <rect width="320" height="192" rx="12" fill="#F4F4F5"/>
+  <rect x="43" y="27" width="234" height="138" rx="4" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <rect x="66" y="48" width="188" height="96" rx="3" fill="none" stroke="#2563EB" stroke-width="3"/>
+  <path d="M66 75h188M101 48v96" stroke="#A3A3A3" stroke-width="2"/>
+  <path d="M78 60h10M78 86h10M78 102h10M78 118h10" stroke="#0A0A0A" stroke-width="3"/>
+  <rect x="122" y="69" width="106" height="52" rx="3" fill="#F4F4F5" stroke="#0A0A0A" stroke-width="3"/>
+  <path d="M135 84h48M135 95h76M135 106h58" stroke="#0A0A0A" stroke-width="4"/>
+  <path d="M213 84l12 7-12 7z" fill="#2563EB"/>
+  <path d="M51 37l10 6-10 6-5-6zM269 143l10 6-10 6-5-6z" fill="#2563EB"/>
+  <path d="M43 54H30v28M277 138h13v-28" fill="none" stroke="#2563EB" stroke-width="3"/>
+</svg>

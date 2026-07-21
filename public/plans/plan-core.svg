@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 192" role="img" aria-labelledby="title desc">
+  <title id="title">Core workspace</title>
+  <desc id="desc">A structured personal workspace with one active agent workflow.</desc>
+  <rect width="320" height="192" rx="12" fill="#F4F4F5"/>
+  <rect x="54" y="32" width="212" height="128" rx="4" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/>
+  <path d="M54 58h212M91 58v102" stroke="#0A0A0A" stroke-width="3"/>
+  <path d="M68 43h9M82 43h9M96 43h9" stroke="#2563EB" stroke-width="4"/>
+  <path d="M68 79h10M68 94h10M68 109h10" stroke="#A3A3A3" stroke-width="3"/>
+  <path d="M113 82h84M113 99h62M113 116h94" stroke="#0A0A0A" stroke-width="5"/>
+  <path d="M113 136h54" stroke="#2563EB" stroke-width="5"/>
+  <path d="M221 79l18 10-18 10-8-10z" fill="#2563EB"/>
+</svg>
