@@ -8,24 +8,27 @@ const canonicalUrl = "https://www.glauxagent.com/install/";
 
 const featureImages = [
   [
-    "/features/glaux-connect.svg",
+    "/features/glaux-connect.svg?v=20260721",
     "A geometric agent connected to multiple work channels",
   ],
   [
-    "/features/glaux-memory.svg",
+    "/features/glaux-memory.svg?v=20260721",
     "Layered geometric facets converging into retained context",
   ],
   [
-    "/features/glaux-schedule.svg",
+    "/features/glaux-schedule.svg?v=20260721",
     "A precise clock inside a recurring automation orbit",
   ],
   [
-    "/features/glaux-delegate.svg",
+    "/features/glaux-delegate.svg?v=20260721",
     "One agent delegating work to three focused agents",
   ],
-  ["/features/glaux-search.svg", "A search lens moving beyond a browser frame"],
   [
-    "/features/glaux-isolation.svg",
+    "/features/glaux-search.svg?v=20260721",
+    "A search lens moving beyond a browser frame",
+  ],
+  [
+    "/features/glaux-isolation.svg?v=20260721",
     "A protected execution cube enclosed by a policy boundary",
   ],
 ] as const;
