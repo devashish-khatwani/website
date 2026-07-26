@@ -14,6 +14,7 @@ interface Props {
   description: string;
   canonicalUrl?: string;
   noindex?: boolean;
+  referrerPolicy?: "no-referrer";
   og?: {
     title: string;
     description: string;
@@ -24,7 +25,14 @@ interface Props {
   };
 }
 
-const { title, description, canonicalUrl, noindex = false, og } = Astro.props;
+const {
+  title,
+  description,
+  canonicalUrl,
+  noindex = false,
+  referrerPolicy,
+  og,
+} = Astro.props;
 const signInUrl = buildAppLoginUrl();
 const currentPath = Astro.url.pathname;
 const isProductSection = productNavigation.some(
@@ -38,6 +46,7 @@ const isProductSection = productNavigation.some(
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {referrerPolicy && <meta name="referrer" content={referrerPolicy} />}
     <link rel="icon" type="image/svg+xml" href="/brand/glaux-mark.svg" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
