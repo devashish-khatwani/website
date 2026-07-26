@@ -10,6 +10,7 @@
     "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
     "build": "npm run validate:content && ASTRO_TELEMETRY_DISABLED=1 astro build",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "preview:pages": "wrangler pages dev \"$PWD/dist\" --cwd /tmp --ip 127.0.0.1 --port ${GLAUX_PAGES_PORT:-8788} --inspector-port ${GLAUX_PAGES_INSPECTOR_PORT:-9230} --compatibility-date 2026-07-26",
     "validate:content": "ASTRO_TELEMETRY_DISABLED=1 astro sync && node --experimental-strip-types scripts/validate-content.ts",
     "typecheck": "ASTRO_TELEMETRY_DISABLED=1 astro check",
     "lint": "eslint .",
@@ -38,6 +39,7 @@
     "typescript-eslint": "8.64.0",
     "vite": "8.1.5",
     "vitest": "4.1.10",
+    "wrangler": "4.114.0",
     "yaml": "2.9.0"
   }
 }

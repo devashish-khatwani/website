@@ -1,0 +1,19 @@
+# Baseline policy for Cloudflare Pages static responses.
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+
+# The canonical Pages redirect is /contact -> /contact/, but both forms stay
+# fail-closed if redirect behavior changes.
+/contact
+  Cache-Control: no-store
+
+/contact/*
+  Cache-Control: no-store
+
+# Astro emits content-hashed build artifacts under /_astro/.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

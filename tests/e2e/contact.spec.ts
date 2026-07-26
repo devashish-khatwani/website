@@ -6,7 +6,9 @@ import {
 
 const canonicalUrl = "https://www.glauxagent.com/contact/";
 const hubSpotScriptUrl = "https://js.hsforms.net/forms/embed/v2.js";
-const productionContactUrl = "http://www.glauxagent.com:4321/contact/";
+const productionContactUrl = `http://www.glauxagent.com:${
+  process.env.GLAUX_PAGES_PORT ?? "8788"
+}/contact/`;
 
 declare global {
   interface Window {
