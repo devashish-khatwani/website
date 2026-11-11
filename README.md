@@ -15,12 +15,12 @@ Tower service. It is static-first and targets Cloudflare Pages with:
 
 ## Current source documents
 
-The private parent Glaux repository remains the source of truth for product
-requirements and implementation planning. These links are intentionally
-repository-scoped and require access to the Glaux repository:
+The private Glaux product repository remains the source of truth for product
+requirements and implementation planning. These documents require access to that
+repository:
 
-- [Website PRD](https://github.com/devashish-khatwani/Glaux/blob/main/docs/website/website-prd.md)
-- [Website implementation plan](https://github.com/devashish-khatwani/Glaux/blob/main/docs/website/implementation-plan.md)
+- Website PRD: `docs/website/website-prd.md`
+- Website implementation plan: `docs/website/implementation-plan.md`
 
 ## Commands
 
