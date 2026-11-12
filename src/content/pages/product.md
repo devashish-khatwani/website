@@ -10,6 +10,6 @@ launchState: "draft"
 publicationState: "draft"
 claimReviewStatus: "draft"
 claimReferences:
-  - "claim-skillhub-preview"
+  - "claim-skills-library-preview"
   - "claim-enterprise-mcp-preview"
 ---

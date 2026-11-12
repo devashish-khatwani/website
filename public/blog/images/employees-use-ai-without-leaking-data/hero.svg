@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 840" role="img" aria-labelledby="t d">
+  <title id="t">A protected workspace with a single governed exit</title>
+  <desc id="d">A graphite hexagon holds three documents inside a blue boundary. One line leaves through a gate in the boundary toward a distant model node. The documents stay inside.</desc>
+  <rect width="1600" height="840" fill="#f2f2f2"/>
+  <g fill="none" stroke="#0a0a0a" stroke-width="14" stroke-linejoin="miter">
+    <path d="M560 110 852 278v336L560 782 268 614V278z"/>
+    <path d="M560 200 774 323v246L560 692 346 569V323z" stroke="#2563eb"/>
+  </g>
+  <g fill="#0a0a0a">
+    <rect x="430" y="380" width="70" height="92"/>
+    <rect x="525" y="350" width="70" height="92"/>
+    <rect x="620" y="400" width="70" height="92"/>
+  </g>
+  <g fill="#f2f2f2"><rect x="444" y="400" width="42" height="8"/><rect x="444" y="420" width="30" height="8"/><rect x="539" y="370" width="42" height="8"/><rect x="539" y="390" width="30" height="8"/><rect x="634" y="420" width="42" height="8"/><rect x="634" y="440" width="30" height="8"/></g>
+  <rect x="766" y="420" width="96" height="52" fill="#f2f2f2"/>
+  <g fill="#2563eb"><rect x="842" y="396" width="24" height="24"/><rect x="842" y="472" width="24" height="24"/></g>
+  <path d="M700 446H1250" stroke="#0a0a0a" stroke-width="14" stroke-dasharray="34 22"/>
+  <circle cx="1330" cy="446" r="80" fill="none" stroke="#0a0a0a" stroke-width="14"/>
+  <circle cx="1330" cy="446" r="30" fill="#2563eb"/>
+</svg>

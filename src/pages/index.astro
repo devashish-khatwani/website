@@ -14,7 +14,7 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
 
 const claimIds = [
   "observability-preview",
-  "skillhub-preview",
+  "skills-library-preview",
   "enterprise-mcp-preview",
   "model-studio-coming-soon",
 ] as const;
@@ -23,7 +23,7 @@ type HomepageClaimId = (typeof claimIds)[number];
 
 const displayTitleByClaimId = {
   "observability-preview": "Observability",
-  "skillhub-preview": "Enterprise SkillHub",
+  "skills-library-preview": "Shared skills",
   "enterprise-mcp-preview": "Enterprise connections",
   "model-studio-coming-soon": "Model Studio",
 } satisfies Record<HomepageClaimId, string>;

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+  <title id="t">The layers you would build in-house</title>
+  <desc id="d">Eight layers of a governed AI setup, from top to bottom: an agent client for employees, sign-in with your identity provider, a policy engine with approvals and access requests, a model gateway with key custody and budgets, tool governance for MCP, a skills registry, an audit store with export, and trace observability. Next to each is the Glaux part that covers it: the Glaux desktop app, Glaux SSO, Glaux Control Tower, Glaux AI Gateway, Glaux tools gateway, Glaux skills library, Glaux audit, and Glaux observability.</desc>
+  <rect width="800" height="1000" fill="#ffffff"/>
+  <text x="40" y="60" font-size="30" font-weight="700" fill="#0a0a0a">What "build it ourselves" means</text>
+  <text x="40" y="96" font-size="19" fill="#525252">Each layer, and the Glaux part that covers it</text>
+  <g font-size="21">
+    <rect x="40" y="130" width="720" height="88" rx="12" fill="#0a0a0a"/><text x="66" y="182" fill="#fff" font-weight="600">Agent app for employees</text><text x="734" y="182" fill="#60a5fa" text-anchor="end">Glaux desktop app</text>
+    <rect x="40" y="230" width="720" height="88" rx="12" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="2"/><text x="66" y="282" fill="#0a0a0a" font-weight="600">Sign-in with your IdP</text><text x="734" y="282" fill="#2563eb" text-anchor="end">Glaux SSO</text>
+    <rect x="40" y="330" width="720" height="88" rx="12" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="2"/><text x="66" y="382" fill="#0a0a0a" font-weight="600">Policy, approvals, requests</text><text x="734" y="382" fill="#2563eb" text-anchor="end">Glaux Control Tower</text>
+    <rect x="40" y="430" width="720" height="88" rx="12" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="2"/><text x="66" y="482" fill="#0a0a0a" font-weight="600">Model gateway, keys, budget</text><text x="734" y="482" fill="#2563eb" text-anchor="end">Glaux AI Gateway</text>
+    <rect x="40" y="530" width="720" height="88" rx="12" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="2"/><text x="66" y="582" fill="#0a0a0a" font-weight="600">Tool (MCP) governance</text><text x="734" y="582" fill="#2563eb" text-anchor="end">Glaux tools gateway</text>
+    <rect x="40" y="630" width="720" height="88" rx="12" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="2"/><text x="66" y="682" fill="#0a0a0a" font-weight="600">Skills registry</text><text x="734" y="682" fill="#2563eb" text-anchor="end">Glaux skills library</text>
+    <rect x="40" y="730" width="720" height="88" rx="12" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="2"/><text x="66" y="782" fill="#0a0a0a" font-weight="600">Audit store and export</text><text x="734" y="782" fill="#2563eb" text-anchor="end">Glaux audit</text>
+    <rect x="40" y="830" width="720" height="88" rx="12" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="2"/><text x="66" y="882" fill="#0a0a0a" font-weight="600">Traces and observability</text><text x="734" y="882" fill="#2563eb" text-anchor="end">Glaux observability</text>
+  </g>
+  <text x="40" y="964" font-size="18" fill="#737373">The hard part is the glue: one identity and one policy across all eight.</text>
+</svg>

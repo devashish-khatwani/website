@@ -1,0 +1,69 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Badge from "../../components/Badge.astro";
+import SiteLayout from "../../components/SiteLayout.astro";
+import { buildPageHeadMetadata, isSearchIndexingAllowed } from "../../lib/site";
+import "../../styles/blog.css";
+
+export async function getStaticPaths() {
+  return (await getCollection("blog")).map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { data } = post;
+const pageHead = buildPageHeadMetadata({
+  title: `${data.title} | Glaux`,
+  description: data.description,
+  canonicalPath: `/blog/${post.id}/`,
+  og: {
+    title: data.title,
+    description: data.description,
+    image: data.heroImage.replace(/\.svg$/u, ".png"),
+    imageAlt: data.heroImageAlt,
+  },
+});
+---
+
+<SiteLayout
+  {...pageHead}
+  og={{ ...pageHead.og, type: "article" }}
+  noindex={!isSearchIndexingAllowed()}
+>
+  <article class="route-main blog-page blog-post">
+    <header class="blog-heading">
+      <a class="plain-label blog-back" href="/blog/">Back to blog</a>
+      <h1>{data.title}</h1>
+      <p class="product-lede">{data.description}</p>
+      <div class="blog-byline">
+        <span>{data.author}</span>
+        <time datetime={data.date.toISOString().slice(0, 10)}>
+          {
+            data.date.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              timeZone: "UTC",
+            })
+          }
+        </time>
+      </div>
+      <ul class="blog-tags" aria-label="Tags">
+        {
+          data.tags.map((tag) => (
+            <li>
+              <Badge>{tag}</Badge>
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+    <div class="blog-prose"><Content /></div>
+  </article>
+</SiteLayout>

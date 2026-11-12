@@ -1,5 +1,6 @@
 import { expect, test, type ConsoleMessage, type Page } from "@playwright/test";
 import { expectVisibleFocusOutline } from "./assertions";
+import { blogPosts } from "./blog-posts";
 
 const routes = [
   { path: "/", h1: "AI coworkers. Enterprise control." },
@@ -13,6 +14,11 @@ const routes = [
   { path: "/install/", h1: "Put Glaux to work." },
   { path: "/plans/", h1: "Start focused. Scale with control." },
   { path: "/how-it-works/", h1: "From request to reviewable result." },
+  { path: "/blog/", h1: "Blog" },
+  ...blogPosts.map(({ slug, title }) => ({
+    path: `/blog/${slug}/`,
+    h1: title,
+  })),
   { path: "/404", h1: "This page isn’t here." },
 ] as const;
 
@@ -35,6 +41,7 @@ const primaryLinks = [
   { name: "Install", href: "/install/" },
   { name: "Plans", href: "/plans/" },
   { name: "Company", href: "/company/" },
+  { name: "Blog", href: "/blog/" },
 ] as const;
 
 async function expectNoHorizontalOverflowWithinTolerance(page: Page) {

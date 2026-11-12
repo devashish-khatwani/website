@@ -6,7 +6,7 @@ const defaultCanonicalSiteOrigin = "https://www.glauxagent.com";
 const defaultAppOrigin = "https://app.glauxagent.com";
 const productionBranch = "main";
 
-export const publishedRoutes = [] as const;
+export const publishedRoutes = ["/blog/"] as const;
 
 export const productNavigation = [
   {
@@ -31,6 +31,7 @@ export const primaryNavigation = [
   { label: "Install", href: "/install/" },
   { label: "Plans", href: "/plans/" },
   { label: "Company", href: "/company/" },
+  { label: "Blog", href: "/blog/" },
 ] as const;
 
 export const footerNavigation = [
@@ -179,11 +180,12 @@ export function buildRobotsTxt(
 
 export function buildSitemapXml(
   environment: SiteEnvironment = process.env,
+  additionalRoutes: readonly string[] = [],
 ): string {
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...publishedRoutes.flatMap((path) => [
+    ...[...publishedRoutes, ...additionalRoutes].flatMap((path) => [
       "  <url>",
       `    <loc>${escapeXmlTextContent(absoluteSiteUrl(path, environment))}</loc>`,
       "  </url>",

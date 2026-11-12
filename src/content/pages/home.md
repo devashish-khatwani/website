@@ -12,7 +12,7 @@ claimReviewStatus: "draft"
 claimReferences:
   - "claim-security-control-authority"
   - "claim-observability-preview"
-  - "claim-skillhub-preview"
+  - "claim-skills-library-preview"
   - "claim-enterprise-mcp-preview"
   - "claim-model-studio-coming-soon"
 ---

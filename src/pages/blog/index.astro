@@ -1,0 +1,64 @@
+---
+import { getCollection } from "astro:content";
+import SiteLayout from "../../components/SiteLayout.astro";
+import { buildPageHeadMetadata, isSearchIndexingAllowed } from "../../lib/site";
+import "../../styles/blog.css";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) =>
+    b.data.date.getTime() - a.data.date.getTime() || a.id.localeCompare(b.id),
+);
+const title = "Blog | Glaux";
+const description =
+  "Practical perspectives on AI governance, security, and putting AI agents to work.";
+const pageHead = buildPageHeadMetadata({
+  title,
+  description,
+  canonicalPath: "/blog/",
+  og: {
+    title,
+    description,
+    imageAlt: "Glaux perspectives on AI governance and security.",
+  },
+});
+---
+
+<SiteLayout {...pageHead} noindex={!isSearchIndexingAllowed()}>
+  <div class="route-main blog-page">
+    <header class="blog-heading">
+      <p class="plain-label">From the Glaux team</p>
+      <h1 class="product-title">Blog</h1>
+      <p class="product-lede">{description}</p>
+    </header>
+    <div class="blog-grid">
+      {
+        posts.map(({ id, data }) => (
+          <article class="blog-card">
+            <img
+              src={data.heroImage}
+              alt={data.heroImageAlt}
+              width="1200"
+              height="630"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="blog-card__copy">
+              <time datetime={data.date.toISOString().slice(0, 10)}>
+                {data.date.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  timeZone: "UTC",
+                })}
+              </time>
+              <h2>
+                <a href={`/blog/${id}/`}>{data.title}</a>
+              </h2>
+              <p>{data.description}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</SiteLayout>

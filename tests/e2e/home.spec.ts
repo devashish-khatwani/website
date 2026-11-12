@@ -157,8 +157,8 @@ test("home page renders only approved draft platform labels and statements", asy
       "Preview",
     ],
     [
-      "claim-skillhub-preview",
-      "Enterprise SkillHub",
+      "claim-skills-library-preview",
+      "Shared skills",
       "Share trusted ways of working.",
       "Preview",
     ],

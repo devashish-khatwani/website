@@ -171,3 +171,22 @@ export const pageMetadataSchema = z
 
 export type ClaimEntry = z.infer<typeof claimEntrySchema>;
 export type PageMetadata = z.infer<typeof pageMetadataSchema>;
+
+export const blogPostSchema = z.object({
+  title: z.string().min(3).max(80),
+  description: z.string().min(20).max(200),
+  date: z.coerce
+    .date()
+    .refine(
+      (date) =>
+        date.toISOString().slice(0, 10) <=
+        new Date().toISOString().slice(0, 10),
+      { message: "Blog posts cannot be future-dated." },
+    ),
+  author: z.literal("The Glaux Team"),
+  tags: z.array(z.string().min(1)).min(1),
+  heroImage: z
+    .string()
+    .regex(/^\/blog\/images\/[a-z0-9-]+\/[a-z0-9-]+\.(?:svg|png)$/u),
+  heroImageAlt: z.string().min(12),
+});

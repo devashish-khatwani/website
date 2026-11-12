@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1120" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+  <title id="t">The path of one AI request through Glaux</title>
+  <desc id="d">An employee asks the Glaux desktop app. Glaux Control Tower checks identity and policy and issues a signed run envelope. Model calls go through the Glaux AI Gateway with a 30-minute key, approved models and an organization budget. Tool calls go through the Glaux tools gateway, which re-checks every call. Decisions land in the append-only Glaux audit store.</desc>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0a0a0a"/></marker></defs>
+  <rect width="800" height="1120" fill="#ffffff"/>
+  <text x="40" y="60" font-size="30" font-weight="700" fill="#0a0a0a">One request, one governed path</text>
+  <!-- 1 -->
+  <rect x="40" y="100" width="720" height="130" rx="16" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="3"/>
+  <text x="70" y="148" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">1 · ON THE LAPTOP</text>
+  <text x="70" y="182" font-size="26" font-weight="700" fill="#0a0a0a">Employee asks the Glaux desktop app</text>
+  <text x="70" y="212" font-size="20" fill="#525252">Work happens inside one workspace. No provider keys here.</text>
+  <path d="M400 230v46" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/>
+  <!-- 2 -->
+  <rect x="40" y="286" width="720" height="170" rx="16" fill="#0a0a0a"/>
+  <text x="70" y="334" font-size="25" font-weight="700" fill="#60a5fa" letter-spacing="1">2 · GLAUX CONTROL TOWER</text>
+  <text x="70" y="368" font-size="26" font-weight="700" fill="#ffffff">Who is this, and what may they do?</text>
+  <text x="70" y="400" font-size="20" fill="#e5e5e5">SSO identity, workspace, policy.</text>
+  <text x="70" y="430" font-size="20" fill="#e5e5e5">Result: a signed, expiring run envelope.</text>
+  <path d="M212 456v56" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/><path d="M588 456v56" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/>
+  <!-- 3a 3b -->
+  <rect x="40" y="522" width="345" height="230" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+  <text x="64" y="568" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">3 · AI GATEWAY</text>
+  <text x="64" y="602" font-size="24" font-weight="700" fill="#0a0a0a">Model calls</text>
+  <text x="64" y="638" font-size="19" fill="#1e3a8a">30-minute key</text>
+  <text x="64" y="668" font-size="19" fill="#1e3a8a">Approved models only</text>
+  <text x="64" y="698" font-size="19" fill="#1e3a8a">Organization budget</text>
+  <text x="64" y="728" font-size="19" fill="#1e3a8a">Provider keys stay here</text>
+  <rect x="415" y="522" width="345" height="230" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+  <text x="439" y="568" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">3 · TOOLS GATEWAY</text>
+  <text x="439" y="602" font-size="24" font-weight="700" fill="#0a0a0a">Tool (MCP) calls</text>
+  <text x="439" y="638" font-size="19" fill="#1e3a8a">Approved tool registry</text>
+  <text x="439" y="668" font-size="19" fill="#1e3a8a">Policy checked per call</text>
+  <text x="439" y="698" font-size="19" fill="#1e3a8a">Tool credentials held</text>
+  <text x="439" y="728" font-size="19" fill="#1e3a8a">centrally, not on laptops</text>
+  <path d="M212 752v50" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/><path d="M588 752v50" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/>
+  <rect x="40" y="812" width="345" height="80" rx="16" fill="#ffffff" stroke="#0a0a0a" stroke-width="3"/>
+  <text x="212" y="861" font-size="22" font-weight="600" fill="#0a0a0a" text-anchor="middle">Model providers</text>
+  <rect x="415" y="812" width="345" height="80" rx="16" fill="#ffffff" stroke="#0a0a0a" stroke-width="3"/>
+  <text x="588" y="861" font-size="22" font-weight="600" fill="#0a0a0a" text-anchor="middle">Company tools</text>
+  <!-- audit -->
+  <path d="M400 930v-18" stroke="#737373" stroke-width="3" stroke-dasharray="6 6"/>
+  <rect x="40" y="940" width="720" height="140" rx="16" fill="#f2f2f2" stroke="#0a0a0a" stroke-width="3" stroke-dasharray="10 8"/>
+  <text x="70" y="988" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">4 · GLAUX AUDIT</text>
+  <text x="70" y="1022" font-size="24" font-weight="700" fill="#0a0a0a">Decisions recorded, append-only</text>
+  <text x="70" y="1054" font-size="19" fill="#525252">Who, what, outcome, policy version. Never raw prompts.</text>
+</svg>

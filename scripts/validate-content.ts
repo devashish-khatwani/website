@@ -61,9 +61,11 @@ function parseFrontmatter(path: string): Record<string, unknown> {
 function runContentValidation(): void {
   const claimsDirectory = join(root, "src/content/claims");
   const pagesDirectory = join(root, "src/content/pages");
+  const postsDirectory = join(root, "src/content/blog");
 
   assertRequiredContentDirectory(claimsDirectory, "src/content/claims");
   assertRequiredContentDirectory(pagesDirectory, "src/content/pages");
+  assertRequiredContentDirectory(postsDirectory, "src/content/blog");
 
   const claims = walkFiles(claimsDirectory, new Set([".json"])).map((path) =>
     JSON.parse(readFileSync(path, "utf8")),
@@ -72,7 +74,10 @@ function runContentValidation(): void {
     parseFrontmatter,
   );
 
-  const result = validateContentForRelease({ claims, pages });
+  const posts = walkFiles(postsDirectory, new Set([".md"])).map(
+    parseFrontmatter,
+  );
+  const result = validateContentForRelease({ claims, pages, posts });
 
   if (!result.valid) {
     for (const issue of result.issues) {

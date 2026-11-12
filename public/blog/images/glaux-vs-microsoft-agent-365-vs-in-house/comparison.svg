@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1452" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+  <title id="t">Three options at a glance</title>
+  <desc id="d">Microsoft Agent 365: best fit for companies already standardized on Microsoft 365 and Entra; strength is breadth across identity, data security and threat protection; trade-off is that it governs agents rather than giving employees one, and works best with Microsoft E5. Glaux: best fit for mid-size teams that want one governed AI coworker for employees; strength is the agent, model gateway, policy, approvals and audit in one product with your own identity provider and model keys; trade-off is that it is early, in its design-partner stage, and does not do DLP or threat protection. Build in-house: best fit for teams with platform engineers and unusual requirements; strength is full control; trade-off is that you build and run every layer yourself.</desc>
+  <rect width="800" height="1452" fill="#ffffff"/>
+  <text x="40" y="62" font-size="32" font-weight="700" fill="#0a0a0a">Three options at a glance</text>
+  <rect x="40" y="100" width="720" height="429" rx="16" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="3"/>
+  <text x="70" y="156" font-size="32" font-weight="700" fill="#0a0a0a">Microsoft Agent 365</text>
+  <text x="70" y="208" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">BEST FIT</text>
+  <text x="70" y="244" font-size="23" fill="#171717">Already all-in on Microsoft 365 and Entra</text>
+  <text x="70" y="299" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">STRENGTH</text>
+  <text x="70" y="335" font-size="23" fill="#171717">Breadth: identity, DLP, threat protection,</text>
+  <text x="70" y="366" font-size="23" fill="#171717">registry for Microsoft and partner agents</text>
+  <text x="70" y="421" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">TRADE-OFF</text>
+  <text x="70" y="457" font-size="23" fill="#171717">Governs agents; doesn't give people one.</text>
+  <text x="70" y="488" font-size="23" fill="#171717">Microsoft says it works best with E5.</text>
+  <rect x="40" y="561" width="720" height="429" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+  <text x="70" y="617" font-size="32" font-weight="700" fill="#0a0a0a">Glaux</text>
+  <text x="70" y="669" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">BEST FIT</text>
+  <text x="70" y="705" font-size="23" fill="#171717">Mid-size teams that want one governed agent</text>
+  <text x="70" y="760" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">STRENGTH</text>
+  <text x="70" y="796" font-size="23" fill="#171717">Agent, model gateway, policy, approvals and</text>
+  <text x="70" y="827" font-size="23" fill="#171717">audit together; your IdP, your model keys</text>
+  <text x="70" y="882" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">TRADE-OFF</text>
+  <text x="70" y="918" font-size="23" fill="#171717">Early: design-partner stage. No DLP</text>
+  <text x="70" y="949" font-size="23" fill="#171717">or threat protection.</text>
+  <rect x="40" y="1022" width="720" height="398" rx="16" fill="#ffffff" stroke="#0a0a0a" stroke-width="3" stroke-dasharray="10 8"/>
+  <text x="70" y="1078" font-size="32" font-weight="700" fill="#0a0a0a">Build it in-house</text>
+  <text x="70" y="1130" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">BEST FIT</text>
+  <text x="70" y="1166" font-size="23" fill="#171717">A platform team and unusual requirements</text>
+  <text x="70" y="1221" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">STRENGTH</text>
+  <text x="70" y="1257" font-size="23" fill="#171717">Total control over every layer</text>
+  <text x="70" y="1312" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">TRADE-OFF</text>
+  <text x="70" y="1348" font-size="23" fill="#171717">You build, secure, and run all of it,</text>
+  <text x="70" y="1379" font-size="23" fill="#171717">including the parts nobody sees</text>
+</svg>

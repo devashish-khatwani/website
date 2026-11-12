@@ -81,7 +81,7 @@ test("install page keeps approved capability copy and vector feature assets", as
 
   await expect(
     page.getByRole("heading", {
-      name: "Built on Hermes. Ready for enterprise.",
+      name: "Built for work. Ready for enterprise.",
     }),
   ).toBeVisible();
   await expect(

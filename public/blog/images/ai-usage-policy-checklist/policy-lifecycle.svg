@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 820" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+  <title id="t">Changing a policy safely in Glaux</title>
+  <desc id="d">Draft or import a Cedar policy. Validate it against the schema; secrets are rejected. Simulate a decision and preview which people it affects. Publish it as a new version. If something goes wrong, pause it, let it expire, or roll back to an earlier version. Every version stays in history and can be exported.</desc>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0a0a0a"/></marker></defs>
+  <rect width="800" height="820" fill="#ffffff"/>
+  <text x="40" y="60" font-size="30" font-weight="700" fill="#0a0a0a">Change policy like code</text>
+  <g font-size="22" font-weight="700">
+    <rect x="40" y="100" width="340" height="110" rx="16" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="3"/><text x="66" y="148" fill="#0a0a0a">1  Draft or import</text><text x="66" y="182" font-size="18" font-weight="400" fill="#525252">Cedar, portable bundle</text>
+    <rect x="420" y="100" width="340" height="110" rx="16" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="3"/><text x="446" y="148" fill="#0a0a0a">2  Validate</text><text x="446" y="182" font-size="18" font-weight="400" fill="#525252">Schema check; secrets rejected</text>
+    <rect x="40" y="260" width="340" height="110" rx="16" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="3"/><text x="66" y="308" fill="#0a0a0a">3  Simulate</text><text x="66" y="342" font-size="18" font-weight="400" fill="#525252">"Would Dana be allowed?"</text>
+    <rect x="420" y="260" width="340" height="110" rx="16" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="3"/><text x="446" y="308" fill="#0a0a0a">4  Preview impact</text><text x="446" y="342" font-size="18" font-weight="400" fill="#525252">Who this change affects</text>
+    <rect x="40" y="420" width="720" height="110" rx="16" fill="#2563eb"/><text x="66" y="468" fill="#ffffff">5  Publish a new version</text><text x="66" y="502" font-size="18" font-weight="400" fill="#dbeafe">Old versions stay in history, unchanged</text>
+  </g>
+  <path d="M380 155h32" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M590 210v18H210v24" stroke="#0a0a0a" stroke-width="3" fill="none" marker-end="url(#a)"/>
+  <path d="M380 315h32" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M590 370v42" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M400 530v42" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/>
+  <text x="40" y="606" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">IF IT GOES WRONG</text>
+  <g font-size="21" font-weight="600" fill="#0a0a0a">
+    <rect x="40" y="626" width="220" height="80" rx="12" fill="#ffffff" stroke="#0a0a0a" stroke-width="3"/><text x="150" y="674" text-anchor="middle">Pause</text>
+    <rect x="290" y="626" width="220" height="80" rx="12" fill="#ffffff" stroke="#0a0a0a" stroke-width="3"/><text x="400" y="674" text-anchor="middle">Expire</text>
+    <rect x="540" y="626" width="220" height="80" rx="12" fill="#ffffff" stroke="#0a0a0a" stroke-width="3"/><text x="650" y="674" text-anchor="middle">Roll back</text>
+  </g>
+  <text x="40" y="770" font-size="18" fill="#737373">Export any policy as a Cedar bundle for review or backup.</text>
+</svg>

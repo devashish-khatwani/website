@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 840" role="img" aria-labelledby="t d">
+  <title id="t">Three ways to govern AI at work</title>
+  <desc id="d">Three abstract forms side by side: a large grid of squares for a broad suite, an owl-eyed hexagon for Glaux, and a stack of loose blocks for building it yourself.</desc>
+  <rect width="1600" height="840" fill="#f2f2f2"/>
+  <g fill="none" stroke="#0a0a0a" stroke-width="10"><rect x="130" y="240" width="96" height="96"/><rect x="248" y="240" width="96" height="96"/><rect x="366" y="240" width="96" height="96"/><rect x="130" y="358" width="96" height="96"/><rect x="248" y="358" width="96" height="96"/><rect x="366" y="358" width="96" height="96"/><rect x="130" y="476" width="96" height="96"/><rect x="248" y="476" width="96" height="96"/><rect x="366" y="476" width="96" height="96"/></g>
+  <rect x="366" y="476" width="96" height="96" fill="#0a0a0a"/>
+  <g fill="none" stroke="#0a0a0a" stroke-width="14" stroke-linejoin="miter">
+    <path d="M800 170 1000 285v230L800 630 600 515V285z"/>
+    <path d="M800 250 930 325v150L800 550 670 475V325z" stroke="#2563eb"/>
+  </g>
+  <path d="M800 340 868 379v78L800 496 732 457v-78z" fill="#0a0a0a"/>
+  <circle cx="776" cy="418" r="11" fill="#fff"/><circle cx="824" cy="418" r="11" fill="#fff"/>
+  <g fill="none" stroke="#0a0a0a" stroke-width="12">
+    <rect x="1140" y="470" width="240" height="100"/><rect x="1170" y="360" width="170" height="100" transform="rotate(-6 1255 410)"/><rect x="1200" y="250" width="130" height="96" transform="rotate(8 1265 298)"/>
+  </g>
+  <rect x="1390" y="530" width="60" height="40" fill="#2563eb"/>
+  <path d="M150 700h1300" stroke="#0a0a0a" stroke-width="6" stroke-dasharray="20 18"/>
+</svg>

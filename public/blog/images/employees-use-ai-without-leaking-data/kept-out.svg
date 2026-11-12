@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+  <title id="t">What Glaux records and what it keeps out</title>
+  <desc id="d">Two columns. Recorded: who acted, which workspace, the action and resource, the outcome, the policy version, and correlation IDs. Kept out of audit and telemetry: raw prompts, model responses, raw tool payloads, secrets and keys, local files, and the agent's local memory.</desc>
+  <rect width="800" height="700" fill="#ffffff"/>
+  <text x="40" y="60" font-size="30" font-weight="700" fill="#0a0a0a">Record the decision, not the data</text>
+  <rect x="40" y="100" width="345" height="560" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+  <text x="66" y="150" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">RECORDED</text>
+  <g font-size="21" fill="#0a0a0a">
+    <text x="66" y="210">Who acted</text><text x="66" y="290">Which workspace</text><text x="66" y="370">Action + resource</text><text x="66" y="450">Outcome</text><text x="66" y="530">Policy version</text><text x="66" y="610">Run + request IDs</text>
+  </g>
+  <g stroke="#2563eb" stroke-width="2"><path d="M66 238h293M66 318h293M66 398h293M66 478h293M66 558h293"/></g>
+  <rect x="415" y="100" width="345" height="560" rx="16" fill="#0a0a0a"/>
+  <text x="441" y="150" font-size="25" font-weight="700" fill="#60a5fa" letter-spacing="1">KEPT OUT</text>
+  <g font-size="21" fill="#ffffff">
+    <text x="441" y="210">Raw prompts</text><text x="441" y="290">Model responses</text><text x="441" y="370">Raw tool payloads</text><text x="441" y="450">Secrets and keys</text><text x="441" y="530">Local files</text><text x="441" y="610">Agent's local memory</text>
+  </g>
+  <g stroke="#525252" stroke-width="2"><path d="M441 238h293M441 318h293M441 398h293M441 478h293M441 558h293"/></g>
+</svg>

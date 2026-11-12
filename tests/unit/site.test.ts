@@ -27,6 +27,7 @@ describe("site shell navigation contract", () => {
       { label: "Install", href: "/install/" },
       { label: "Plans", href: "/plans/" },
       { label: "Company", href: "/company/" },
+      { label: "Blog", href: "/blog/" },
     ]);
     expect(
       footerNavigation.map(({ label, href }) => ({ label, href })),
@@ -37,6 +38,7 @@ describe("site shell navigation contract", () => {
       { label: "Install", href: "/install/" },
       { label: "Plans", href: "/plans/" },
       { label: "Company", href: "/company/" },
+      { label: "Blog", href: "/blog/" },
     ]);
     expect(primaryNavigation.map((item) => item.label)).not.toContain(
       "Resources",
@@ -145,7 +147,7 @@ describe("site discoverability metadata", () => {
   });
 
   it("allows crawling only for an explicit Cloudflare Pages production build", () => {
-    expect(publishedRoutes).toEqual([]);
+    expect(publishedRoutes).toEqual(["/blog/"]);
     expect(isSearchIndexingAllowed({})).toBe(false);
     expect(
       isSearchIndexingAllowed({
@@ -167,6 +169,21 @@ describe("site discoverability metadata", () => {
         CF_PAGES_BRANCH: "main",
       }),
     ).toContain("Allow: /");
-    expect(buildSitemapXml()).not.toContain("<loc>");
+    expect(buildSitemapXml()).toContain(
+      "<loc>https://www.glauxagent.com/blog/</loc>",
+    );
+  });
+
+  it("includes collection routes in the sitemap under the configured origin", () => {
+    const sitemap = buildSitemapXml(
+      { PUBLIC_SITE_ORIGIN: "https://preview.example.com" },
+      ["/blog/example/"],
+    );
+
+    expect(sitemap).toContain("<loc>https://preview.example.com/blog/</loc>");
+    expect(sitemap).toContain(
+      "<loc>https://preview.example.com/blog/example/</loc>",
+    );
+    expect(sitemap).not.toContain("<loc>https://preview.example.com/</loc>");
   });
 });

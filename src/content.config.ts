@@ -1,6 +1,10 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
-import { claimEntrySchema, pageMetadataSchema } from "./lib/content/schemas";
+import {
+  blogPostSchema,
+  claimEntrySchema,
+  pageMetadataSchema,
+} from "./lib/content/schemas";
 
 const pages = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/pages" }),
@@ -12,4 +16,9 @@ const claims = defineCollection({
   schema: claimEntrySchema,
 });
 
-export const collections = { pages, claims };
+const blog = defineCollection({
+  loader: glob({ pattern: "*.md", base: "./src/content/blog" }),
+  schema: blogPostSchema,
+});
+
+export const collections = { pages, claims, blog };

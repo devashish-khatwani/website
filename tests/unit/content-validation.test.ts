@@ -241,6 +241,53 @@ describe("content release validation", () => {
   });
 });
 
+describe("blog publication validation", () => {
+  const post = {
+    title: "A practical AI usage policy checklist",
+    description:
+      "A practical checklist for choosing AI access, deciding what agents can do, and keeping useful evidence.",
+    date: "2026-11-11",
+    author: "The Glaux Team",
+    tags: ["AI policy", "AI governance"],
+    heroImage: "/blog/images/ai-usage-policy-checklist/hero.svg",
+    heroImageAlt: "A clipboard checklist beside a deny box and a clock.",
+  };
+
+  it("accepts a published post with team attribution and accessible local images", () => {
+    expect(
+      validateContentForRelease({ claims: [], pages: [], posts: [post] }),
+    ).toEqual({ valid: true, issues: [] });
+  });
+
+  it.each([
+    {
+      reason: "future publication date",
+      invalidField: { date: "2999-01-01" },
+    },
+    {
+      reason: "non-team byline",
+      invalidField: { author: "Editorial contributor" },
+    },
+    {
+      reason: "missing hero alternative text",
+      invalidField: { heroImageAlt: undefined },
+    },
+    {
+      reason: "relative hero image URL",
+      invalidField: { heroImage: "./images/checklist/hero.svg" },
+    },
+  ])("rejects a post with $reason", ({ invalidField }) => {
+    const result = validateContentForRelease({
+      claims: [],
+      pages: [],
+      posts: [{ ...post, ...invalidField }],
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.length).toBeGreaterThan(0);
+  });
+});
+
 describe("content validator required roots", () => {
   it("reports an actionable error when a required content root is missing", () => {
     const directory = join(

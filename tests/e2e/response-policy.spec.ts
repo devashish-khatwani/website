@@ -1,4 +1,5 @@
 import { expect, test, type APIResponse } from "@playwright/test";
+import { blogPosts } from "./blog-posts";
 
 const baselineSecurityHeaders = {
   "referrer-policy": "strict-origin-when-cross-origin",
@@ -37,16 +38,22 @@ function expectHtmlIsNotBroadlyCached(response: APIResponse): void {
   }
 }
 
-test("Cloudflare Pages applies the baseline policy without broadly caching HTML", async ({
-  request,
-}) => {
-  const homeResponse = await request.get("/");
+for (const path of [
+  "/",
+  "/blog/",
+  ...blogPosts.map(({ slug }) => `/blog/${slug}/`),
+]) {
+  test(`Cloudflare Pages applies the baseline policy without broadly caching ${path}`, async ({
+    request,
+  }) => {
+    const response = await request.get(path);
 
-  expect(homeResponse.status()).toBe(200);
-  expectBaselineSecurityHeaders(homeResponse);
-  expectHtmlIsNotBroadlyCached(homeResponse);
-  expect(homeResponse.headers()).not.toHaveProperty("content-security-policy");
-});
+    expect(response.status()).toBe(200);
+    expectBaselineSecurityHeaders(response);
+    expectHtmlIsNotBroadlyCached(response);
+    expect(response.headers()).not.toHaveProperty("content-security-policy");
+  });
+}
 
 test("Cloudflare Pages keeps the contact surface out of shared caches", async ({
   request,

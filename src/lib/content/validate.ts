@@ -1,4 +1,5 @@
 import {
+  blogPostSchema,
   claimEntrySchema,
   type ClaimEntry,
   pageMetadataSchema,
@@ -6,7 +7,7 @@ import {
 } from "./schemas.ts";
 
 export type ContentValidationIssue = {
-  scope: "claim" | "page" | "release";
+  scope: "claim" | "page" | "post" | "release";
   id: string;
   message: string;
 };
@@ -14,6 +15,7 @@ export type ContentValidationIssue = {
 export type RawContentForRelease = {
   claims: unknown[];
   pages: unknown[];
+  posts?: unknown[];
 };
 
 export type ContentValidationResult = {
@@ -44,6 +46,19 @@ export function validateContentForRelease(
   const issues: ContentValidationIssue[] = [];
   const claims = new Map<string, ClaimEntry>();
   const pages: PageMetadata[] = [];
+
+  for (const rawPost of content.posts ?? []) {
+    const parsed = blogPostSchema.safeParse(rawPost);
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        issues.push({
+          scope: "post",
+          id: fallbackId(rawPost, "title"),
+          message: issue.message,
+        });
+      }
+    }
+  }
 
   for (const rawClaim of content.claims) {
     const parsed = claimEntrySchema.safeParse(rawClaim);

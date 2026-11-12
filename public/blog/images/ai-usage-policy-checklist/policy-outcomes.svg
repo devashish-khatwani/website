@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
+  <title id="t">The four answers a Glaux policy can give</title>
+  <desc id="d">Allow: the action runs, optionally with limits and obligations set by the policy. Require approval: the action waits for a person, and the approval expires. Deny: blocked, but the person can file an access request that an administrator approves or denies. Hard deny: blocked, and no access request or grant can override it.</desc>
+  <rect width="800" height="900" fill="#ffffff"/>
+  <text x="40" y="60" font-size="30" font-weight="700" fill="#0a0a0a">Four answers, not two</text>
+  <text x="40" y="96" font-size="19" fill="#525252">What Glaux policy can say about one action</text>
+  <rect x="40" y="130" width="720" height="170" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+  <text x="70" y="182" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">ALLOW</text>
+  <text x="70" y="218" font-size="24" font-weight="700" fill="#0a0a0a">Runs now</text>
+  <text x="70" y="252" font-size="20" fill="#1e3a8a">Can carry limits that the policy sets,</text>
+  <text x="70" y="278" font-size="20" fill="#1e3a8a">plus obligations to follow.</text>
+  <rect x="40" y="320" width="720" height="170" rx="16" fill="#ffffff" stroke="#2563eb" stroke-width="3" stroke-dasharray="10 8"/>
+  <text x="70" y="372" font-size="25" font-weight="700" fill="#2563eb" letter-spacing="1">REQUIRE APPROVAL</text>
+  <text x="70" y="408" font-size="24" font-weight="700" fill="#0a0a0a">Waits for a person</text>
+  <text x="70" y="442" font-size="20" fill="#525252">Tied to this exact action and session.</text>
+  <text x="70" y="468" font-size="20" fill="#525252">Expires if nobody answers.</text>
+  <rect x="40" y="510" width="720" height="170" rx="16" fill="#f5f5f5" stroke="#0a0a0a" stroke-width="3"/>
+  <text x="70" y="562" font-size="25" font-weight="700" fill="#525252" letter-spacing="1">DENY</text>
+  <text x="70" y="598" font-size="24" font-weight="700" fill="#0a0a0a">Blocked, but you can ask</text>
+  <text x="70" y="632" font-size="20" fill="#525252">The person files an access request.</text>
+  <text x="70" y="658" font-size="20" fill="#525252">An admin approves, denies, or asks for more.</text>
+  <rect x="40" y="700" width="720" height="170" rx="16" fill="#0a0a0a"/>
+  <text x="70" y="752" font-size="25" font-weight="700" fill="#60a5fa" letter-spacing="1">HARD DENY</text>
+  <text x="70" y="788" font-size="24" font-weight="700" fill="#ffffff">Never</text>
+  <text x="70" y="822" font-size="20" fill="#e5e5e5">No request or grant can override it.</text>
+  <text x="70" y="848" font-size="20" fill="#e5e5e5">Use it for your true red lines.</text>
+</svg>

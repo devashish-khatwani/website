@@ -38,8 +38,8 @@ test("how it works keeps preview capabilities labeled and public copy claim-safe
 
   for (const [claimId, title, statement] of [
     [
-      "claim-skillhub-preview",
-      "Enterprise SkillHub",
+      "claim-skills-library-preview",
+      "Shared skills",
       "Share trusted ways of working.",
     ],
     [

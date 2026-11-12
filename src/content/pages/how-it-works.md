@@ -11,7 +11,7 @@ publicationState: "draft"
 claimReviewStatus: "draft"
 claimReferences:
   - "claim-security-control-authority"
-  - "claim-skillhub-preview"
+  - "claim-skills-library-preview"
   - "claim-enterprise-mcp-preview"
   - "claim-observability-preview"
 ---

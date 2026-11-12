@@ -1,13 +1,13 @@
 {
-  "id": "claim-skillhub-preview",
-  "title": "Enterprise SkillHub preview",
+  "id": "claim-skills-library-preview",
+  "title": "Shared skills preview",
   "statement": "Share trusted ways of working.",
   "classification": "preview",
   "publicationState": "draft",
   "evidence": [
     {
       "label": "Website PRD section 9.2",
-      "source": "Enterprise SkillHub — Preview at launch"
+      "source": "Shared skills — Preview at launch"
     }
   ],
   "review": {

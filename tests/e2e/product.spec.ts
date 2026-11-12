@@ -51,8 +51,8 @@ test("product page renders the W-07 employee and admin story", async ({
 
   for (const [claimId, title, statement, label] of [
     [
-      "claim-skillhub-preview",
-      "Enterprise SkillHub",
+      "claim-skills-library-preview",
+      "Shared skills",
       "Share trusted ways of working.",
       "Preview",
     ],
