@@ -79,7 +79,8 @@ export const adminViews: MockView[] = [
   {
     ...pane("ai-gateway"),
     caption: "Choose the models for your workspace.",
-    takeaway: "Choose available models and see what each one costs.",
+    takeaway:
+      "Turn models on or off for everyone, and see what each one costs.",
     chips: ["Spend in one place"],
   },
   {

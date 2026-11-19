@@ -1399,7 +1399,7 @@ button.mock-card[aria-expanded="true"] {
   margin: 0 0 14px 4px;
 }
 .mock-preview {
-  height: 448px;
+  height: auto;
   box-shadow: 0 16px 38px -24px rgb(31 42 68 / 28%);
 }
 .mock-preview .mock-window {
