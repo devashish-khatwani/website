@@ -41,7 +41,7 @@ export const productSection = {
       },
       {
         name: "Guardrails",
-        teaser: "A separate product, still to come.",
+        teaser: "Policy checks on every run.",
       },
       {
         name: "Model Studio",

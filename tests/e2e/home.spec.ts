@@ -46,10 +46,8 @@ test("home page explains the governed desktop runtime and offers an honest next 
   }
   await expect(
     page.getByText("Coming soon · video not yet available"),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: /Watch the walkthrough/u }),
   ).toHaveCount(0);
+  await expect(page.getByText("Watch the walkthrough")).toHaveCount(0);
   const hero = page.getByRole("img", {
     name: "The Glaux desktop app, ready for a new work session.",
     exact: true,
@@ -329,6 +327,49 @@ test("desktop Product supports click, keyboard, Escape and outside dismissal", a
   await page.mouse.click(20, 800);
   await expect(menu).toBeHidden();
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
+});
+
+test("desktop Product covers the hero demo CTA while header actions stay accessible", async ({
+  page,
+}) => {
+  for (const [width, height] of [
+    [1024, 1000],
+    [1280, 1000],
+    [1440, 1000],
+    [1920, 1000],
+    [1440, 600],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    const heroDemo = page
+      .locator(".home-hero")
+      .getByRole("link", { name: "Book a demo" });
+    await heroDemo.click({ trial: true });
+    await page.locator(".nav-dropdown__trigger").click();
+    await expect
+      .poll(() =>
+        heroDemo.evaluate((button) => {
+          const box = button.getBoundingClientRect();
+          return [box.top + 1, box.top + box.height / 2, box.bottom - 1].every(
+            (y) =>
+              Boolean(
+                document
+                  .elementFromPoint(box.x + box.width / 2, y)
+                  ?.closest(".nav-dropdown__panel"),
+              ),
+          );
+        }),
+      )
+      .toBe(true);
+    const headerActions = page.locator(".site-nav__actions");
+    for (const name of ["Sign in", "Book a demo"]) {
+      await headerActions
+        .getByRole("link", { name, exact: true })
+        .click({ trial: true });
+    }
+    await page.keyboard.press("Escape");
+    await heroDemo.click({ trial: true });
+  }
 });
 
 test("desktop hover crosses into Product and click pins it until explicitly closed", async ({
