@@ -62,7 +62,7 @@ test("home page explains the governed desktop runtime and offers an honest next 
   await expect(hero).toHaveAttribute("src", /^\/product\//u);
 });
 
-test("hero carousel shows full real windows and honors playback controls and reduced motion", async ({
+test("hero carousel shows real product captures and honors playback controls and reduced motion", async ({
   page,
 }) => {
   await page.clock.install({ time: new Date("2026-11-18T12:00:00Z") });
@@ -83,7 +83,7 @@ test("hero carousel shows full real windows and honors playback controls and red
   ).toBeVisible();
   const expectedDimensions = [
     [2560, 1640],
-    [1600, 1000],
+    [1420, 1273],
   ];
   for (const [index, image] of (
     await showcase.locator("img").all()
@@ -100,7 +100,7 @@ test("hero carousel shows full real windows and honors playback controls and red
   await expect(admin).toBeVisible();
   await expect(desktop).toBeHidden();
   await expect(
-    admin.getByText("Your admin decides which tools it gets."),
+    admin.getByText("Review the tools in the catalog."),
   ).toBeVisible();
 
   await showcase.hover();
@@ -170,11 +170,6 @@ test("home page connects sourced incidents, four product pillars, and a staged c
   await expect(
     page.getByRole("heading", { name: "Glaux is the governed runtime" }),
   ).toBeVisible();
-  for (const title of ["01 Connect", "02 Work", "03 See", "04 Govern"]) {
-    await expect(
-      page.getByRole("heading", { name: title, exact: true }),
-    ).toBeVisible();
-  }
   const scenario = page.getByRole("region", {
     name: "“Clean up this old database table.”",
   });
@@ -190,7 +185,9 @@ test("home page connects sourced incidents, four product pillars, and a staged c
     ),
   ).toBeVisible();
   await expect(
-    scenario.getByRole("img", { name: /read-only MCP tool permissions/u }),
+    scenario.getByRole("img", {
+      name: /catalog details for the fictitious Acme database/u,
+    }),
   ).toBeVisible();
   const replies = scenario.getByRole("img", {
     name: /Glaux desktop app tells Sam.*legacy_sessions_2024.*cannot delete/u,
@@ -341,7 +338,7 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
     mobileNav.getByRole("link", { name: "Book a demo" }),
   ).toHaveAttribute("href", "/contact/");
   await menu.click();
-  await page.getByRole("link", { name: "More about this feature" }).focus();
+  await page.locator("[data-feature-detail] .feature-capture").last().focus();
   for (const name of ["Cleanup scenario agent reply"]) {
     const replyCapture = page.getByRole("region", { name, exact: true });
     await page.keyboard.press("Tab");

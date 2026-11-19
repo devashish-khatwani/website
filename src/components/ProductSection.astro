@@ -16,43 +16,33 @@ import { productSection as copy } from "../lib/content/product-section";
 
   <div class="product-section__explorer">
     <div class="product-section__overview">
-      <ol class="product-pillars">
+      <ul class="product-panes">
         {
-          copy.pillars.map((pillar) => (
+          copy.panes.map((pane) => (
             <li>
               <h3>
-                <span>{pillar.number}</span> {pillar.name}
+                <a href={`#feature-${pane.id}`} data-feature-link>
+                  {pane.name}
+                </a>
               </h3>
-              <p>{pillar.summary}</p>
-              <ul>
-                {pillar.features.map((feature) => (
-                  <li>
-                    <a href={`#feature-${feature.id}`} data-feature-link>
-                      {feature.name}
-                      <span aria-hidden="true"> ↗</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <p>{pane.summary}</p>
             </li>
           ))
         }
-      </ol>
+      </ul>
       <aside class="product-soon" aria-labelledby="product-soon-heading">
         <h3 id="product-soon-heading">{copy.comingSoon.heading}</h3>
         <ul data-coming-soon>
           {
             copy.comingSoon.items.map((item) => (
               <li>
-                <>
-                  <div>
-                    <>
-                      <span>{item.name}</span>
-                      <span class="soon-tag">{copy.comingSoon.tag}</span>
-                    </>
-                  </div>
-                  <p>{item.teaser}</p>
-                </>
+                <div>
+                  <>
+                    <span>{item.name}</span>
+                    <span class="soon-tag">{copy.comingSoon.tag}</span>
+                  </>
+                </div>
+                <p>{item.teaser}</p>
               </li>
             ))
           }
@@ -67,24 +57,17 @@ import { productSection as copy } from "../lib/content/product-section";
       </header>
       <div class="feature-guide__body">
         <nav class="feature-nav" aria-label={copy.navigationLabel}>
-          {
-            copy.pillars.map((pillar) => (
-              <div class="feature-nav__group">
-                <p>
-                  {pillar.number} · {pillar.name}
-                </p>
-                <ul>
-                  {pillar.features.map((feature) => (
-                    <li>
-                      <a href={`#feature-${feature.id}`} data-feature-link>
-                        {feature.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
+          <ul>
+            {
+              copy.panes.map((pane) => (
+                <li>
+                  <a href={`#feature-${pane.id}`} data-feature-link>
+                    {pane.name}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
           <div class="feature-nav__soon">
             <p>{copy.comingSoon.heading}</p>
             <ul data-coming-soon>
@@ -104,72 +87,54 @@ import { productSection as copy } from "../lib/content/product-section";
 
         <div class="feature-panels">
           {
-            copy.pillars.flatMap((pillar) =>
-              pillar.features.map((feature) => (
-                <article
-                  class:list={[
-                    "feature-panel",
-                    { "feature-panel--text": !feature.capture },
-                  ]}
-                  id={`feature-${feature.id}`}
-                  aria-labelledby={`feature-heading-${feature.id}`}
-                  tabindex="0"
-                  data-feature-panel
-                >
-                  <header>
-                    <p class="plain-label">{feature.surface}</p>
-                    <h3 id={`feature-heading-${feature.id}`}>{feature.name}</h3>
-                    <p>{feature.summary}</p>
-                  </header>
-                  {feature.capture ? (
-                    <figure>
-                      <div
-                        class="feature-capture"
-                        role="region"
-                        tabindex="0"
-                        aria-label={`${feature.name}: ${copy.captureLabel}`}
-                      >
-                        <img
-                          src={feature.capture.src}
-                          alt={feature.capture.alt}
-                          width={feature.capture.width}
-                          height={feature.capture.height}
-                          style={`--capture-min-width: ${feature.capture.minWidth}px`}
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                      <figcaption>
-                        {feature.capture.caption}
-                        <span>{copy.captureHint}</span>
-                      </figcaption>
-                    </figure>
-                  ) : (
-                    <div class="feature-text">
-                      <p>{feature.headline}</p>
-                      <p>
-                        {feature.explanation.map((line) => (
-                          <span>{line}</span>
-                        ))}
-                      </p>
-                      <small>{copy.textOnlyNote}</small>
-                    </div>
-                  )}
-                  <ol class="feature-flow">
-                    {feature.flow.map((step, index) => (
-                      <li>
-                        <span aria-hidden="true">{index + 1}</span>
-                        <p>{step}</p>
-                      </li>
-                    ))}
-                  </ol>
-                  <a class="feature-detail-link" href={`#detail-${feature.id}`}>
-                    {copy.detailLink}
-                    <span aria-hidden="true"> ↓</span>
-                  </a>
-                </article>
-              )),
-            )
+            copy.panes.map((pane) => (
+              <article
+                class="feature-panel"
+                id={`feature-${pane.id}`}
+                aria-labelledby={`feature-heading-${pane.id}`}
+                tabindex="0"
+                data-feature-panel
+              >
+                <header>
+                  <p class="plain-label">{pane.surface}</p>
+                  <h3 id={`feature-heading-${pane.id}`}>{pane.name}</h3>
+                  <p>{pane.summary}</p>
+                </header>
+                <figure>
+                  <div
+                    class="feature-capture"
+                    role="region"
+                    tabindex="0"
+                    aria-label={`${pane.name}: ${copy.captureLabel}`}
+                  >
+                    <img
+                      src={pane.capture.src}
+                      alt={pane.capture.alt}
+                      width={pane.capture.width}
+                      height={pane.capture.height}
+                      style={`--capture-min-width: ${pane.capture.minWidth}px`}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <figcaption>
+                    {pane.capture.caption}
+                    <span>{copy.captureHint}</span>
+                  </figcaption>
+                </figure>
+                <ol class="feature-flow">
+                  {pane.flow.map((step, index) => (
+                    <li>
+                      <span aria-hidden="true">{index + 1}</span>
+                      <p>{step}</p>
+                    </li>
+                  ))}
+                </ol>
+                <a class="feature-detail-link" href={`#detail-${pane.id}`}>
+                  {copy.detailLink}
+                </a>
+              </article>
+            ))
           }
         </div>
       </div>
@@ -179,21 +144,41 @@ import { productSection as copy } from "../lib/content/product-section";
   <section class="feature-details" aria-labelledby="feature-details-heading">
     <h2 id="feature-details-heading">{copy.detailsHeading}</h2>
     {
-      copy.pillars.flatMap((pillar) =>
-        pillar.features.map((feature) => (
-          <article id={`detail-${feature.id}`} data-feature-detail>
-            <p class="plain-label">
-              {pillar.number} · {feature.name}
-            </p>
-            <h3>{feature.headline}</h3>
+      copy.panes.map((pane) => (
+        <article id={`detail-${pane.id}`} data-feature-detail>
+          <div class="feature-detail-copy">
+            <p class="plain-label">{pane.name}</p>
+            <h3>{pane.headline}</h3>
             <p>
-              {feature.explanation.map((line) => (
+              {pane.explanation.map((line) => (
                 <span>{line}</span>
               ))}
             </p>
-          </article>
-        )),
-      )
+          </div>
+          <figure>
+            <div
+              class="feature-capture"
+              role="region"
+              tabindex="0"
+              aria-label={`${pane.name}: ${copy.captureLabel}`}
+            >
+              <img
+                src={pane.capture.src}
+                alt={pane.capture.alt}
+                width={pane.capture.width}
+                height={pane.capture.height}
+                style={`--capture-min-width: ${pane.capture.minWidth}px`}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption>
+              {pane.capture.caption}
+              <span>{copy.captureHint}</span>
+            </figcaption>
+          </figure>
+        </article>
+      ))
     }
   </section>
 </section>
@@ -270,40 +255,31 @@ import { productSection as copy } from "../lib/content/product-section";
     margin: 0;
     padding: 0;
   }
-  .product-pillars {
+  .product-panes {
     display: grid;
     gap: var(--space-6);
   }
-  .product-pillars > li {
+  .product-panes > li {
     border-top: 1px solid var(--color-hairline);
     padding-block-start: var(--space-4);
   }
-  .product-pillars h3 {
+  .product-panes h3 {
     font-size: var(--text-h3);
   }
-  .product-pillars h3 > span {
-    margin-inline-end: var(--space-3);
-    font-size: 0.8rem;
-    color: var(--color-primary);
-  }
-  .product-pillars p {
-    margin-block: var(--space-3) var(--space-2);
+  .product-panes p {
+    margin-block-start: var(--space-2);
     font-size: 0.85rem;
     color: var(--color-body);
   }
-  .product-pillars a {
+  .product-panes a {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    font-size: 0.85rem;
+    font-size: 1rem;
     text-decoration: underline;
     text-underline-offset: 4px;
   }
-  .product-pillars a > span {
-    margin-inline-start: var(--space-2);
-    color: var(--color-primary);
-  }
-  .product-pillars a[aria-current] {
+  .product-panes a[aria-current] {
     color: var(--color-primary-hover);
   }
   .product-soon {
@@ -383,9 +359,6 @@ import { productSection as copy } from "../lib/content/product-section";
     border-right: 1px solid var(--color-hairline);
     padding: var(--space-4) var(--space-3);
   }
-  .feature-nav__group {
-    margin-block-end: var(--space-5);
-  }
   .feature-nav p {
     padding: var(--space-2);
     font-size: 0.7rem;
@@ -412,6 +385,7 @@ import { productSection as copy } from "../lib/content/product-section";
   }
   .feature-nav__soon {
     border-top: 1px solid var(--color-hairline);
+    margin-block-start: var(--space-5);
     padding-block-start: var(--space-2);
   }
   .feature-nav__soon li {
@@ -471,31 +445,6 @@ import { productSection as copy } from "../lib/content/product-section";
     display: block;
     margin-block-start: var(--space-2);
   }
-  .feature-text {
-    border-block: 1px solid var(--color-hairline);
-    padding-block: var(--space-8);
-  }
-  .feature-text > p:first-child {
-    max-width: 17ch;
-    font-size: clamp(1.75rem, 3vw, 2.5rem);
-    letter-spacing: -0.035em;
-    line-height: 1.15;
-  }
-  .feature-text > p + p {
-    margin-block: var(--space-4);
-    color: var(--color-body);
-    font-size: 0.9rem;
-  }
-  .feature-text > p > span {
-    display: block;
-  }
-  .feature-text > p > span + span {
-    margin-block-start: var(--space-2);
-  }
-  .feature-text small {
-    font-size: 0.72rem;
-    color: var(--color-body);
-  }
   .feature-flow {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -522,31 +471,6 @@ import { productSection as copy } from "../lib/content/product-section";
     font-size: 0.8rem;
     line-height: 1.5;
   }
-  .feature-panel--text .feature-flow {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-    padding-block-start: 0;
-    border-top: 0;
-  }
-  .feature-panel--text .feature-flow li {
-    grid-template-columns: 3rem minmax(0, 1fr);
-    align-items: center;
-    gap: var(--space-5);
-    padding-block: var(--space-5);
-    border-bottom: 1px solid var(--color-hairline);
-  }
-  .feature-panel--text .feature-flow li > span {
-    width: auto;
-    height: auto;
-    justify-items: start;
-    border-radius: 0;
-    background: none;
-    font-size: clamp(2rem, 4vw, 3rem);
-    line-height: 1;
-  }
-  .feature-panel--text .feature-flow p {
-    font-size: 1rem;
-  }
   .feature-detail-link {
     display: inline-flex;
     align-items: center;
@@ -554,9 +478,6 @@ import { productSection as copy } from "../lib/content/product-section";
     font-size: 0.8rem;
     text-decoration: underline;
     text-underline-offset: 4px;
-  }
-  .feature-detail-link > span {
-    margin-inline-start: var(--space-2);
   }
   .feature-details {
     margin-block-start: var(--space-20);
@@ -566,36 +487,37 @@ import { productSection as copy } from "../lib/content/product-section";
   }
   .feature-details article {
     display: grid;
-    grid-template-columns: minmax(8rem, 0.65fr) minmax(0, 1.3fr) minmax(
-        0,
-        1.3fr
-      );
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr);
     gap: var(--space-8);
-    align-items: start;
+    align-items: center;
     border-top: 1px solid var(--color-hairline);
     padding-block: var(--space-10);
     scroll-margin-block-start: 7rem;
+  }
+  .feature-detail-copy {
+    display: grid;
+    gap: var(--space-4);
   }
   .feature-details h3 {
     max-width: 19ch;
     font-size: clamp(1.5rem, 2.5vw, 2.25rem);
   }
-  .feature-details article > p:last-child {
+  .feature-detail-copy > p:last-child {
     color: var(--color-body);
     font-size: 0.95rem;
   }
-  .feature-details article > p:last-child span {
+  .feature-detail-copy > p:last-child span {
     display: block;
   }
-  .feature-details article > p:last-child span + span {
+  .feature-detail-copy > p:last-child span + span {
     margin-block-start: var(--space-2);
   }
   @media (max-width: 70rem) {
     .product-section__explorer {
       grid-template-columns: 1fr;
     }
-    .product-pillars {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    .product-panes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     .product-soon ul {
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -613,7 +535,7 @@ import { productSection as copy } from "../lib/content/product-section";
     .product-section__heading {
       margin-block-end: var(--space-8);
     }
-    .product-pillars,
+    .product-panes,
     .product-soon ul {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--space-5);
@@ -635,8 +557,10 @@ import { productSection as copy } from "../lib/content/product-section";
       border-right: 0;
       border-bottom: 1px solid var(--color-hairline);
     }
-    .feature-nav__group {
-      margin: 0;
+    .feature-nav > ul {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-column: 1 / -1;
     }
     .feature-nav__soon {
       grid-column: 1 / -1;

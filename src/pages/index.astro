@@ -164,35 +164,37 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
         <figure>
           <figcaption>
             <span class="plain-label">Glaux admin console</span>
-            <h3>Read-only tools. No delete tool.</h3>
+            <h3>Two tools for inspection.</h3>
             <p>
-              The admin permission view shows list_tables and describe_table.
+              This synthetic catalog entry publishes list_tables and
+              describe_table.
             </p>
           </figcaption>
           <div
             class="scenario-capture"
             role="region"
             tabindex="0"
-            aria-label="Cleanup scenario read-only tool permissions"
+            aria-label="Cleanup scenario tool catalog example"
           >
             <img
-              src="/product/read-only-tools.webp"
-              alt="Glaux admin console read-only MCP tool permissions for list_tables and describe_table."
-              width="668"
-              height="254"
+              src="/product/connected-tools-catalog.webp"
+              class="scenario-tools"
+              alt="Glaux admin console catalog details for the fictitious Acme database, with published list_tables and describe_table tools."
+              width="1420"
+              height="1273"
               loading="lazy"
               decoding="async"
             />
           </div>
           <p class="capture-scroll-note">
-            Scroll to inspect the full permission rows.
+            Scroll to inspect the full catalog detail.
           </p>
         </figure>
       </div>
       <p class="capture-note">
         Real two-turn desktop conversation with synthetic demo data. The agent
-        offers help drafting SQL; no write tool is available. Admin grant
-        delivery was pending in the permission capture.
+        offers help drafting SQL; no write tool is available. The catalog
+        capture is a separate local example.
       </p>
     </section>
 
@@ -365,6 +367,9 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     width: auto;
     min-width: 650px;
     max-width: none;
+  }
+  .scenario-capture .scenario-tools {
+    width: 100%;
   }
   .capture-scroll-note {
     color: var(--color-body);

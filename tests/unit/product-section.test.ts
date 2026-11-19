@@ -9,11 +9,7 @@ vi.mock("../../src/lib/content/product-section", async (importOriginal) => {
     >();
   const copy = structuredClone(original.productSection);
   copy.statement = "A platform statement edited by the copy author.";
-  const pillar = copy.pillars[0];
-  assert(pillar);
-  pillar.name = "Edited pillar";
-  pillar.summary = "An edited pillar explanation.";
-  const feature = pillar.features[0];
+  const feature = copy.panes[0];
   assert(feature);
   feature.name = "Edited feature";
   feature.summary = "An edited feature explanation.";
@@ -37,8 +33,6 @@ test("renders author edits across the whole feature guide with a complete no-JS 
   const html = await container.renderToString(ProductSection);
   for (const text of [
     "A platform statement edited by the copy author.",
-    "Edited pillar",
-    "An edited pillar explanation.",
     "Edited feature",
     "An edited feature explanation.",
     "An edited deep dive.",
@@ -53,12 +47,12 @@ test("renders author edits across the whole feature guide with a complete no-JS 
   ]) {
     expect(html).toContain(text);
   }
-  expect(html.match(/data-feature-panel[\s>]/gu)).toHaveLength(8);
-  expect(html.match(/data-feature-detail[\s>]/gu)).toHaveLength(8);
+  expect(html.match(/data-feature-panel[\s>]/gu)).toHaveLength(7);
+  expect(html.match(/data-feature-detail[\s>]/gu)).toHaveLength(7);
   const panels = [
     ...html.matchAll(/<article\b[^>]*data-feature-panel[^>]*>/gu),
   ];
-  expect(panels).toHaveLength(8);
+  expect(panels).toHaveLength(7);
   for (const panel of panels)
     expect(panel[0]).not.toMatch(/\shidden(?:\s|=|>)/u);
   const soonGroups = [
