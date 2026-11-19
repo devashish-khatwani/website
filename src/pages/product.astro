@@ -54,6 +54,8 @@ const automationsCapability = {
 const previewCapabilitySpecs = [
   ["skills-library-preview", "Shared skills"],
   ["enterprise-mcp-preview", "Enterprise connections"],
+  ["observability-preview", "Observability"],
+  ["model-studio-coming-soon", "Model Studio"],
 ] as const satisfies ReadonlyArray<readonly [string, string]>;
 
 const previewCapabilities = await Promise.all(
@@ -64,9 +66,12 @@ const previewCapabilities = await Promise.all(
       throw new Error(`Missing product capability claim: ${id}.`);
     }
 
-    if (entry.data.classification !== "preview") {
+    if (
+      entry.data.classification !== "preview" &&
+      entry.data.classification !== "coming-soon"
+    ) {
       throw new Error(
-        `Product capability claim ${entry.data.id} must be Preview.`,
+        `Product capability claim ${entry.data.id} must be Preview or Coming soon.`,
       );
     }
 
@@ -74,16 +79,13 @@ const previewCapabilities = await Promise.all(
       claimId: entry.data.id,
       title,
       body: entry.data.statement,
-      label: "Preview",
+      label:
+        entry.data.classification === "preview" ? "Preview" : "Coming soon",
     };
   }),
 );
 
-const capabilityCards = [
-  approvedToolsCapability,
-  ...previewCapabilities,
-  automationsCapability,
-];
+const capabilityCards = [approvedToolsCapability, automationsCapability];
 
 const adminScopes = [
   "People",
@@ -134,9 +136,11 @@ const recentDecisions = [
           From question to useful outcome.
         </h1>
         <p class="product-lede">
-          Glaux helps employees ask, research, write, analyze, browse, and
-          create artifacts with approved company knowledge and approved tools.
-          When work needs access or approval, the request stays in the task.
+          Employees work in the Glaux desktop app, with each agent on its own
+          governed machine. Ask, research, write, analyze, browse, and create
+          artifacts with approved company knowledge and approved tools,
+          including MCP tools. Desktop approvals keep sensitive commands in the
+          task.
         </p>
         <div class="product-actions" aria-label="Primary product actions">
           <Button href="/contact/" variant="primary">Book a demo</Button>
@@ -146,37 +150,22 @@ const recentDecisions = [
         </div>
       </div>
 
-      <div class="product-story" aria-label="Product work preview">
+      <figure
+        class="product-story product-capture"
+        aria-label="Glaux desktop app capture"
+      >
         <img
-          class="product-story__photo"
-          src="https://images.unsplash.com/photo-1758691737124-05c5bffe46f0?auto=format&fit=crop&fm=jpg&q=82&w=1600"
-          srcset="https://images.unsplash.com/photo-1758691737124-05c5bffe46f0?auto=format&fit=crop&fm=jpg&q=82&w=640 640w, https://images.unsplash.com/photo-1758691737124-05c5bffe46f0?auto=format&fit=crop&fm=jpg&q=82&w=960 960w, https://images.unsplash.com/photo-1758691737124-05c5bffe46f0?auto=format&fit=crop&fm=jpg&q=82&w=1600 1600w"
+          src="/product/desktop-1600.webp"
+          srcset="/product/desktop-800.webp 800w, /product/desktop-1600.webp 1600w"
           sizes="(max-width: 54rem) calc(100vw - 2.5rem), 50vw"
-          alt="Colleagues reviewing work together"
+          alt="The real Glaux desktop app, ready for a new work session."
           width="1600"
-          height="1067"
+          height="1000"
           loading="eager"
           decoding="async"
         />
-        <div class="product-story__workflow">
-          <div class="work-preview__bar preview-toolbar">
-            <span>Launch brief</span>
-            <span class="status-pill">Ready to review</span>
-          </div>
-          <div class="conversation preview-prompt">
-            <span>Ask Glaux</span>
-            <p>
-              Compare the top customer requests with the approved roadmap and
-              draft the launch brief.
-            </p>
-          </div>
-          <div class="completed-work artifact-preview">
-            <span>Created artifact</span>
-            <strong>Q3 launch brief</strong>
-            <p>Source notes, open decisions, and approval-ready next steps.</p>
-          </div>
-        </div>
-      </div>
+        <figcaption>The Glaux desktop app · real product capture</figcaption>
+      </figure>
     </section>
 
     <section class="product-work-section" aria-labelledby="work-heading">
@@ -209,9 +198,9 @@ const recentDecisions = [
         <p class="plain-label">Access and approval</p>
         <h2 id="access-heading">Ask without leaving the work.</h2>
         <p>
-          If a task needs a new tool, source, or sensitive action, Glaux keeps
-          the request attached to the work so the approver sees the reason and
-          the user sees what happens next.
+          In the desktop app, if a task needs a new tool, source, or sensitive
+          action, Glaux keeps the request attached to the work so the approver
+          sees the reason and the user sees what happens next.
         </p>
       </div>
       <div
@@ -307,6 +296,39 @@ const recentDecisions = [
     </section>
 
     <section
+      class="capability-section"
+      id="what-comes-next"
+      aria-labelledby="next-heading"
+    >
+      <div class="section-heading">
+        <p class="plain-label">What comes next</p>
+        <h2 id="next-heading">A look ahead, clearly labeled.</h2>
+        <p>
+          Preview capabilities and future plans. Availability belongs in your
+          demo conversation.
+        </p>
+      </div>
+      <div class="platform-grid capability-grid">
+        {
+          previewCapabilities.map((capability) => (
+            <article
+              class="platform-card capability-card"
+              data-claim-id={capability.claimId}
+            >
+              <div class="capability-card__header">
+                <>
+                  <h3>{capability.title}</h3>
+                  <span class="badge">{capability.label}</span>
+                </>
+              </div>
+              <p>{capability.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section
       class="security-cta technical-depth"
       aria-labelledby="technical-depth-heading"
     >
@@ -325,3 +347,21 @@ const recentDecisions = [
     </section>
   </div>
 </SiteLayout>
+
+<style>
+  .product-capture {
+    margin: 0;
+    background: var(--color-primary-wash);
+    border: 1px solid var(--color-hairline);
+  }
+  .product-capture img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-sm);
+  }
+  .product-capture figcaption {
+    padding: var(--space-4) var(--space-2) 0;
+    color: var(--color-primary-ink);
+    font-size: 0.85rem;
+  }
+</style>

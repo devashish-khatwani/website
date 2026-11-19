@@ -26,15 +26,19 @@ test("product page renders the W-07 employee and admin story", async ({
   await expect(
     page.getByText(/approved company knowledge and approved tools/u),
   ).toBeVisible();
-  await expect(
-    page.getByLabel("Product work preview").getByText("Q3 launch brief"),
-  ).toBeVisible();
-  const productPhoto = page.getByRole("img", {
-    name: "Colleagues reviewing work together",
+  const productCapture = page.getByRole("img", {
+    name: "The real Glaux desktop app, ready for a new work session.",
   });
-  await expect(productPhoto).toBeVisible();
-  await expect(productPhoto).toHaveAttribute("srcset", /w=640 640w/u);
-  await expect(productPhoto).toHaveAttribute("sizes", /50vw/u);
+  await expect(productCapture).toBeVisible();
+  await expect(productCapture).toHaveAttribute(
+    "src",
+    "/product/desktop-1600.webp",
+  );
+  expect(
+    await productCapture.evaluate(
+      (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+    ),
+  ).toBe(true);
 
   for (const workMode of [
     "Ask",
@@ -61,6 +65,18 @@ test("product page renders the W-07 employee and admin story", async ({
       "Enterprise connections",
       "Connect the tools your company depends on.",
       "Preview",
+    ],
+    [
+      "claim-observability-preview",
+      "Observability",
+      "See how agents perform, where they struggle, and where controls intervene.",
+      "Preview",
+    ],
+    [
+      "claim-model-studio-coming-soon",
+      "Model Studio",
+      "Turn carefully selected enterprise experience into a specialized model the enterprise owns and controls.",
+      "Coming soon",
     ],
   ] as const) {
     const card = page.locator(`[data-claim-id="${claimId}"]`);

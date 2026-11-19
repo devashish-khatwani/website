@@ -1,7 +1,7 @@
 {
   "id": "claim-security-request-integrity",
   "title": "Signed request integrity",
-  "statement": "Signed Control Tower service requests bind method, path and raw query, request ID, contract version, and body hash, with replay protection.",
+  "statement": "Signed Glaux admin console service requests bind method, path and raw query, request ID, contract version, and body hash, with replay protection.",
   "classification": "verified-implementation",
   "publicationState": "draft",
   "evidence": [
@@ -16,6 +16,6 @@
   ],
   "review": {
     "status": "draft",
-    "notes": "Draft implementation claim verified against current Control Tower auth source; not approved for publication."
+    "notes": "Draft implementation claim verified against current Glaux admin console auth source; not approved for publication."
   }
 }

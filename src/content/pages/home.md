@@ -1,20 +1,16 @@
 ---
-title: "Glaux | AI coworkers. Enterprise control."
-description: "Glaux gives employees AI coworkers for useful work while security controls what AI can know, do, and share."
+title: "Glaux | Your agent shouldn't reach production unless you say so."
+description: "Glaux is a governed AI coworker in the Glaux desktop app: its own machine, admin-approved tools including MCP, desktop approvals, and reviewable activity."
 canonicalPath: "/"
 og:
-  title: "Glaux | AI coworkers. Enterprise control."
-  description: "Glaux gives employees AI coworkers for useful work while security controls what AI can know, do, and share."
-  imageAlt: "Glaux product preview showing governed enterprise work."
+  title: "Glaux | Your agent shouldn't reach production unless you say so."
+  description: "Glaux is a governed AI coworker in the Glaux desktop app: its own machine, admin-approved tools including MCP, desktop approvals, and reviewable activity."
+  imageAlt: "The Glaux desktop app, ready for a new work session."
 launchState: "draft"
 publicationState: "draft"
 claimReviewStatus: "draft"
 claimReferences:
   - "claim-security-control-authority"
-  - "claim-observability-preview"
-  - "claim-skills-library-preview"
-  - "claim-enterprise-mcp-preview"
-  - "claim-model-studio-coming-soon"
 ---
 
 This draft Markdown entry tracks homepage claim references without publishing

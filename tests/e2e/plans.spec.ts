@@ -49,6 +49,11 @@ test("plans page renders pricing, metadata, and usage separation", async ({
     ).toBeVisible();
   }
 
+  await expect(
+    page.getByText(
+      "Indicative plans and placeholder pricing. Confirm availability and terms in a demo.",
+    ),
+  ).toBeVisible();
   await expect(page.getByText("Recommended", { exact: true })).toBeVisible();
   await expect(page.getByText(/placeholder checkout links/u)).toHaveCount(0);
   await expect(page.getByText(/Proposed plans page/u)).toHaveCount(0);
@@ -101,7 +106,7 @@ test("plans page preserves plan feature vectors and expected features", async ({
       "Business",
       "/plans/plan-business.svg",
       "A central policy control plane governing connected workspaces",
-      "Central Control Tower",
+      "Glaux admin console",
     ],
     [
       "Enterprise",

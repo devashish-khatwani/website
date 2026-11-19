@@ -3,7 +3,7 @@ import { expectVisibleFocusOutline } from "./assertions";
 import { blogPosts } from "./blog-posts";
 
 const routes = [
-  { path: "/", h1: "AI coworkers. Enterprise control." },
+  { path: "/", h1: "Your agent shouldn't reach production unless you say so." },
   { path: "/product/", h1: "From question to useful outcome." },
   { path: "/security/", h1: "You choose what Glaux can access and do." },
   {
@@ -174,6 +174,9 @@ for (const route of routes) {
         height: viewport.height,
       });
       await page.goto(route.path);
+      expect(await page.content()).not.toMatch(
+        /control\s+tower|hermes|litellm|toolhive|skillhub|laminar|workos/iu,
+      );
       await expectExactlyOneVisibleH1(page, route.h1);
       await expect(page.getByRole("main")).toBeVisible();
       await expectNoHorizontalOverflowWithinTolerance(page);

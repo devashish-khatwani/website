@@ -98,7 +98,7 @@ No audit trail is complete, and the dangerous ones pretend to be.
 
 Glaux tracks coverage for each source it ingests from: whether the connector is current, behind, or unavailable. When a source is stale, the Audit pane says so instead of implying the picture is complete.
 
-To be specific about today: Glaux audit receives Glaux Control Tower's own events, which cover policy, access, approvals, AI Gateway changes, and more. It also pulls in the audit feed from the Glaux skills library. Bringing in the native logs of the AI Gateway and the tools gateway is on our roadmap.
+To be specific about today: Glaux audit receives Glaux admin console's own events, which cover policy, access, approvals, AI Gateway changes, and more. It also pulls in the audit feed from the Glaux skills library. Bringing in the native logs of the AI Gateway and the tools gateway is on our roadmap.
 
 ## Searching and exporting without creating a new risk
 

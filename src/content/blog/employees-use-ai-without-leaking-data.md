@@ -36,7 +36,7 @@ The design principle is simple. Give people one sanctioned way to use AI, and ma
 
 Here's what that looks like for a single request in Glaux.
 
-![The path of one AI request through Glaux: the employee asks the Glaux desktop app, Glaux Control Tower checks identity and policy and issues a signed run envelope, model calls go through the Glaux AI Gateway and tool calls through the Glaux tools gateway, and decisions land in Glaux audit.](/blog/images/employees-use-ai-without-leaking-data/request-path.svg)
+![The path of one AI request through Glaux: the employee asks the Glaux desktop app, Glaux admin console checks identity and policy and issues a signed run envelope, model calls go through the Glaux AI Gateway and tool calls through the Glaux tools gateway, and decisions land in Glaux audit.](/blog/images/employees-use-ai-without-leaking-data/request-path.svg)
 
 Let's walk through it.
 
@@ -46,13 +46,13 @@ People use Glaux through the Glaux desktop app, an AI agent that runs on their l
 
 That last part matters. If the laptop can't reach a model on its own, there's nothing to misconfigure and nothing to steal.
 
-### 2. Glaux Control Tower decides who this is and what they may do
+### 2. Glaux admin console decides who this is and what they may do
 
-Before any work starts, Glaux Control Tower answers two questions on the server.
+Before any work starts, Glaux admin console answers two questions on the server.
 
-_Who is this?_ People sign in through your existing identity provider using single sign-on (SSO). Control Tower maps that sign-in to its own record of the person. Group names or roles that arrive from the identity provider don't grant anything by themselves. Access comes from what an administrator assigned in Glaux.
+_Who is this?_ People sign in through your existing identity provider using single sign-on (SSO). Glaux admin console maps that sign-in to its own record of the person. Group names or roles that arrive from the identity provider don't grant anything by themselves. Access comes from what an administrator assigned in Glaux.
 
-_What may they do?_ Control Tower evaluates your policy. The answer isn't just yes or no. It can be allow, allow-but-ask-a-person, deny with a way to request access, or a hard no. (We cover those in detail in our policy checklist post.)
+_What may they do?_ Glaux admin console evaluates your policy. The answer isn't just yes or no. It can be allow, allow-but-ask-a-person, deny with a way to request access, or a hard no. (We cover those in detail in our policy checklist post.)
 
 The result is a signed, expiring "run envelope." Think of it as a permission slip for this session. It's tied to the person, the workspace, the session, and the policy version, and it lists exactly what they're allowed to do. If it's missing, expired, or revoked, the work doesn't start. We call this failing closed, and it's the default everywhere in Glaux.
 
@@ -61,7 +61,7 @@ The result is a signed, expiring "run envelope." Think of it as a permission sli
 Every model call goes through the Glaux AI Gateway. A few things happen here that close the "keys on laptops" problem for good:
 
 - **Your provider credentials live in the gateway.** Administrators add their own provider keys once, in the gateway. Employees never see them.
-- **People get short-lived keys instead.** Control Tower asks the gateway for a virtual key that lasts 30 minutes and is tied to that one session. The desktop app holds it in protected memory. It isn't written to disk, logs, or crash reports.
+- **People get short-lived keys instead.** Glaux admin console asks the gateway for a virtual key that lasts 30 minutes and is tied to that one session. The desktop app holds it in protected memory. It isn't written to disk, logs, or crash reports.
 - **Only approved models are reachable.** Administrators pick which providers and models are on. A person can't point the agent at some other endpoint.
 - **There's a spending boundary.** Administrators set an organization budget in the gateway, so a runaway loop hits a ceiling instead of a surprise invoice.
 

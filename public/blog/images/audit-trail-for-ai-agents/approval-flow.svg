@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
   <title id="t">How one approval becomes three linked audit events</title>
-  <desc id="d">The agent asks to take a sensitive action. Glaux policy returns require approval. Control Tower creates a pending approval tied to the session, run envelope, action and resource, with a risk level and an expiry. The person approves or rejects, or it expires. Before the action runs, the approval is checked again. Creating the approval and every change to it writes an audit event that points at the same approval record.</desc>
+  <desc id="d">The agent asks to take a sensitive action. Glaux policy returns require approval. Glaux admin console creates a pending approval tied to the session, run envelope, action and resource, with a risk level and an expiry. The person approves or rejects, or it expires. Before the action runs, the approval is checked again. Creating the approval and every change to it writes an audit event that points at the same approval record.</desc>
   <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0a0a0a"/></marker></defs>
   <rect width="800" height="1000" fill="#ffffff"/>
   <text x="40" y="60" font-size="30" font-weight="700" fill="#0a0a0a">One approval, fully traceable</text>

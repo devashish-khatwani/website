@@ -142,7 +142,7 @@ test("security page covers activity history, data inventory, and technical optio
 
   await expect(
     page.locator('[data-claim-id="claim-security-request-integrity"]'),
-  ).toContainText("Signed Control Tower service requests bind method");
+  ).toContainText("Signed Glaux admin console service requests bind method");
 });
 
 test("security page uses standards alignment wording without prohibited claims", async ({

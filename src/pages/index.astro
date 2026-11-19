@@ -11,116 +11,44 @@ if (!homeEntry) {
 }
 
 const pageHead = buildPageHeadMetadata(homeEntry.data);
-
-const claimIds = [
-  "observability-preview",
-  "skills-library-preview",
-  "enterprise-mcp-preview",
-  "model-studio-coming-soon",
-] as const;
-
-type HomepageClaimId = (typeof claimIds)[number];
-
-const displayTitleByClaimId = {
-  "observability-preview": "Observability",
-  "skills-library-preview": "Shared skills",
-  "enterprise-mcp-preview": "Enterprise connections",
-  "model-studio-coming-soon": "Model Studio",
-} satisfies Record<HomepageClaimId, string>;
-
-const claimEntries = await Promise.all(
-  claimIds.map(async (id) => {
-    const entry = await getEntry("claims", id);
-
-    if (!entry) {
-      throw new Error(`Missing homepage platform claim: ${id}.`);
-    }
-
-    return { id, entry };
-  }),
-);
-
-const availabilityLabelByClass = {
-  preview: "Preview",
-  "coming-soon": "Coming soon",
-} as const;
-
-const platformCards = claimEntries.map(({ id, entry }) => {
-  const classification = entry.data.classification;
-
-  if (classification !== "preview" && classification !== "coming-soon") {
-    throw new Error(
-      `Homepage platform claim ${entry.data.id} must use Preview or Coming soon.`,
-    );
-  }
-
-  return {
-    id: entry.data.id,
-    title: displayTitleByClaimId[id],
-    statement: entry.data.statement,
-    label: availabilityLabelByClass[classification],
-  };
-});
-
-const architectureProof = [
+const pillars = [
   {
-    label: "Boundary",
-    title: "Policy before action",
-    body: "Allowed capabilities and approvals shape what can happen next.",
+    number: "01",
+    title: "Own machine",
+    body: "Each agent works on its own governed machine through the Glaux desktop app.",
+    image: "/product/desktop-800.webp",
+    alt: "The Glaux desktop app with a new session, artifacts, and automations.",
+    width: 800,
+    height: 500,
   },
   {
-    label: "Authority",
-    title: "Authority stays server-owned",
-    body: "Clients request and display decisions; they do not grant themselves access.",
+    number: "02",
+    title: "Approved tools",
+    body: "Your admin chooses which tools, including MCP tools, each person can use.",
+    image: "/product/approved-tools-800.webp",
+    alt: "Glaux admin console showing workspace permissions for MCP tools.",
+    width: 800,
+    height: 500,
   },
   {
-    label: "Record",
-    title: "Activity after result",
-    body: "Requests, decisions, and outcomes remain available for review.",
-  },
-] as const;
-
-const workflowSteps = [
-  {
-    label: "Ask",
-    title: "Ask for work",
-    body: "Start with a brief, analysis, comparison, draft, or repeated workflow instead of a technical agent configuration.",
+    number: "03",
+    title: "Approvals",
+    body: "In the desktop app, a destructive command can wait for a person to run or reject it.",
+    image: "/product/desktop-approval-750.webp",
+    alt: "A real desktop approval card with the database command and Reject and Run controls.",
+    width: 750,
+    height: 230,
   },
   {
-    label: "Scope",
-    title: "Bring approved context",
-    body: "Glaux assembles the knowledge, models, tools, and skills allowed for that person, workspace, and task.",
+    number: "04",
+    title: "Audit",
+    body: "Review the desktop action and result. Use admin audit to review policy and access changes.",
+    image: "/product/desktop-result-800.webp",
+    alt: "Desktop action history showing a database command and its completed result in a disposable demo.",
+    width: 800,
+    height: 60,
   },
-  {
-    label: "Act",
-    title: "Act within policy",
-    body: "The work continues, pauses for approval, or stops before a sensitive action crosses the boundary.",
-  },
-  {
-    label: "Return",
-    title: "Return work and evidence",
-    body: "The employee gets the useful artifact; the organization gets the decision and activity record.",
-  },
-] as const;
-
-const controlOutcomes = [
-  {
-    title: "Continue",
-    body: "The request fits the rules and the work carries on.",
-  },
-  {
-    title: "Ask for approval",
-    body: "The next step waits with its reason and task context attached.",
-  },
-  {
-    title: "Stop safely",
-    body: "A request outside the boundary is blocked before the action.",
-  },
-  {
-    title: "Explain why",
-    body: "The employee and reviewer see the rule and the next useful option.",
-  },
-] as const;
+];
 ---
 
 <SiteLayout
@@ -130,833 +58,503 @@ const controlOutcomes = [
   noindex
   og={pageHead.og}
 >
-  <div class="home-page home-concept">
+  <div class="home-page home-refresh">
     <section class="home-hero" aria-labelledby="home-heading">
       <div class="home-hero__copy">
+        <p class="plain-label">A governed AI coworker</p>
         <h1 id="home-heading" class="home-title">
-          AI coworkers. Enterprise control.
+          Your agent shouldn't reach production unless you say so.
         </h1>
         <p class="home-lede">
-          Employees move faster. Security controls what AI can know, do, and
-          share.
+          Glaux is a governed AI coworker. Each agent runs in the Glaux desktop
+          app, on its own machine, with only the tools your admin approved.
+          Destructive actions are blocked or wait for a person. Then you can see
+          exactly what happened.
         </p>
         <div class="home-actions" aria-label="Primary home actions">
-          <Button href="#product" variant="primary">See Glaux in action</Button>
-          <Button href="/contact/" variant="ghost">Book a demo</Button>
-        </div>
-      </div>
-
-      <section
-        class="product-window"
-        id="product"
-        aria-label="Illustrative Glaux product concept"
-      >
-        <div class="product-window__bar">
-          <span>Renewal-risk brief</span>
-          <small>Illustrative product view</small>
-          <div class="view-tabs" role="tablist" aria-label="Product views">
-            <button
-              type="button"
-              role="tab"
-              aria-selected="true"
-              aria-controls="employee-view"
-              id="employee-tab"
-              tabindex="0"
-            >
-              Employee
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected="false"
-              aria-controls="control-view"
-              id="control-tab"
-              tabindex="-1"
-            >
-              Control
-            </button>
-          </div>
-        </div>
-
-        <div
-          class="product-view employee-view"
-          id="employee-view"
-          role="tabpanel"
-          aria-labelledby="employee-tab"
-          tabindex="0"
-        >
-          <div class="thread-panel">
-            <span class="ui-label">Work thread</span>
-            <div class="prompt">
-              Compare account signals with the approved renewal playbook and
-              prepare a briefing.
-            </div>
-            <div class="answer">
-              I found three renewal risks and prepared the review brief. Sending
-              the customer summary requires approval.
-            </div>
-            <div class="artifact">
-              <span class="ui-label">Created artifact</span>
-              <strong>Renewal-risk briefing</strong>
-              <p>Evidence, proposed actions, and customer summary draft.</p>
-            </div>
-          </div>
-          <aside class="rule-panel" aria-label="Rules applied in the task">
-            <span class="ui-label">Rules applied</span>
-            <div class="decision">
-              <span class="decision-dot" aria-hidden="true"></span>
-              <div>
-                <strong>Knowledge allowed</strong>
-                <p>Customer-success workspace</p>
-              </div>
-            </div>
-            <div class="decision">
-              <span class="decision-dot" aria-hidden="true"></span>
-              <div>
-                <strong>Research continued</strong>
-                <p>Approved sources and browsing path</p>
-              </div>
-            </div>
-            <div class="decision">
-              <span class="decision-dot" aria-hidden="true"></span>
-              <div>
-                <strong>Approval requested</strong>
-                <p>Required before external sharing</p>
-              </div>
-            </div>
-          </aside>
-        </div>
-
-        <div
-          class="product-view control-view"
-          id="control-view"
-          role="tabpanel"
-          aria-labelledby="control-tab"
-          tabindex="0"
-          hidden
-        >
-          <aside
-            class="admin-panel admin-list"
-            aria-label="Control Tower areas"
+          <Button href="https://www.glauxagent.com/contact/" variant="primary"
+            >Book a demo</Button
           >
-            <span class="ui-label">Control Tower</span>
-            <span class="admin-list__item admin-list__item--active"
-              >Activity</span
+          <span class="walkthrough-placeholder">
+            Watch the walkthrough <small
+              >Coming soon · video not yet available</small
             >
-            <span class="admin-list__item">Approvals</span>
-            <span class="admin-list__item">People and groups</span>
-            <span class="admin-list__item">Tools and skills</span>
-          </aside>
-          <div class="admin-panel">
-            <span class="ui-label">Recent decisions</span>
-            <div class="activity-list">
-              <div class="activity-row">
-                <span>10:42</span>
-                <strong>Renewal-risk brief</strong>
-                <b>Continued</b>
-              </div>
-              <div class="activity-row">
-                <span>10:47</span>
-                <strong>Customer summary</strong>
-                <b>Approval</b>
-              </div>
-              <div class="activity-row">
-                <span>11:03</span>
-                <strong>Data export</strong>
-                <b>Stopped</b>
-              </div>
-              <div class="activity-row">
-                <span>11:18</span>
-                <strong>Source changed</strong>
-                <b>Review</b>
-              </div>
-            </div>
-          </div>
+          </span>
         </div>
-      </section>
-    </section>
-
-    <section class="architecture-proof" aria-label="Architecture proof">
-      <div class="proof-inner">
-        <div class="proof-intro">
-          <span>Current architecture</span>
-          <strong>Governance is part of execution.</strong>
-        </div>
-        {
-          architectureProof.map((proof) => (
-            <article class="proof-item">
-              <span>{proof.label}</span>
-              <h2>{proof.title}</h2>
-              <p>{proof.body}</p>
-            </article>
-          ))
-        }
       </div>
+      <figure class="hero-capture">
+        <div class="capture-label">
+          <span>Glaux desktop app</span><span>Real product capture</span>
+        </div>
+        <img
+          src="/product/desktop-1600.webp"
+          srcset="/product/desktop-800.webp 800w, /product/desktop-1600.webp 1600w"
+          sizes="(max-width: 60rem) calc(100vw - 2.5rem), 50vw"
+          alt="The Glaux desktop app, ready for a new work session."
+          width="1600"
+          height="1000"
+          fetchpriority="high"
+          decoding="async"
+        />
+        <figcaption>
+          Your coworker starts here. Its tools start with your rules.
+        </figcaption>
+      </figure>
     </section>
 
-    <section class="split-story" id="how" aria-labelledby="how-heading">
-      <div class="section-copy">
-        <h2 id="how-heading">One task. Two views. No lost context.</h2>
+    <section class="incident-section" aria-labelledby="problem-heading">
+      <div class="section-heading">
+        <p class="plain-label">Based on public reports · 2025</p>
+        <h2 id="problem-heading">
+          A prompt is a request. It isn't a boundary.
+        </h2>
         <p>
-          Employees stay focused on the outcome. Security and platform teams see
-          the boundaries that shaped it.
+          When an agent can reach the wrong thing, a routine task can become a
+          recovery job.
         </p>
       </div>
-      <div class="story-list">
+      <div class="incident-grid">
+        <article>
+          <p class="plain-label">A production database</p>
+          <h3>Deleted during a code freeze.</h3>
+          <p>
+            Public reporting described a Replit agent deleting production data
+            despite instructions to stop changes. Replit later confirmed the
+            deletion and recovery.
+          </p>
+          <div class="source-links">
+            <a
+              href="https://www.theregister.com/2025/07/21/replit_saastr_vibe_coding_incident/"
+              >Read the reporting ↗</a
+            >
+            <a
+              href="https://replit.com/blog/doubling-down-on-our-commitment-to-secure-vibe-coding"
+              >Replit's response ↗</a
+            >
+          </div>
+        </article>
+        <article>
+          <p class="plain-label">A person's home folder</p>
+          <h3>A cleanup command went too far.</h3>
+          <p>
+            A Claude Code user reported a recursive delete reaching their home
+            directory. This is a public issue report, not an independently
+            verified finding.
+          </p>
+          <div class="source-links">
+            <a href="https://github.com/anthropics/claude-code/issues/12637"
+              >Read the issue report ↗</a
+            >
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="runtime-section" aria-labelledby="runtime-heading">
+      <div>
+        <p class="plain-label">The difference is where work runs</p>
+        <h2 id="runtime-heading">
+          Give people an agent with the boundary built in.
+        </h2>
+      </div>
+      <div class="runtime-contrast">
+        <div>
+          <h3>Discovery and posture tools</h3>
+          <p>
+            Help you find and watch agents already running across your company.
+          </p>
+        </div>
+        <div>
+          <h3>Glaux is the governed runtime</h3>
+          <p>
+            The coworker your team uses, inside its own machine, with the tools
+            your admin approved. A complementary place to put useful work.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pillars-section" aria-labelledby="pillars-heading">
+      <div class="section-heading">
+        <p class="plain-label">Useful work. Visible control.</p>
+        <h2 id="pillars-heading">Four guardrails around the work.</h2>
+      </div>
+      <div class="pillars-grid">
         {
-          workflowSteps.map((step) => (
-            <article class="story-row">
-              <span>{step.label}</span>
-              <h3>{step.title}</h3>
-              <p>{step.body}</p>
+          pillars.map((pillar) => (
+            <article>
+              <div class="pillar-heading">
+                <>
+                  <span>{pillar.number}</span>
+                  <h3>{pillar.title}</h3>
+                </>
+              </div>
+              <p>{pillar.body}</p>
+              <div class="pillar-capture">
+                <img
+                  src={pillar.image}
+                  alt={pillar.alt}
+                  width={pillar.width}
+                  height={pillar.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
             </article>
           ))
         }
       </div>
+      <p class="capture-note">
+        Real product captures with synthetic demo data. The audit image shows
+        desktop action history; it is not a joined admin audit record.
+      </p>
     </section>
 
     <section
-      class="control-section"
-      id="control"
-      aria-labelledby="control-heading"
+      class="scenario-section"
+      id="cleanup"
+      aria-labelledby="scenario-heading"
     >
-      <div class="control-section__copy">
-        <h2 id="control-heading">
-          Control that appears where the work happens.
-        </h2>
+      <div class="section-heading">
+        <p class="plain-label">One cleanup. Two responsibilities.</p>
+        <h2 id="scenario-heading">“Clean up this old database table.”</h2>
         <p>
-          The rule is checked before the action. The record is written after the
-          result. Everyone sees a plain-language next step.
+          A small request with a destructive step. The desktop app shows the
+          command. The admin console controls which database tools are
+          available.
         </p>
       </div>
-      <div class="control-outcomes">
-        {
-          controlOutcomes.map((outcome) => (
-            <article class="control-outcome">
-              <span aria-hidden="true" />
-              <h3>{outcome.title}</h3>
-              <p>{outcome.body}</p>
-            </article>
-          ))
-        }
+      <div class="scenario-grid">
+        <figure>
+          <figcaption>
+            <span class="plain-label">Glaux desktop app</span><h3>
+              A person gets the final say.
+            </h3><p>
+              The staged demo holds a table deletion at a native Run / Reject
+              approval card.
+            </p>
+          </figcaption>
+          <div class="scenario-capture scenario-capture--approval">
+            <img
+              src="/product/desktop-approval-750.webp"
+              alt="The desktop app holding a table deletion for Run or Reject."
+              width="750"
+              height="230"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </figure>
+        <figure>
+          <figcaption>
+            <span class="plain-label">Glaux admin console</span><h3>
+              Tool access is an admin decision.
+            </h3><p>
+              Read-only MCP tools have explicit permissions for the person and
+              workspace.
+            </p>
+          </figcaption>
+          <div class="scenario-capture">
+            <img
+              src="/product/approved-tools-800.webp"
+              srcset="/product/approved-tools-800.webp 800w, /product/approved-tools-1600.webp 1600w"
+              sizes="(max-width: 48rem) calc(100vw - 2.5rem), 50vw"
+              alt="Glaux admin console showing allowed read-only database tools for the synthetic Acme workspace."
+              width="800"
+              height="500"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </figure>
       </div>
-    </section>
-
-    <section class="platform-section" aria-labelledby="platform-heading">
-      <div class="section-heading">
-        <h2 id="platform-heading">What comes next for enterprise teams.</h2>
-      </div>
-      <div class="platform-grid">
-        {
-          platformCards.map((card) => (
-            <article class="platform-card" data-claim-id={card.id}>
-              <div class="platform-card__header">
-                <h3>{card.title}</h3>
-                <span class="badge">{card.label}</span>
-              </div>
-              <p>{card.statement}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section class="closing-cta" id="contact" aria-labelledby="closing-heading">
-      <h2 id="closing-heading">Bring one sensitive, repetitive workflow.</h2>
-      <p>
-        We’ll map the useful work, the capability boundary, the approval point,
-        and the result your team would review.
+      <p class="capture-note">
+        Separate staged captures on disposable demo data. Desktop command
+        approval and admin tool access are distinct controls; these images do
+        not show an end-to-end production run.
       </p>
-      <Button href="/contact/" variant="primary"
-        >Book a focused walkthrough</Button
+    </section>
+
+    <section class="security-cta" aria-labelledby="security-heading">
+      <div class="section-heading section-heading--compact">
+        <p class="plain-label">Security, honestly</p>
+        <h2 id="security-heading">Start with what it can reach.</h2>
+        <p>
+          Review tool permissions, the desktop approval boundary, and what gets
+          recorded. Deployment and data-handling terms belong in your security
+          review.
+        </p>
+      </div>
+      <Button href="/security/" variant="ghost">Read security details</Button>
+    </section>
+
+    <aside class="stage-note" aria-label="Product stage">
+      <span class="plain-label">Design-partner stage</span>
+      <p>
+        We're working with early teams. Glaux is not generally available or open
+        for self-serve signup. <a href="/company/">Meet Glaux ↗</a>
+      </p>
+      <a href="/product/#what-comes-next">See what's in preview ↗</a>
+    </aside>
+
+    <section class="closing-cta" aria-labelledby="close-heading">
+      <h2 id="close-heading">Real work. Your guardrails.</h2>
+      <p>
+        Walk through one workflow: the tool boundary, the desktop approval
+        point, and the record you can review.
+      </p>
+      <Button href="https://www.glauxagent.com/contact/" variant="primary"
+        >Book a demo</Button
       >
     </section>
   </div>
 </SiteLayout>
 
-<script>
-  const tablists = document.querySelectorAll<HTMLElement>(
-    '[role="tablist"][aria-label="Product views"]',
-  );
-
-  for (const tablist of tablists) {
-    const tabs = Array.from(
-      tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
-    );
-
-    const selectTab = (selectedTab: HTMLButtonElement, shouldFocus = false) => {
-      for (const tab of tabs) {
-        const isSelected = tab === selectedTab;
-        const panelId = tab.getAttribute("aria-controls");
-        const panel = panelId ? document.getElementById(panelId) : null;
-
-        tab.setAttribute("aria-selected", String(isSelected));
-        tab.tabIndex = isSelected ? 0 : -1;
-
-        if (panel) {
-          panel.hidden = !isSelected;
-        }
-      }
-
-      if (shouldFocus) {
-        selectedTab.focus();
-      }
-    };
-
-    for (const tab of tabs) {
-      tab.addEventListener("click", () => selectTab(tab));
-
-      tab.addEventListener("keydown", (event) => {
-        const currentIndex = tabs.indexOf(tab);
-        let nextIndex: number | undefined;
-
-        if (event.key === "ArrowRight") {
-          nextIndex = (currentIndex + 1) % tabs.length;
-        }
-
-        if (event.key === "ArrowLeft") {
-          nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-        }
-
-        if (event.key === "Home") {
-          nextIndex = 0;
-        }
-
-        if (event.key === "End") {
-          nextIndex = tabs.length - 1;
-        }
-
-        if (nextIndex !== undefined) {
-          const nextTab = tabs[nextIndex];
-
-          if (!nextTab) {
-            return;
-          }
-
-          event.preventDefault();
-          selectTab(nextTab, true);
-        }
-      });
-    }
-  }
-</script>
-
 <style>
-  .home-concept {
-    --home-window-line: #3a3a3a;
-    padding-block-end: clamp(var(--space-16), 9vw, var(--space-32));
+  .home-refresh {
+    padding-block-end: var(--space-8);
   }
-
-  .home-concept .home-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 0.83fr) minmax(32rem, 1.17fr);
+  .home-refresh .home-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
     justify-items: stretch;
-    gap: clamp(var(--space-12), 7vw, var(--space-24));
-    min-height: 48rem;
-    padding-block: clamp(var(--space-16), 9vw, var(--space-32));
+    gap: var(--space-12);
+    min-height: 45rem;
   }
-
-  .home-concept .home-hero__copy {
+  .home-refresh .home-hero__copy {
     justify-items: start;
-    max-width: 39rem;
-    text-align: start;
-  }
-
-  .home-concept .home-title {
-    max-width: 9ch;
-  }
-
-  .home-concept .home-lede {
-    max-width: 36rem;
-  }
-
-  .product-window {
-    overflow: hidden;
-    border-radius: var(--radius-lg);
-    background: var(--color-carbon);
-    box-shadow: 0 8px 0 var(--color-primary-soft);
-    color: var(--color-chalk);
-  }
-
-  .product-window__bar {
-    display: grid;
-    grid-template-columns: minmax(8rem, 1fr) auto auto;
-    align-items: center;
-    gap: var(--space-4);
-    min-height: 3.5rem;
-    border-bottom: 1px solid var(--home-window-line);
-    padding: 0.8rem var(--space-4);
-    font-size: 0.78rem;
-    font-weight: 750;
-  }
-
-  .product-window__bar small {
-    color: #bdbdbd;
-    font-size: 0.72rem;
-    font-weight: 600;
-  }
-
-  .view-tabs {
-    display: flex;
-    gap: var(--space-2);
-    border-radius: var(--radius-sm);
-  }
-
-  .view-tabs button {
-    min-height: 36px;
-    border: 0;
-    border-radius: 0.5rem;
-    background: transparent;
-    color: #d4d4d4;
-    padding: 0.45rem 0.75rem;
-    font-size: 0.76rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .view-tabs button[aria-selected="true"] {
-    background: var(--color-chalk);
-    color: var(--color-graphite);
-  }
-
-  .product-view {
-    min-height: 31rem;
-    padding: clamp(var(--space-4), 2.6vw, var(--space-8));
-  }
-
-  .employee-view {
-    display: grid;
-    grid-template-columns: 1.25fr 0.75fr;
-    gap: var(--space-4);
-  }
-
-  .control-view {
-    display: grid;
-    grid-template-columns: 0.7fr 1.3fr;
-    gap: var(--space-4);
-  }
-
-  .thread-panel,
-  .rule-panel,
-  .admin-panel {
-    display: grid;
-    align-content: start;
-    gap: var(--space-4);
-    border-radius: var(--radius-sm);
-    background: #222222;
-    padding: var(--space-4);
-  }
-
-  .ui-label {
-    color: #a3a3a3;
-    font-size: 0.68rem;
-    font-weight: 750;
-    letter-spacing: 0.06em;
-    line-height: 1.3;
-    text-transform: uppercase;
-  }
-
-  .prompt,
-  .answer {
-    border-radius: var(--radius-sm);
-    padding: 0.9rem;
-    font-size: 0.82rem;
-    line-height: 1.5;
-  }
-
-  .prompt {
-    max-width: 92%;
-    background: #303030;
-  }
-
-  .answer {
-    justify-self: end;
-    max-width: 95%;
-    background: var(--color-primary-wash);
-    color: var(--color-graphite);
-  }
-
-  .artifact {
-    display: grid;
-    gap: var(--space-2);
-    border-radius: var(--radius-sm);
-    background: var(--color-chalk);
-    color: var(--color-graphite);
-    padding: var(--space-4);
-  }
-
-  .artifact .ui-label {
-    color: var(--color-concrete);
-  }
-
-  .artifact strong {
-    font-size: 1rem;
-  }
-
-  .artifact p {
-    color: var(--color-body);
-    font-size: 0.76rem;
-  }
-
-  .decision {
-    display: grid;
-    grid-template-columns: 0.7rem minmax(0, 1fr);
-    gap: var(--space-3);
-    border-top: 1px solid var(--home-window-line);
-    padding-block: 0.85rem;
-  }
-
-  .decision-dot {
-    width: 0.7rem;
-    height: 0.7rem;
-    margin-block-start: 0.2rem;
-    border-radius: 50%;
-    background: var(--color-primary-line);
-  }
-
-  .decision strong {
-    display: block;
-    font-size: 0.82rem;
-  }
-
-  .decision p {
-    color: #d4d4d4;
-    font-size: 0.72rem;
-  }
-
-  .admin-list {
-    gap: var(--space-2);
-  }
-
-  .admin-list__item {
-    display: flex;
-    align-items: center;
-    min-height: 40px;
-    border-radius: 0.5rem;
-    color: #d4d4d4;
-    padding: 0.65rem 0.75rem;
     text-align: left;
   }
-
-  .admin-list__item--active {
-    background: #303030;
-    color: var(--color-chalk);
+  .home-refresh .home-title {
+    max-width: 15ch;
+    font-size: clamp(2.8rem, 1.5rem + 3.5vw, 4.75rem);
   }
-
-  .activity-list {
-    display: grid;
-    border-block: 1px solid var(--home-window-line);
+  .home-refresh .home-lede {
+    font-size: clamp(1rem, 0.9rem + 0.25vw, 1.15rem);
   }
-
-  .activity-row {
+  .home-refresh .home-actions {
+    align-items: center;
+    gap: var(--space-6);
+  }
+  .walkthrough-placeholder {
     display: grid;
-    grid-template-columns: 6.5rem minmax(0, 1fr) 5.5rem;
-    gap: var(--space-3);
-    padding-block: 0.9rem;
+    gap: var(--space-1);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .walkthrough-placeholder small {
+    color: var(--color-body);
     font-size: 0.75rem;
+    font-weight: 400;
   }
-
-  .activity-row + .activity-row {
-    border-top: 1px solid var(--home-window-line);
+  figure {
+    margin: 0;
   }
-
-  .activity-row span {
-    color: #bdbdbd;
+  .hero-capture {
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-md);
+    background: var(--color-primary-wash);
+    padding: var(--space-4);
   }
-
-  .activity-row b {
-    color: #93c5fd;
-    text-align: right;
+  .capture-label {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-block-end: var(--space-4);
+    color: var(--color-primary-ink);
+    font-size: 0.75rem;
+    font-weight: 600;
   }
-
-  .architecture-proof,
-  .control-section {
-    width: 100vw;
-    margin-inline: calc(50% - 50vw);
+  .hero-capture img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
   }
-
-  .architecture-proof {
-    border-block: 1px solid var(--color-hairline);
-    background: var(--color-soft);
+  .hero-capture figcaption {
+    padding-block-start: var(--space-4);
+    color: var(--color-primary-ink);
+    font-size: 0.85rem;
   }
-
-  .proof-inner {
-    display: grid;
-    grid-template-columns: 0.8fr repeat(3, 1fr);
-    width: min(calc(100% - 2.5rem), var(--content-width));
-    margin-inline: auto;
-  }
-
-  .proof-intro,
-  .proof-item {
-    min-height: 9rem;
-    padding: var(--space-6);
-  }
-
-  .proof-intro {
-    padding-inline-start: 0;
-  }
-
-  .proof-intro span,
-  .proof-item span {
-    color: var(--color-primary);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-  }
-
-  .proof-intro strong {
-    display: block;
-    max-width: 15rem;
-    margin-block-start: var(--space-2);
-    font-size: 1.15rem;
-    line-height: 1.2;
-  }
-
-  .proof-item {
-    border-inline-start: 1px solid var(--color-hairline);
-  }
-
-  .proof-item h2 {
-    margin-block: var(--space-2);
-    font-size: 0.95rem;
-    letter-spacing: -0.02em;
-  }
-
-  .proof-item p {
-    color: var(--color-body);
-    font-size: 0.8rem;
-    line-height: 1.5;
-  }
-
-  .split-story {
-    display: grid;
-    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
-    gap: clamp(var(--space-12), 8vw, var(--space-32));
-    padding-block: clamp(var(--space-20), 10vw, 9rem);
-  }
-
-  .section-copy {
-    display: grid;
-    align-content: start;
-    gap: var(--space-5);
-  }
-
-  .section-copy h2,
-  .control-section h2,
-  .closing-cta h2 {
-    max-width: 10ch;
-    font-size: clamp(2.5rem, 4vw, 4.5rem);
-    font-weight: 620;
-  }
-
-  .section-copy p,
-  .control-section__copy p {
-    max-width: 35rem;
-    color: var(--color-body);
-  }
-
-  .story-list,
-  .control-outcomes {
-    border-block: 1px solid var(--color-hairline);
-  }
-
-  .story-row {
-    display: grid;
-    grid-template-columns: 4.5rem 0.75fr 1.25fr;
-    gap: var(--space-5);
-    padding-block: var(--space-8);
-  }
-
-  .story-row + .story-row {
+  .incident-section,
+  .pillars-section,
+  .scenario-section {
+    padding-block: var(--space-20);
     border-top: 1px solid var(--color-hairline);
   }
-
-  .story-row > span {
-    color: var(--color-primary);
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-  }
-
-  .story-row h3 {
-    font-size: 1.1rem;
-  }
-
-  .story-row p {
-    color: var(--color-body);
-    font-size: 0.9rem;
-    line-height: 1.55;
-  }
-
-  .control-section {
+  .incident-grid,
+  .pillars-grid,
+  .scenario-grid {
     display: grid;
-    grid-template-columns: 0.85fr 1.15fr;
-    gap: clamp(var(--space-12), 8vw, var(--space-32));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+  }
+  .incident-grid article {
+    border-top: 2px solid var(--color-graphite);
+    padding-block-start: var(--space-6);
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+  h3 {
+    font-size: var(--text-h3);
+  }
+  .incident-grid article > p:not(.plain-label),
+  .pillars-grid article > p,
+  .scenario-grid figcaption > p,
+  .runtime-contrast p {
+    color: var(--color-body);
+  }
+  .source-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: 0.85rem;
+  }
+  .source-links a,
+  .stage-note a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .runtime-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
     background: var(--color-carbon);
     color: var(--color-chalk);
-    padding: clamp(var(--space-20), 9vw, var(--space-32))
-      max(var(--space-5), calc((100vw - var(--content-width)) / 2));
+    padding: var(--space-12);
+    border-radius: var(--radius-md);
   }
-
-  .control-section__copy {
+  .runtime-section h2 {
+    margin-block-start: var(--space-4);
+    font-size: var(--text-h2);
+  }
+  .runtime-section .plain-label {
+    color: var(--color-primary-line);
+  }
+  .runtime-contrast {
     display: grid;
-    align-content: start;
-    gap: var(--space-5);
+    gap: var(--space-8);
   }
-
-  .control-section__copy p,
-  .control-outcome p {
-    color: #d4d4d4;
+  .runtime-contrast h3 {
+    margin-block-end: var(--space-3);
   }
-
-  .control-outcomes {
-    border-color: #464646;
-  }
-
-  .control-outcome {
-    display: grid;
-    grid-template-columns: 0.8rem 0.6fr 1.4fr;
-    gap: var(--space-4);
-    padding-block: var(--space-5);
-  }
-
-  .control-outcome + .control-outcome {
-    border-top: 1px solid #464646;
-  }
-
-  .control-outcome > span {
-    width: 0.75rem;
-    height: 0.75rem;
-    margin-block-start: 0.25rem;
-    border-radius: 50%;
-    background: var(--color-primary-line);
-  }
-
-  .control-outcome h3 {
-    font-size: 1rem;
-  }
-
-  .control-outcome p {
-    font-size: 0.88rem;
-    line-height: 1.55;
-  }
-
-  .platform-section {
-    padding-block: clamp(var(--space-16), 8vw, var(--space-24));
-  }
-
-  .home-concept .closing-cta {
-    margin-block: 0;
-    background: var(--color-graphite);
-  }
-
-  .home-concept .closing-cta h2 {
-    max-width: 12ch;
-  }
-
-  .home-concept .closing-cta p {
+  .runtime-contrast p {
     color: var(--color-hairline);
   }
-
-  .home-concept .closing-cta :global(.button--primary) {
-    background: var(--color-primary);
-    color: var(--color-chalk);
+  .pillars-section {
+    margin-block-start: var(--space-20);
   }
-
-  .home-concept .closing-cta :global(.button--primary:hover) {
-    background: var(--color-primary-hover);
+  .pillars-grid {
+    row-gap: var(--space-12);
   }
-
-  @media (max-width: 70rem) {
-    .home-concept .home-hero {
+  .pillars-grid article {
+    min-width: 0;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: var(--space-4);
+  }
+  .pillar-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .pillar-heading > span {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+  }
+  .pillar-capture,
+  .scenario-capture {
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
+    background: var(--color-soft);
+  }
+  .pillar-capture {
+    aspect-ratio: 8 / 5;
+  }
+  .pillar-capture img,
+  .scenario-capture img {
+    width: 100%;
+    height: auto;
+  }
+  .capture-note {
+    max-width: 65rem;
+    margin-block-start: var(--space-6);
+    color: var(--color-body);
+    font-size: 0.8rem;
+  }
+  .scenario-grid figcaption {
+    display: grid;
+    gap: var(--space-3);
+    margin-block-end: var(--space-6);
+  }
+  .scenario-capture {
+    aspect-ratio: 8 / 5;
+  }
+  .scenario-capture--approval {
+    padding: var(--space-4);
+  }
+  .stage-note {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-12);
+    font-size: 0.95rem;
+  }
+  .stage-note > p {
+    max-width: 55rem;
+    color: var(--color-body);
+  }
+  .home-refresh .closing-cta {
+    margin-block: 0 var(--space-12);
+  }
+  .home-refresh .closing-cta h2 {
+    max-width: 12ch;
+    font-size: clamp(2.5rem, 2rem + 2vw, 4.5rem);
+  }
+  @media (max-width: 60rem) {
+    .home-refresh .home-hero {
       grid-template-columns: 1fr;
-      min-height: auto;
+      gap: var(--space-10);
+      padding-block: var(--space-12);
     }
-
-    .home-concept .home-hero__copy {
-      max-width: 46rem;
+    .home-refresh .home-title {
+      max-width: 19ch;
     }
-
-    .product-window {
+    .home-hero__copy {
+      max-width: 45rem;
+    }
+    .hero-capture {
       width: 100%;
     }
-
-    .proof-inner {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .proof-intro {
-      grid-column: 1 / -1;
-      padding-inline-start: var(--space-6);
-    }
-
-    .proof-item:nth-child(2) {
-      border-inline-start: 0;
-    }
-
-    .split-story,
-    .control-section {
+    .runtime-section {
       grid-template-columns: 1fr;
+      gap: var(--space-8);
     }
   }
-
-  @media (max-width: 38rem) {
-    .product-window__bar,
-    .employee-view,
-    .control-view {
+  @media (max-width: 48rem) {
+    .incident-grid,
+    .pillars-grid,
+    .scenario-grid {
       grid-template-columns: 1fr;
     }
-
-    .product-window__bar {
-      align-items: start;
+    .incident-section,
+    .pillars-section,
+    .scenario-section {
+      padding-block: var(--space-12);
     }
-
-    .product-view {
-      min-height: auto;
+    .runtime-section {
+      padding: var(--space-8) var(--space-6);
     }
-
-    .proof-inner {
-      grid-template-columns: 1fr;
-      width: min(calc(100% - 1.5rem), var(--content-width));
+    .pillars-section {
+      margin-block-start: var(--space-12);
     }
-
-    .proof-item,
-    .proof-item:nth-child(2) {
-      border-top: 1px solid var(--color-hairline);
-      border-inline-start: 0;
-    }
-
-    .story-row {
-      grid-template-columns: 4.5rem 1fr;
-    }
-
-    .story-row p {
-      grid-column: 2;
-    }
-
-    .control-section {
-      padding-inline: var(--space-3);
-    }
-
-    .control-outcome {
-      grid-template-columns: 0.8rem 1fr;
-    }
-
-    .control-outcome p {
-      grid-column: 2;
-    }
-
-    .activity-row {
-      grid-template-columns: 4rem minmax(0, 1fr);
-    }
-
-    .activity-row b {
-      grid-column: 2;
-      text-align: left;
+    .hero-capture {
+      padding: var(--space-3);
     }
   }
 </style>

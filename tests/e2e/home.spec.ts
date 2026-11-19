@@ -13,12 +13,13 @@ const expectedRobotsDirective = isProductionPagesBuild
   ? "Allow: /"
   : "Disallow: /";
 
-test("home page renders the approved homepage promise and product concept", async ({
+test("home page explains the governed desktop runtime and offers an honest next step", async ({
   page,
 }) => {
   await page.goto("/");
-
-  await expect(page).toHaveTitle(/AI coworkers\. Enterprise control\./u);
+  await expect(page).toHaveTitle(
+    /Your agent shouldn't reach production unless you say so/u,
+  );
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
     "noindex, nofollow",
@@ -26,168 +27,85 @@ test("home page renders the approved homepage promise and product concept", asyn
   await expect(
     page.getByRole("link", { name: "Glaux home" }).locator("img"),
   ).toHaveAttribute("src", "/brand/glaux-lockup.svg");
-  await expect(
-    page.getByRole("heading", {
-      name: "AI coworkers. Enterprise control.",
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(
-      "Employees move faster. Security controls what AI can know, do, and share.",
-      { exact: true },
-    ),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("main").getByRole("link", { name: "See Glaux in action" }),
-  ).toHaveAttribute("href", "#product");
-  await expect(
-    page.getByRole("main").getByRole("link", { name: "Book a demo" }),
-  ).toHaveAttribute("href", "/contact/");
-
-  const productWindow = page.getByLabel("Illustrative Glaux product concept");
-  await expect(
-    productWindow
-      .locator(".product-window__bar")
-      .getByText("Renewal-risk brief", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    productWindow.getByRole("tab", { name: "Employee" }),
-  ).toHaveAttribute("aria-selected", "true");
-  await expect(productWindow.getByText("Renewal-risk briefing")).toBeVisible();
-  await expect(productWindow.getByText("Rules applied")).toBeVisible();
-});
-
-test("home page keeps the concept concise without concept-only chrome", async ({
-  page,
-}) => {
-  await page.goto("/");
-
-  await expect(
-    page.getByRole("heading", {
-      name: "One task. Two views. No lost context.",
-    }),
-  ).toBeVisible();
-  for (const label of [
-    "Ask for work",
-    "Bring approved context",
-    "Act within policy",
-    "Return work and evidence",
-    "Policy before action",
-    "Authority stays server-owned",
-    "Activity after result",
-  ]) {
-    await expect(page.getByRole("heading", { name: label })).toBeVisible();
-  }
-
-  await expect(
-    page.getByRole("heading", {
-      name: "Control that appears where the work happens.",
-    }),
-  ).toBeVisible();
-  for (const outcome of [
-    "Continue",
-    "Ask for approval",
-    "Stop safely",
-    "Explain why",
-  ]) {
-    await expect(page.getByRole("heading", { name: outcome })).toBeVisible();
-  }
-
-  await expect(page.getByText(/Proposed homepage direction/u)).toHaveCount(0);
-  await expect(page.getByRole("main").getByText(/Install|Plans/u)).toHaveCount(
-    0,
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Your agent shouldn't reach production unless you say so.",
   );
-  await expect(page.getByText(/Powered by Hermes|Hermes Agent/u)).toHaveCount(
-    0,
-  );
-});
-
-test("product concept tabs update visible state with mouse and keyboard", async ({
-  page,
-}) => {
-  await page.goto("/");
-
-  const productWindow = page.getByLabel("Illustrative Glaux product concept");
-  const employeeTab = productWindow.getByRole("tab", { name: "Employee" });
-  const controlTab = productWindow.getByRole("tab", { name: "Control" });
-  const employeePanel = page.locator("#employee-view");
-  const controlPanel = page.locator("#control-view");
-
-  await expect(employeeTab).toHaveAttribute("aria-selected", "true");
-  await expect(employeePanel).toBeVisible();
-  await expect(controlPanel).toBeHidden();
-
-  await controlTab.click();
-  await expect(controlTab).toHaveAttribute("aria-selected", "true");
-  await expect(controlPanel).toBeVisible();
-  await expect(employeePanel).toBeHidden();
-  await expect(productWindow.getByText("Recent decisions")).toBeVisible();
   await expect(
-    productWindow.getByText("Customer summary", { exact: true }),
+    page.getByText(/Each agent runs in the Glaux desktop app/u),
   ).toBeVisible();
-
-  await controlTab.focus();
-  await page.keyboard.press("ArrowLeft");
-  await expect(employeeTab).toHaveAttribute("aria-selected", "true");
-  await expect(employeeTab).toBeFocused();
-  await expect(employeePanel).toBeVisible();
-  await expect(controlPanel).toBeHidden();
-
-  await page.keyboard.press("End");
-  await expect(controlTab).toHaveAttribute("aria-selected", "true");
-  await expect(controlTab).toBeFocused();
-  await expect(controlPanel).toBeVisible();
-
-  await page.keyboard.press("Home");
-  await expect(employeeTab).toHaveAttribute("aria-selected", "true");
-  await expect(employeeTab).toBeFocused();
-  await expect(employeePanel).toBeVisible();
-});
-
-test("home page renders only approved draft platform labels and statements", async ({
-  page,
-}) => {
-  await page.goto("/");
-
-  const platformClaims = [
-    [
-      "claim-observability-preview",
-      "Observability",
-      "See how agents perform, where they struggle, and where controls intervene.",
-      "Preview",
-    ],
-    [
-      "claim-skills-library-preview",
-      "Shared skills",
-      "Share trusted ways of working.",
-      "Preview",
-    ],
-    [
-      "claim-enterprise-mcp-preview",
-      "Enterprise connections",
-      "Connect the tools your company depends on.",
-      "Preview",
-    ],
-    [
-      "claim-model-studio-coming-soon",
-      "Model Studio",
-      "Turn carefully selected enterprise experience into a specialized model the enterprise owns and controls.",
-      "Coming soon",
-    ],
-  ] as const;
-
-  for (const [claimId, title, statement, label] of platformClaims) {
-    const card = page.locator(`[data-claim-id="${claimId}"]`);
-    await expect(card.getByRole("heading", { name: title })).toBeVisible();
-    await expect(card.getByText(statement, { exact: true })).toBeVisible();
-    await expect(card.locator(".badge")).toHaveText(label);
+  const demoLinks = page
+    .getByRole("main")
+    .getByRole("link", { name: "Book a demo" });
+  await expect(demoLinks).toHaveCount(2);
+  for (const link of await demoLinks.all()) {
+    await expect(link).toHaveAttribute(
+      "href",
+      "https://www.glauxagent.com/contact/",
+    );
   }
-
   await expect(
-    page.getByText(
-      /Laminar|Inkling|Tinker|draft claim registry|certification claims|governed Hermes Agent/u,
-    ),
+    page.getByText("Coming soon · video not yet available"),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Watch the walkthrough/u }),
   ).toHaveCount(0);
+  const hero = page.getByRole("img", {
+    name: "The Glaux desktop app, ready for a new work session.",
+    exact: true,
+  });
+  await expect(hero).toBeVisible();
+  expect(
+    await hero.evaluate(
+      (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+    ),
+  ).toBe(true);
+  await expect(hero).toHaveAttribute("src", /^\/product\//u);
+});
+
+test("home page connects sourced incidents, four controls, and a staged cleanup", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(
+    page.getByRole("link", { name: "Read the reporting" }),
+  ).toHaveAttribute(
+    "href",
+    "https://www.theregister.com/2025/07/21/replit_saastr_vibe_coding_incident/",
+  );
+  await expect(
+    page.getByRole("link", { name: "Read the issue report" }),
+  ).toHaveAttribute(
+    "href",
+    "https://github.com/anthropics/claude-code/issues/12637",
+  );
+  await expect(
+    page.getByRole("heading", { name: "Glaux is the governed runtime" }),
+  ).toBeVisible();
+  for (const title of ["Own machine", "Approved tools", "Approvals", "Audit"]) {
+    await expect(
+      page.getByRole("heading", { name: title, exact: true }),
+    ).toBeVisible();
+  }
+  const scenario = page.getByRole("region", {
+    name: "“Clean up this old database table.”",
+  });
+  await expect(scenario.getByRole("img")).toHaveCount(2);
+  await expect(
+    scenario.getByText(/Separate staged captures on disposable demo data/u),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Read security details" }),
+  ).toHaveAttribute("href", "/security/");
+  await expect(page.getByLabel("Product stage")).toContainText(
+    "not generally available",
+  );
+  await expect(
+    page.getByRole("heading", { name: "Real work. Your guardrails." }),
+  ).toBeVisible();
+  await expect(page.locator("[data-claim-id]")).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "See what's in preview" }),
+  ).toHaveAttribute("href", "/product/#what-comes-next");
 });
 
 test("home page preserves shell navigation and focus behavior", async ({
@@ -324,11 +242,11 @@ test("home page exposes canonical and draft Open Graph metadata", async ({
   );
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
     "content",
-    "Glaux | AI coworkers. Enterprise control.",
+    "Glaux | Your agent shouldn't reach production unless you say so.",
   );
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
     "content",
-    /controls what AI can know, do, and share/u,
+    /its own machine, admin-approved tools including MCP/u,
   );
   await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
     "content",
