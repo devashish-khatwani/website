@@ -1,6 +1,7 @@
 ---
 import { getEntry } from "astro:content";
 import Button from "../components/Button.astro";
+import HeroShowcase from "../components/HeroShowcase.astro";
 import SiteLayout from "../components/SiteLayout.astro";
 import { buildPageHeadMetadata } from "../lib/site";
 
@@ -16,37 +17,36 @@ const pillars = [
     number: "01",
     title: "Own machine",
     body: "Each agent works on its own governed machine through the Glaux desktop app.",
-    image: "/product/desktop-800.webp",
-    alt: "The Glaux desktop app with a new session, artifacts, and automations.",
-    width: 800,
-    height: 500,
+    image: "/product/desktop-start.webp",
+    mobileImage: "/product/desktop-start-mobile.webp",
+    alt: "The new-session prompt in the Glaux desktop app.",
+    width: 935,
+    height: 650,
   },
   {
     number: "02",
     title: "Approved tools",
-    body: "Your admin chooses which tools, including MCP tools, each person can use.",
-    image: "/product/approved-tools-800.webp",
-    alt: "Glaux admin console showing workspace permissions for MCP tools.",
-    width: 800,
-    height: 500,
+    body: "The hosted production database is reachable only through MCP tools your admin approved.",
+    image: "/product/read-only-tools.webp",
+    alt: "Glaux admin console read-only MCP tool permissions for list_tables and describe_table.",
+    width: 668,
+    height: 254,
+    scrollable: true,
   },
   {
     number: "03",
     title: "Approvals",
-    body: "In the desktop app, a destructive command can wait for a person to run or reject it.",
-    image: "/product/desktop-approval-750.webp",
-    alt: "A real desktop approval card with the database command and Reject and Run controls.",
-    width: 750,
-    height: 230,
+    body: "Your admin approves the tool set. With read-only inspection tools and no delete tool, a cleanup request stops for a person.",
+    image: "/product/desktop-no-delete.webp",
+    alt: "The Glaux desktop app tells Sam that its tools can inspect legacy_sessions_2024 but cannot delete data.",
+    width: 1012,
+    height: 137,
+    scrollable: true,
   },
   {
     number: "04",
     title: "Audit",
-    body: "Review the desktop action and result. Use admin audit to review policy and access changes.",
-    image: "/product/desktop-result-800.webp",
-    alt: "Desktop action history showing a database command and its completed result in a disposable demo.",
-    width: 800,
-    height: 60,
+    body: "Review policy and access changes in the Glaux admin console.",
   },
 ];
 ---
@@ -68,8 +68,8 @@ const pillars = [
         <p class="home-lede">
           Glaux is a governed AI coworker. Each agent runs in the Glaux desktop
           app, on its own machine, with only the tools your admin approved.
-          Destructive actions are blocked or wait for a person. Then you can see
-          exactly what happened.
+          Production data lives in a separate hosted service, reached only
+          through approved MCP tools.
         </p>
         <div class="home-actions" aria-label="Primary home actions">
           <Button href="https://www.glauxagent.com/contact/" variant="primary"
@@ -82,24 +82,7 @@ const pillars = [
           </span>
         </div>
       </div>
-      <figure class="hero-capture">
-        <div class="capture-label">
-          <span>Glaux desktop app</span><span>Real product capture</span>
-        </div>
-        <img
-          src="/product/desktop-1600.webp"
-          srcset="/product/desktop-800.webp 800w, /product/desktop-1600.webp 1600w"
-          sizes="(max-width: 60rem) calc(100vw - 2.5rem), 50vw"
-          alt="The Glaux desktop app, ready for a new work session."
-          width="1600"
-          height="1000"
-          fetchpriority="high"
-          decoding="async"
-        />
-        <figcaption>
-          Your coworker starts here. Its tools start with your rules.
-        </figcaption>
-      </figure>
+      <HeroShowcase />
     </section>
 
     <section class="incident-section" aria-labelledby="problem-heading">
@@ -190,23 +173,53 @@ const pillars = [
                 </>
               </div>
               <p>{pillar.body}</p>
-              <div class="pillar-capture">
-                <img
-                  src={pillar.image}
-                  alt={pillar.alt}
-                  width={pillar.width}
-                  height={pillar.height}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
+              {pillar.image && (
+                <div
+                  class:list={[
+                    "pillar-capture",
+                    { "pillar-capture--tools": pillar.scrollable },
+                  ]}
+                  role={pillar.scrollable ? "region" : undefined}
+                  tabindex={pillar.scrollable ? 0 : undefined}
+                  aria-label={
+                    pillar.scrollable
+                      ? `${pillar.title} product capture`
+                      : undefined
+                  }
+                >
+                  <picture>
+                    {pillar.mobileImage && (
+                      <source
+                        media="(max-width: 48rem)"
+                        srcset={pillar.mobileImage}
+                        width="850"
+                        height="275"
+                      />
+                    )}
+                    <img
+                      src={pillar.image}
+                      alt={pillar.alt}
+                      width={pillar.width}
+                      height={pillar.height}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
+                </div>
+              )}
+              {pillar.scrollable && (
+                <p class="capture-scroll-note">
+                  Scroll to read the full{" "}
+                  {pillar.title === "Approvals" ? "reply" : "permission rows"}.
+                </p>
+              )}
             </article>
           ))
         }
       </div>
       <p class="capture-note">
-        Real product captures with synthetic demo data. The audit image shows
-        desktop action history; it is not a joined admin audit record.
+        Real product captures with synthetic demo data. Admin grant delivery was
+        pending in this capture.
       </p>
     </section>
 
@@ -219,59 +232,67 @@ const pillars = [
         <p class="plain-label">One cleanup. Two responsibilities.</p>
         <h2 id="scenario-heading">“Clean up this old database table.”</h2>
         <p>
-          A small request with a destructive step. The desktop app shows the
-          command. The admin console controls which database tools are
-          available.
+          The production database lives in a separate hosted service. The agent
+          can reach it only through approved MCP tools.
         </p>
       </div>
       <div class="scenario-grid">
-        <figure>
-          <figcaption>
-            <span class="plain-label">Glaux desktop app</span><h3>
-              A person gets the final say.
-            </h3><p>
-              The staged demo holds a table deletion at a native Run / Reject
-              approval card.
-            </p>
-          </figcaption>
-          <div class="scenario-capture scenario-capture--approval">
+        <article class="scenario-outcome">
+          <p class="plain-label">Glaux desktop app</p>
+          <h3>Inspect. Then explain the limit.</h3>
+          <p>
+            The agent finds legacy_sessions_2024, then tells Sam its tools
+            cannot delete data. No deletion is attempted.
+          </p>
+          <div
+            class="scenario-capture"
+            role="region"
+            tabindex="0"
+            aria-label="Cleanup scenario agent reply"
+          >
             <img
-              src="/product/desktop-approval-750.webp"
-              alt="The desktop app holding a table deletion for Run or Reject."
-              width="750"
-              height="230"
+              src="/product/desktop-no-delete.webp"
+              alt="The Glaux desktop app tells Sam that its tools can inspect legacy_sessions_2024 but cannot delete data."
+              width="1012"
+              height="137"
               loading="lazy"
               decoding="async"
             />
           </div>
-        </figure>
+          <p class="capture-scroll-note">Scroll to read the full reply.</p>
+        </article>
         <figure>
           <figcaption>
-            <span class="plain-label">Glaux admin console</span><h3>
-              Tool access is an admin decision.
-            </h3><p>
-              Read-only MCP tools have explicit permissions for the person and
-              workspace.
+            <span class="plain-label">Glaux admin console</span>
+            <h3>Read-only tools. No delete tool.</h3>
+            <p>
+              The admin permission view shows list_tables and describe_table.
             </p>
           </figcaption>
-          <div class="scenario-capture">
+          <div
+            class="scenario-capture"
+            role="region"
+            tabindex="0"
+            aria-label="Cleanup scenario read-only tool permissions"
+          >
             <img
-              src="/product/approved-tools-800.webp"
-              srcset="/product/approved-tools-800.webp 800w, /product/approved-tools-1600.webp 1600w"
-              sizes="(max-width: 48rem) calc(100vw - 2.5rem), 50vw"
-              alt="Glaux admin console showing allowed read-only database tools for the synthetic Acme workspace."
-              width="800"
-              height="500"
+              src="/product/read-only-tools.webp"
+              alt="Glaux admin console read-only MCP tool permissions for list_tables and describe_table."
+              width="668"
+              height="254"
               loading="lazy"
               decoding="async"
             />
           </div>
+          <p class="capture-scroll-note">
+            Scroll to inspect the full permission rows.
+          </p>
         </figure>
       </div>
       <p class="capture-note">
-        Separate staged captures on disposable demo data. Desktop command
-        approval and admin tool access are distinct controls; these images do
-        not show an end-to-end production run.
+        Real two-turn desktop conversation with synthetic demo data. The agent
+        offers help drafting SQL; no write tool is available. Admin grant
+        delivery was pending in the permission capture.
       </p>
     </section>
 
@@ -280,7 +301,7 @@ const pillars = [
         <p class="plain-label">Security, honestly</p>
         <h2 id="security-heading">Start with what it can reach.</h2>
         <p>
-          Review tool permissions, the desktop approval boundary, and what gets
+          Review the hosted-service boundary, approved MCP tools, and what gets
           recorded. Deployment and data-handling terms belong in your security
           review.
         </p>
@@ -300,8 +321,8 @@ const pillars = [
     <section class="closing-cta" aria-labelledby="close-heading">
       <h2 id="close-heading">Real work. Your guardrails.</h2>
       <p>
-        Walk through one workflow: the tool boundary, the desktop approval
-        point, and the record you can review.
+        Walk through one workflow: read-only inspection, a clear stop, and
+        admin-approved tool access.
       </p>
       <Button href="https://www.glauxagent.com/contact/" variant="primary"
         >Book a demo</Button
@@ -315,18 +336,18 @@ const pillars = [
     padding-block-end: var(--space-8);
   }
   .home-refresh .home-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
-    justify-items: stretch;
+    justify-items: center;
     gap: var(--space-12);
     min-height: 45rem;
   }
   .home-refresh .home-hero__copy {
-    justify-items: start;
-    text-align: left;
+    justify-items: center;
+    text-align: center;
   }
   .home-refresh .home-title {
-    max-width: 15ch;
+    max-width: 24ch;
     font-size: clamp(2.8rem, 1.5rem + 3.5vw, 4.75rem);
   }
   .home-refresh .home-lede {
@@ -334,6 +355,7 @@ const pillars = [
   }
   .home-refresh .home-actions {
     align-items: center;
+    justify-content: center;
     gap: var(--space-6);
   }
   .walkthrough-placeholder {
@@ -349,34 +371,6 @@ const pillars = [
   }
   figure {
     margin: 0;
-  }
-  .hero-capture {
-    overflow: hidden;
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-md);
-    background: var(--color-primary-wash);
-    padding: var(--space-4);
-  }
-  .capture-label {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    padding-block-end: var(--space-4);
-    color: var(--color-primary-ink);
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  .hero-capture img {
-    width: 100%;
-    height: auto;
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-sm);
-  }
-  .hero-capture figcaption {
-    padding-block-start: var(--space-4);
-    color: var(--color-primary-ink);
-    font-size: 0.85rem;
   }
   .incident-section,
   .pillars-section,
@@ -453,7 +447,7 @@ const pillars = [
   .pillars-grid article {
     min-width: 0;
     display: grid;
-    grid-template-rows: auto auto 1fr;
+    align-content: start;
     gap: var(--space-4);
   }
   .pillar-heading {
@@ -474,9 +468,6 @@ const pillars = [
     border-radius: var(--radius-sm);
     background: var(--color-soft);
   }
-  .pillar-capture {
-    aspect-ratio: 8 / 5;
-  }
   .pillar-capture img,
   .scenario-capture img {
     width: 100%;
@@ -493,11 +484,27 @@ const pillars = [
     gap: var(--space-3);
     margin-block-end: var(--space-6);
   }
+  .pillar-capture--tools,
   .scenario-capture {
-    aspect-ratio: 8 / 5;
+    overflow-x: auto;
   }
-  .scenario-capture--approval {
-    padding: var(--space-4);
+  .pillar-capture--tools img,
+  .scenario-capture img {
+    width: auto;
+    min-width: 650px;
+    max-width: none;
+  }
+  .capture-scroll-note {
+    color: var(--color-body);
+    font-size: 0.8rem;
+  }
+  .scenario-outcome {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+  }
+  .scenario-outcome > p:not(.plain-label) {
+    color: var(--color-body);
   }
   .stage-note {
     display: grid;
@@ -528,9 +535,6 @@ const pillars = [
     .home-hero__copy {
       max-width: 45rem;
     }
-    .hero-capture {
-      width: 100%;
-    }
     .runtime-section {
       grid-template-columns: 1fr;
       gap: var(--space-8);
@@ -540,7 +544,7 @@ const pillars = [
     .incident-grid,
     .pillars-grid,
     .scenario-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .incident-section,
     .pillars-section,
@@ -552,9 +556,6 @@ const pillars = [
     }
     .pillars-section {
       margin-block-start: var(--space-12);
-    }
-    .hero-capture {
-      padding: var(--space-3);
     }
   }
 </style>

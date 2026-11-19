@@ -62,10 +62,99 @@ test("home page explains the governed desktop runtime and offers an honest next 
   await expect(hero).toHaveAttribute("src", /^\/product\//u);
 });
 
-test("home page connects sourced incidents, four controls, and a staged cleanup", async ({
+test("hero carousel shows full real windows and honors playback controls and reduced motion", async ({
   page,
 }) => {
+  await page.clock.install({ time: new Date("2026-11-18T12:00:00Z") });
+  await page.clock.pauseAt(new Date("2026-11-18T12:00:01Z"));
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
+  const showcase = page.getByRole("region", { name: "Glaux product views" });
+  const desktop = showcase.getByRole("group", {
+    name: "1 of 2: Glaux desktop app",
+  });
+  const admin = showcase.getByRole("group", {
+    name: "2 of 2: Glaux admin console",
+  });
+  await expect(desktop).toBeVisible();
+  await expect(admin).toBeHidden();
+  await expect(
+    desktop.getByText("Your coworker works on its own machine."),
+  ).toBeVisible();
+  const expectedDimensions = [
+    [2560, 1640],
+    [1600, 1000],
+  ];
+  for (const [index, image] of (
+    await showcase.locator("img").all()
+  ).entries()) {
+    await expect(image).toHaveAttribute("alt", /Glaux/u);
+    expect(
+      await image.evaluate((img: HTMLImageElement) => [
+        img.naturalWidth,
+        img.naturalHeight,
+      ]),
+    ).toEqual(expectedDimensions[index]);
+  }
+  await page.clock.fastForward(9000);
+  await expect(admin).toBeVisible();
+  await expect(desktop).toBeHidden();
+  await expect(
+    admin.getByText("Your admin decides which tools it gets."),
+  ).toBeVisible();
+
+  await showcase.hover();
+  await page.clock.fastForward(9000);
+  await expect(admin).toBeVisible();
+  await page.mouse.move(0, 0);
+  await page.clock.fastForward(9000);
+  await expect(desktop).toBeVisible();
+
+  await showcase.getByRole("button", { name: "Pause slideshow" }).click();
+  await page.getByRole("heading", { level: 1 }).click();
+  await page.clock.fastForward(18000);
+  await expect(desktop).toBeVisible();
+  await showcase.getByRole("button", { name: "Resume slideshow" }).click();
+  await page.getByRole("heading", { level: 1 }).click();
+  await page.clock.fastForward(9000);
+  await expect(admin).toBeVisible();
+
+  await showcase.getByRole("button", { name: "Pause slideshow" }).focus();
+  await page.clock.fastForward(9000);
+  await expect(admin).toBeVisible();
+  await showcase.getByRole("button", { name: "Next view" }).click();
+  await expect(desktop).toBeVisible();
+  await expect(
+    showcase.getByRole("button", { name: "Resume slideshow" }),
+  ).toBeVisible();
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.reload();
+  await expect(desktop).toBeVisible();
+  await expect(
+    showcase.getByRole("button", { name: /slideshow/u }),
+  ).toBeHidden();
+  await page.clock.fastForward(27000);
+  await expect(desktop).toBeVisible();
+  await expect(admin).toBeHidden();
+  await showcase.getByRole("button", { name: "Next view" }).click();
+  await expect(admin).toBeVisible();
+});
+
+test("home page connects sourced incidents, four controls, and a staged cleanup", async ({
+  page,
+  request,
+}) => {
+  for (const rejectedAsset of [
+    "/product/desktop-approval-750.webp",
+    "/product/desktop-result-800.webp",
+  ]) {
+    expect((await request.get(rejectedAsset)).status()).toBe(404);
+  }
+  await page.goto("/");
+  expect(await page.content()).not.toMatch(
+    /DROP\s+TABLE|successfully\s+dropped|Run\s*\/\s*Reject|terminal.{0,80}(?:block|delete)/iu,
+  );
   await expect(
     page.getByRole("link", { name: "Read the reporting" }),
   ).toHaveAttribute(
@@ -91,8 +180,33 @@ test("home page connects sourced incidents, four controls, and a staged cleanup"
   });
   await expect(scenario.getByRole("img")).toHaveCount(2);
   await expect(
-    scenario.getByText(/Separate staged captures on disposable demo data/u),
+    scenario.getByText(
+      /production database lives in a separate hosted service/u,
+    ),
   ).toBeVisible();
+  await expect(
+    scenario.getByText(
+      /finds legacy_sessions_2024, then tells Sam its tools cannot delete data/u,
+    ),
+  ).toBeVisible();
+  await expect(
+    scenario.getByRole("img", { name: /read-only MCP tool permissions/u }),
+  ).toBeVisible();
+  const replies = page.getByRole("img", {
+    name: /Glaux desktop app tells Sam.*legacy_sessions_2024.*cannot delete/u,
+  });
+  await expect(replies).toHaveCount(2);
+  for (const reply of await replies.all()) {
+    await reply.scrollIntoViewIfNeeded();
+    expect(
+      await reply.evaluate(
+        (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+      ),
+    ).toBe(true);
+  }
+  await expect(scenario).toContainText(
+    "The agent offers help drafting SQL; no write tool is available.",
+  );
   await expect(
     page.getByRole("link", { name: "Read security details" }),
   ).toHaveAttribute("href", "/security/");
@@ -224,6 +338,35 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   await expect(
     mobileNav.getByRole("link", { name: "Book a demo" }),
   ).toHaveAttribute("href", "/contact/");
+  await menu.click();
+  const toolCapture = page.getByRole("region", {
+    name: "Approved tools product capture",
+    exact: true,
+  });
+  await page.getByRole("link", { name: "Read the issue report" }).focus();
+  await page.keyboard.press("Tab");
+  await expectVisibleFocusOutline(toolCapture);
+  const image = toolCapture.getByRole("img");
+  expect((await image.boundingBox())?.width).toBeGreaterThanOrEqual(650);
+  await page.keyboard.press("ArrowRight");
+  await expect
+    .poll(() => toolCapture.evaluate((element) => element.scrollLeft))
+    .toBeGreaterThan(0);
+  for (const name of [
+    "Approvals product capture",
+    "Cleanup scenario agent reply",
+  ]) {
+    const replyCapture = page.getByRole("region", { name, exact: true });
+    await replyCapture.focus();
+    await expectVisibleFocusOutline(replyCapture);
+    expect(
+      (await replyCapture.getByRole("img").boundingBox())?.width,
+    ).toBeGreaterThanOrEqual(1000);
+    await page.keyboard.press("ArrowRight");
+    await expect
+      .poll(() => replyCapture.evaluate((element) => element.scrollLeft))
+      .toBeGreaterThan(0);
+  }
   await expectNoHorizontalOverflow(page);
 });
 

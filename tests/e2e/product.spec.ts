@@ -32,7 +32,7 @@ test("product page renders the W-07 employee and admin story", async ({
   await expect(productCapture).toBeVisible();
   await expect(productCapture).toHaveAttribute(
     "src",
-    "/product/desktop-1600.webp",
+    "/product/desktop-start.webp",
   );
   expect(
     await productCapture.evaluate(
