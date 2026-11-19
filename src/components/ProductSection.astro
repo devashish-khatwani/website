@@ -1,0 +1,671 @@
+---
+import { productSection as copy } from "../lib/content/product-section";
+---
+
+<section
+  class="product-section"
+  id="product"
+  aria-labelledby="product-section-heading"
+  data-product-section
+>
+  <header class="product-section__heading">
+    <p class="plain-label">{copy.eyebrow}</p>
+    <h2 id="product-section-heading">{copy.heading}</h2>
+    <p>{copy.statement}</p>
+  </header>
+
+  <div class="product-section__explorer">
+    <div class="product-section__overview">
+      <ol class="product-pillars">
+        {
+          copy.pillars.map((pillar) => (
+            <li>
+              <h3>
+                <span>{pillar.number}</span> {pillar.name}
+              </h3>
+              <p>{pillar.summary}</p>
+              <ul>
+                {pillar.features.map((feature) => (
+                  <li>
+                    <a href={`#feature-${feature.id}`} data-feature-link>
+                      {feature.name}
+                      <span aria-hidden="true"> ↗</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+      <aside class="product-soon" aria-labelledby="product-soon-heading">
+        <h3 id="product-soon-heading">{copy.comingSoon.heading}</h3>
+        <ul data-coming-soon>
+          {
+            copy.comingSoon.items.map((item) => (
+              <li>
+                <>
+                  <div>
+                    <>
+                      <span>{item.name}</span>
+                      <span class="soon-tag">{copy.comingSoon.tag}</span>
+                    </>
+                  </div>
+                  <p>{item.teaser}</p>
+                </>
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+    </div>
+
+    <div class="feature-guide">
+      <header class="feature-guide__heading">
+        <p>{copy.guideTitle} <span>{copy.guideLabel}</span></p>
+        <p>{copy.guideHint}</p>
+      </header>
+      <div class="feature-guide__body">
+        <nav class="feature-nav" aria-label={copy.navigationLabel}>
+          {
+            copy.pillars.map((pillar) => (
+              <div class="feature-nav__group">
+                <p>
+                  {pillar.number} · {pillar.name}
+                </p>
+                <ul>
+                  {pillar.features.map((feature) => (
+                    <li>
+                      <a href={`#feature-${feature.id}`} data-feature-link>
+                        {feature.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+          <div class="feature-nav__soon">
+            <p>{copy.comingSoon.heading}</p>
+            <ul data-coming-soon>
+              {
+                copy.comingSoon.items.map((item) => (
+                  <li>
+                    <>
+                      <span>{item.name}</span>
+                      <span class="soon-tag">{copy.comingSoon.tag}</span>
+                    </>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </nav>
+
+        <div class="feature-panels">
+          {
+            copy.pillars.flatMap((pillar) =>
+              pillar.features.map((feature) => (
+                <article
+                  class:list={[
+                    "feature-panel",
+                    { "feature-panel--text": !feature.capture },
+                  ]}
+                  id={`feature-${feature.id}`}
+                  aria-labelledby={`feature-heading-${feature.id}`}
+                  tabindex="0"
+                  data-feature-panel
+                >
+                  <header>
+                    <p class="plain-label">{feature.surface}</p>
+                    <h3 id={`feature-heading-${feature.id}`}>{feature.name}</h3>
+                    <p>{feature.summary}</p>
+                  </header>
+                  {feature.capture ? (
+                    <figure>
+                      <div
+                        class="feature-capture"
+                        role="region"
+                        tabindex="0"
+                        aria-label={`${feature.name}: ${copy.captureLabel}`}
+                      >
+                        <img
+                          src={feature.capture.src}
+                          alt={feature.capture.alt}
+                          width={feature.capture.width}
+                          height={feature.capture.height}
+                          style={`--capture-min-width: ${feature.capture.minWidth}px`}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      <figcaption>
+                        {feature.capture.caption}
+                        <span>{copy.captureHint}</span>
+                      </figcaption>
+                    </figure>
+                  ) : (
+                    <div class="feature-text">
+                      <p>{feature.headline}</p>
+                      <p>
+                        {feature.explanation.map((line) => (
+                          <span>{line}</span>
+                        ))}
+                      </p>
+                      <small>{copy.textOnlyNote}</small>
+                    </div>
+                  )}
+                  <ol class="feature-flow">
+                    {feature.flow.map((step, index) => (
+                      <li>
+                        <span aria-hidden="true">{index + 1}</span>
+                        <p>{step}</p>
+                      </li>
+                    ))}
+                  </ol>
+                  <a class="feature-detail-link" href={`#detail-${feature.id}`}>
+                    {copy.detailLink}
+                    <span aria-hidden="true"> ↓</span>
+                  </a>
+                </article>
+              )),
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="feature-details" aria-labelledby="feature-details-heading">
+    <h2 id="feature-details-heading">{copy.detailsHeading}</h2>
+    {
+      copy.pillars.flatMap((pillar) =>
+        pillar.features.map((feature) => (
+          <article id={`detail-${feature.id}`} data-feature-detail>
+            <p class="plain-label">
+              {pillar.number} · {feature.name}
+            </p>
+            <h3>{feature.headline}</h3>
+            <p>
+              {feature.explanation.map((line) => (
+                <span>{line}</span>
+              ))}
+            </p>
+          </article>
+        )),
+      )
+    }
+  </section>
+</section>
+
+<script>
+  for (const section of document.querySelectorAll<HTMLElement>(
+    "[data-product-section]",
+  )) {
+    const links = [
+      ...section.querySelectorAll<HTMLAnchorElement>("[data-feature-link]"),
+    ];
+    const panels = [
+      ...section.querySelectorAll<HTMLElement>("[data-feature-panel]"),
+    ];
+    const select = (id: string) => {
+      const selected = panels.find((panel) => panel.id === id);
+      if (!selected) return;
+      panels.forEach((panel) => {
+        panel.hidden = panel !== selected;
+      });
+      links.forEach((link) => {
+        if (link.hash === `#${id}`) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      });
+      return selected;
+    };
+    if (!select(window.location.hash.slice(1))) select(panels[0]?.id ?? "");
+    links.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+          return;
+        const selected = select(link.hash.slice(1));
+        if (!selected) return;
+        event.preventDefault();
+        selected.focus({ preventScroll: true });
+        selected.scrollIntoView({ block: "nearest", behavior: "instant" });
+      });
+    });
+    window.addEventListener("hashchange", () => {
+      select(window.location.hash.slice(1));
+    });
+  }
+</script>
+
+<style>
+  .product-section {
+    margin-block-start: var(--space-20);
+    padding-block: var(--space-20);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .product-section__heading {
+    display: grid;
+    gap: var(--space-4);
+    margin-block-end: var(--space-12);
+  }
+  .product-section__heading h2,
+  .feature-details > h2 {
+    font-size: var(--text-h2);
+  }
+  .product-section__heading > p:last-child {
+    max-width: 65ch;
+    color: var(--color-body);
+    font-size: var(--text-lede);
+  }
+  .product-section__explorer {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-6);
+  }
+  ul,
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .product-pillars {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .product-pillars > li {
+    border-top: 1px solid var(--color-hairline);
+    padding-block-start: var(--space-4);
+  }
+  .product-pillars h3 {
+    font-size: var(--text-h3);
+  }
+  .product-pillars h3 > span {
+    margin-inline-end: var(--space-3);
+    font-size: 0.8rem;
+    color: var(--color-primary);
+  }
+  .product-pillars p {
+    margin-block: var(--space-3) var(--space-2);
+    font-size: 0.85rem;
+    color: var(--color-body);
+  }
+  .product-pillars a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 0.85rem;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .product-pillars a > span {
+    margin-inline-start: var(--space-2);
+    color: var(--color-primary);
+  }
+  .product-pillars a[aria-current] {
+    color: var(--color-primary-hover);
+  }
+  .product-soon {
+    border-top: 1px solid var(--color-hairline);
+    margin-block-start: var(--space-6);
+    padding-block-start: var(--space-4);
+  }
+  .product-soon h3 {
+    color: var(--color-body);
+    font-size: 0.95rem;
+    margin-block-end: var(--space-4);
+  }
+  .product-soon ul {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .product-soon li > div,
+  .feature-nav__soon li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+  .product-soon li {
+    color: var(--color-body);
+    font-size: 0.85rem;
+  }
+  .product-soon li p {
+    margin-block-start: var(--space-1);
+    font-size: 0.75rem;
+  }
+  .soon-tag {
+    display: inline-block;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
+    background: var(--color-soft);
+    padding: 0 var(--space-2);
+    color: var(--color-body);
+    font-size: 0.65rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .feature-guide {
+    min-width: 0;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-md);
+    overflow: clip;
+    background: var(--color-chalk);
+  }
+  .feature-guide__heading {
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .feature-guide__heading p:first-child {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    font-weight: 650;
+  }
+  .feature-guide__heading span {
+    font-size: 0.7rem;
+    color: var(--color-body);
+    font-weight: 400;
+  }
+  .feature-guide__heading p:last-child {
+    margin-block-start: var(--space-1);
+    font-size: 0.8rem;
+    color: var(--color-body);
+  }
+  .feature-guide__body {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+  .feature-nav {
+    background: var(--color-subtle);
+    border-right: 1px solid var(--color-hairline);
+    padding: var(--space-4) var(--space-3);
+  }
+  .feature-nav__group {
+    margin-block-end: var(--space-5);
+  }
+  .feature-nav p {
+    padding: var(--space-2);
+    font-size: 0.7rem;
+    color: var(--color-body);
+    font-weight: 600;
+  }
+  .feature-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+  .feature-nav a:hover {
+    background: var(--color-mist);
+  }
+  .feature-nav a[aria-current] {
+    background: var(--color-primary-soft);
+    color: var(--color-primary-ink);
+    font-weight: 600;
+    box-shadow: inset 3px 0 var(--color-primary);
+  }
+  .feature-nav__soon {
+    border-top: 1px solid var(--color-hairline);
+    padding-block-start: var(--space-2);
+  }
+  .feature-nav__soon li {
+    min-height: 36px;
+    padding-inline: var(--space-2);
+    font-size: 0.75rem;
+    color: var(--color-body);
+  }
+  .feature-panels {
+    min-width: 0;
+  }
+  .feature-panel {
+    display: grid;
+    align-content: start;
+    gap: var(--space-6);
+    min-width: 0;
+    padding: var(--space-6) var(--space-4);
+    scroll-margin-block-start: 7rem;
+  }
+  .feature-panel[hidden] {
+    display: none;
+  }
+  .feature-panel + .feature-panel {
+    border-top: 1px solid var(--color-hairline);
+  }
+  .feature-panel h3 {
+    margin-block: var(--space-3);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+  }
+  .feature-panel header > p:last-child {
+    max-width: 48ch;
+    font-size: 0.9rem;
+    color: var(--color-body);
+  }
+  figure {
+    min-width: 0;
+    margin: 0;
+  }
+  .feature-capture {
+    overflow-x: auto;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
+    background: var(--color-chalk);
+  }
+  .feature-capture img {
+    width: 100%;
+    min-width: var(--capture-min-width);
+    max-width: none;
+    height: auto;
+  }
+  figcaption {
+    margin-block-start: var(--space-3);
+    font-size: 0.72rem;
+    color: var(--color-body);
+  }
+  figcaption > span {
+    display: block;
+    margin-block-start: var(--space-2);
+  }
+  .feature-text {
+    border-block: 1px solid var(--color-hairline);
+    padding-block: var(--space-8);
+  }
+  .feature-text > p:first-child {
+    max-width: 17ch;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+  }
+  .feature-text > p + p {
+    margin-block: var(--space-4);
+    color: var(--color-body);
+    font-size: 0.9rem;
+  }
+  .feature-text > p > span {
+    display: block;
+  }
+  .feature-text > p > span + span {
+    margin-block-start: var(--space-2);
+  }
+  .feature-text small {
+    font-size: 0.72rem;
+    color: var(--color-body);
+  }
+  .feature-flow {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+    border-top: 1px solid var(--color-hairline);
+    padding-block-start: var(--space-5);
+  }
+  .feature-flow li {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+  }
+  .feature-flow li > span {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: var(--color-primary-wash);
+    color: var(--color-primary-ink);
+    border-radius: 50%;
+    font-size: 0.75rem;
+  }
+  .feature-flow p {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .feature-panel--text .feature-flow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding-block-start: 0;
+    border-top: 0;
+  }
+  .feature-panel--text .feature-flow li {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-5);
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .feature-panel--text .feature-flow li > span {
+    width: auto;
+    height: auto;
+    justify-items: start;
+    border-radius: 0;
+    background: none;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+  }
+  .feature-panel--text .feature-flow p {
+    font-size: 1rem;
+  }
+  .feature-detail-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 0.8rem;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .feature-detail-link > span {
+    margin-inline-start: var(--space-2);
+  }
+  .feature-details {
+    margin-block-start: var(--space-20);
+  }
+  .feature-details > h2 {
+    margin-block-end: var(--space-10);
+  }
+  .feature-details article {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.65fr) minmax(0, 1.3fr) minmax(
+        0,
+        1.3fr
+      );
+    gap: var(--space-8);
+    align-items: start;
+    border-top: 1px solid var(--color-hairline);
+    padding-block: var(--space-10);
+    scroll-margin-block-start: 7rem;
+  }
+  .feature-details h3 {
+    max-width: 19ch;
+    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  }
+  .feature-details article > p:last-child {
+    color: var(--color-body);
+    font-size: 0.95rem;
+  }
+  .feature-details article > p:last-child span {
+    display: block;
+  }
+  .feature-details article > p:last-child span + span {
+    margin-block-start: var(--space-2);
+  }
+  @media (max-width: 70rem) {
+    .product-section__explorer {
+      grid-template-columns: 1fr;
+    }
+    .product-pillars {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .product-soon ul {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-6);
+    }
+    .feature-guide__body {
+      grid-template-columns: 12rem minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 48rem) {
+    .product-section {
+      margin-block-start: var(--space-12);
+      padding-block: var(--space-12);
+    }
+    .product-section__heading {
+      margin-block-end: var(--space-8);
+    }
+    .product-pillars,
+    .product-soon ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+    .product-soon li > div {
+      align-items: start;
+      flex-wrap: wrap;
+    }
+    .feature-guide__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .feature-guide__heading {
+      padding: var(--space-4);
+    }
+    .feature-nav {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3);
+      border-right: 0;
+      border-bottom: 1px solid var(--color-hairline);
+    }
+    .feature-nav__group {
+      margin: 0;
+    }
+    .feature-nav__soon {
+      grid-column: 1 / -1;
+    }
+    .feature-nav__soon ul {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-2);
+    }
+    .feature-panel {
+      padding: var(--space-6) var(--space-4);
+    }
+    .feature-flow {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .feature-flow li {
+      display: flex;
+      align-items: center;
+    }
+    .feature-flow li > span {
+      flex-shrink: 0;
+    }
+    .feature-details {
+      margin-block-start: var(--space-12);
+    }
+    .feature-details article {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+      padding-block: var(--space-8);
+    }
+  }
+</style>

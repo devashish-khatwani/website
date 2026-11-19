@@ -2,6 +2,7 @@
 import { getEntry } from "astro:content";
 import Button from "../components/Button.astro";
 import HeroShowcase from "../components/HeroShowcase.astro";
+import ProductSection from "../components/ProductSection.astro";
 import SiteLayout from "../components/SiteLayout.astro";
 import { buildPageHeadMetadata } from "../lib/site";
 
@@ -12,43 +13,6 @@ if (!homeEntry) {
 }
 
 const pageHead = buildPageHeadMetadata(homeEntry.data);
-const pillars = [
-  {
-    number: "01",
-    title: "Own machine",
-    body: "Each agent works on its own governed machine through the Glaux desktop app.",
-    image: "/product/desktop-start.webp",
-    mobileImage: "/product/desktop-start-mobile.webp",
-    alt: "The new-session prompt in the Glaux desktop app.",
-    width: 935,
-    height: 650,
-  },
-  {
-    number: "02",
-    title: "Approved tools",
-    body: "The hosted production database is reachable only through MCP tools your admin approved.",
-    image: "/product/read-only-tools.webp",
-    alt: "Glaux admin console read-only MCP tool permissions for list_tables and describe_table.",
-    width: 668,
-    height: 254,
-    scrollable: true,
-  },
-  {
-    number: "03",
-    title: "Approvals",
-    body: "Your admin approves the tool set. With read-only inspection tools and no delete tool, a cleanup request stops for a person.",
-    image: "/product/desktop-no-delete.webp",
-    alt: "The Glaux desktop app tells Sam that its tools can inspect legacy_sessions_2024 but cannot delete data.",
-    width: 1012,
-    height: 137,
-    scrollable: true,
-  },
-  {
-    number: "04",
-    title: "Audit",
-    body: "Review policy and access changes in the Glaux admin console.",
-  },
-];
 ---
 
 <SiteLayout
@@ -157,71 +121,7 @@ const pillars = [
       </div>
     </section>
 
-    <section class="pillars-section" aria-labelledby="pillars-heading">
-      <div class="section-heading">
-        <p class="plain-label">Useful work. Visible control.</p>
-        <h2 id="pillars-heading">Four guardrails around the work.</h2>
-      </div>
-      <div class="pillars-grid">
-        {
-          pillars.map((pillar) => (
-            <article>
-              <div class="pillar-heading">
-                <>
-                  <span>{pillar.number}</span>
-                  <h3>{pillar.title}</h3>
-                </>
-              </div>
-              <p>{pillar.body}</p>
-              {pillar.image && (
-                <div
-                  class:list={[
-                    "pillar-capture",
-                    { "pillar-capture--tools": pillar.scrollable },
-                  ]}
-                  role={pillar.scrollable ? "region" : undefined}
-                  tabindex={pillar.scrollable ? 0 : undefined}
-                  aria-label={
-                    pillar.scrollable
-                      ? `${pillar.title} product capture`
-                      : undefined
-                  }
-                >
-                  <picture>
-                    {pillar.mobileImage && (
-                      <source
-                        media="(max-width: 48rem)"
-                        srcset={pillar.mobileImage}
-                        width="850"
-                        height="275"
-                      />
-                    )}
-                    <img
-                      src={pillar.image}
-                      alt={pillar.alt}
-                      width={pillar.width}
-                      height={pillar.height}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
-                </div>
-              )}
-              {pillar.scrollable && (
-                <p class="capture-scroll-note">
-                  Scroll to read the full{" "}
-                  {pillar.title === "Approvals" ? "reply" : "permission rows"}.
-                </p>
-              )}
-            </article>
-          ))
-        }
-      </div>
-      <p class="capture-note">
-        Real product captures with synthetic demo data. Admin grant delivery was
-        pending in this capture.
-      </p>
-    </section>
+    <ProductSection />
 
     <section
       class="scenario-section"
@@ -315,7 +215,7 @@ const pillars = [
         We're working with early teams. Glaux is not generally available or open
         for self-serve signup. <a href="/company/">Meet Glaux ↗</a>
       </p>
-      <a href="/product/#what-comes-next">See what's in preview ↗</a>
+      <a href="#product-soon-heading">See what's coming soon ↗</a>
     </aside>
 
     <section class="closing-cta" aria-labelledby="close-heading">
@@ -373,13 +273,11 @@ const pillars = [
     margin: 0;
   }
   .incident-section,
-  .pillars-section,
   .scenario-section {
     padding-block: var(--space-20);
     border-top: 1px solid var(--color-hairline);
   }
   .incident-grid,
-  .pillars-grid,
   .scenario-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -396,7 +294,6 @@ const pillars = [
     font-size: var(--text-h3);
   }
   .incident-grid article > p:not(.plain-label),
-  .pillars-grid article > p,
   .scenario-grid figcaption > p,
   .runtime-contrast p {
     color: var(--color-body);
@@ -438,28 +335,6 @@ const pillars = [
   .runtime-contrast p {
     color: var(--color-hairline);
   }
-  .pillars-section {
-    margin-block-start: var(--space-20);
-  }
-  .pillars-grid {
-    row-gap: var(--space-12);
-  }
-  .pillars-grid article {
-    min-width: 0;
-    display: grid;
-    align-content: start;
-    gap: var(--space-4);
-  }
-  .pillar-heading {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-  }
-  .pillar-heading > span {
-    color: var(--color-primary);
-    font-size: 0.85rem;
-  }
-  .pillar-capture,
   .scenario-capture {
     display: grid;
     align-items: center;
@@ -468,7 +343,6 @@ const pillars = [
     border-radius: var(--radius-sm);
     background: var(--color-soft);
   }
-  .pillar-capture img,
   .scenario-capture img {
     width: 100%;
     height: auto;
@@ -484,11 +358,9 @@ const pillars = [
     gap: var(--space-3);
     margin-block-end: var(--space-6);
   }
-  .pillar-capture--tools,
   .scenario-capture {
     overflow-x: auto;
   }
-  .pillar-capture--tools img,
   .scenario-capture img {
     width: auto;
     min-width: 650px;
@@ -542,20 +414,15 @@ const pillars = [
   }
   @media (max-width: 48rem) {
     .incident-grid,
-    .pillars-grid,
     .scenario-grid {
       grid-template-columns: minmax(0, 1fr);
     }
     .incident-section,
-    .pillars-section,
     .scenario-section {
       padding-block: var(--space-12);
     }
     .runtime-section {
       padding: var(--space-8) var(--space-6);
-    }
-    .pillars-section {
-      margin-block-start: var(--space-12);
     }
   }
 </style>

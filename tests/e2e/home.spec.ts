@@ -141,7 +141,7 @@ test("hero carousel shows full real windows and honors playback controls and red
   await expect(admin).toBeVisible();
 });
 
-test("home page connects sourced incidents, four controls, and a staged cleanup", async ({
+test("home page connects sourced incidents, four product pillars, and a staged cleanup", async ({
   page,
   request,
 }) => {
@@ -170,7 +170,7 @@ test("home page connects sourced incidents, four controls, and a staged cleanup"
   await expect(
     page.getByRole("heading", { name: "Glaux is the governed runtime" }),
   ).toBeVisible();
-  for (const title of ["Own machine", "Approved tools", "Approvals", "Audit"]) {
+  for (const title of ["01 Connect", "02 Work", "03 See", "04 Govern"]) {
     await expect(
       page.getByRole("heading", { name: title, exact: true }),
     ).toBeVisible();
@@ -192,17 +192,19 @@ test("home page connects sourced incidents, four controls, and a staged cleanup"
   await expect(
     scenario.getByRole("img", { name: /read-only MCP tool permissions/u }),
   ).toBeVisible();
-  const replies = page.getByRole("img", {
+  const replies = scenario.getByRole("img", {
     name: /Glaux desktop app tells Sam.*legacy_sessions_2024.*cannot delete/u,
   });
-  await expect(replies).toHaveCount(2);
+  await expect(replies).toHaveCount(1);
   for (const reply of await replies.all()) {
     await reply.scrollIntoViewIfNeeded();
-    expect(
-      await reply.evaluate(
-        (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
-      ),
-    ).toBe(true);
+    await expect
+      .poll(() =>
+        reply.evaluate(
+          (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+        ),
+      )
+      .toBe(true);
   }
   await expect(scenario).toContainText(
     "The agent offers help drafting SQL; no write tool is available.",
@@ -218,8 +220,8 @@ test("home page connects sourced incidents, four controls, and a staged cleanup"
   ).toBeVisible();
   await expect(page.locator("[data-claim-id]")).toHaveCount(0);
   await expect(
-    page.getByRole("link", { name: "See what's in preview" }),
-  ).toHaveAttribute("href", "/product/#what-comes-next");
+    page.getByRole("link", { name: "See what's coming soon" }),
+  ).toHaveAttribute("href", "#product-soon-heading");
 });
 
 test("home page preserves shell navigation and focus behavior", async ({
@@ -339,26 +341,21 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
     mobileNav.getByRole("link", { name: "Book a demo" }),
   ).toHaveAttribute("href", "/contact/");
   await menu.click();
-  const toolCapture = page.getByRole("region", {
-    name: "Approved tools product capture",
-    exact: true,
-  });
-  await page.getByRole("link", { name: "Read the issue report" }).focus();
-  await page.keyboard.press("Tab");
-  await expectVisibleFocusOutline(toolCapture);
-  const image = toolCapture.getByRole("img");
-  expect((await image.boundingBox())?.width).toBeGreaterThanOrEqual(650);
-  await page.keyboard.press("ArrowRight");
-  await expect
-    .poll(() => toolCapture.evaluate((element) => element.scrollLeft))
-    .toBeGreaterThan(0);
-  for (const name of [
-    "Approvals product capture",
-    "Cleanup scenario agent reply",
-  ]) {
+  await page.getByRole("link", { name: "More about this feature" }).focus();
+  for (const name of ["Cleanup scenario agent reply"]) {
     const replyCapture = page.getByRole("region", { name, exact: true });
-    await replyCapture.focus();
+    await page.keyboard.press("Tab");
     await expectVisibleFocusOutline(replyCapture);
+    await expect
+      .poll(() =>
+        replyCapture
+          .getByRole("img")
+          .evaluate(
+            (image: HTMLImageElement) =>
+              image.complete && image.naturalWidth > 0,
+          ),
+      )
+      .toBe(true);
     expect(
       (await replyCapture.getByRole("img").boundingBox())?.width,
     ).toBeGreaterThanOrEqual(1000);

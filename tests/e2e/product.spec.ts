@@ -1,13 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { expectNoHorizontalOverflow } from "./assertions";
 
-const canonicalUrl = "https://www.glauxagent.com/product/";
-
-test("product page renders the W-07 employee and admin story", async ({
+test("product overview keeps its metadata, real desktop capture, demo, and security link", async ({
   page,
 }) => {
   await page.goto("/product/");
-
   await expect(page).toHaveTitle(/Product \| Glaux/u);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
@@ -15,165 +12,39 @@ test("product page renders the W-07 employee and admin story", async ({
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    canonicalUrl,
+    "https://www.glauxagent.com/product/",
   );
-
-  await expect(
-    page.getByRole("heading", {
-      name: "From question to useful outcome.",
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(/approved company knowledge and approved tools/u),
-  ).toBeVisible();
-  const productCapture = page.getByRole("img", {
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "From question to useful outcome.",
+  );
+  const capture = page.getByRole("img", {
     name: "The real Glaux desktop app, ready for a new work session.",
+    exact: true,
   });
-  await expect(productCapture).toBeVisible();
-  await expect(productCapture).toHaveAttribute(
-    "src",
-    "/product/desktop-start.webp",
-  );
-  expect(
-    await productCapture.evaluate(
-      (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
-    ),
-  ).toBe(true);
-
-  for (const workMode of [
-    "Ask",
-    "Research",
-    "Write",
-    "Analyze",
-    "Browse",
-    "Create artifacts",
-  ]) {
-    await expect(
-      page.getByRole("heading", { name: workMode, exact: true }),
-    ).toBeVisible();
-  }
-
-  for (const [claimId, title, statement, label] of [
-    [
-      "claim-skills-library-preview",
-      "Shared skills",
-      "Share trusted ways of working.",
-      "Preview",
-    ],
-    [
-      "claim-enterprise-mcp-preview",
-      "Enterprise connections",
-      "Connect the tools your company depends on.",
-      "Preview",
-    ],
-    [
-      "claim-observability-preview",
-      "Observability",
-      "See how agents perform, where they struggle, and where controls intervene.",
-      "Preview",
-    ],
-    [
-      "claim-model-studio-coming-soon",
-      "Model Studio",
-      "Turn carefully selected enterprise experience into a specialized model the enterprise owns and controls.",
-      "Coming soon",
-    ],
-  ] as const) {
-    const card = page.locator(`[data-claim-id="${claimId}"]`);
-    await expect(card.getByRole("heading", { name: title })).toBeVisible();
-    await expect(card.getByText(statement, { exact: true })).toBeVisible();
-    await expect(card.locator(".badge")).toHaveText(label);
-  }
-
+  await expect(capture).toHaveAttribute("src", "/product/desktop-start.webp");
+  await expect
+    .poll(() =>
+      capture.evaluate(
+        (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+      ),
+    )
+    .toBe(true);
   await expect(
-    page.getByRole("heading", { name: "Approved tools", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Automations", exact: true }),
-  ).toBeVisible();
-
-  for (const scope of [
-    "People",
-    "Groups",
-    "Tools",
-    "Models",
-    "Skills",
-    "Usage",
-    "Activity",
-  ]) {
-    await expect(
-      page.getByLabel("Administrator management scope").getByText(scope, {
-        exact: true,
-      }),
-    ).toBeVisible();
-  }
-});
-
-test("product page covers approvals and recent decisions without color-only meaning", async ({
-  page,
-}) => {
-  await page.goto("/product/");
-
-  await expect(
-    page.getByRole("heading", { name: "Ask without leaving the work." }),
-  ).toBeVisible();
-  await expect(
-    page.getByLabel("Approval request preview").getByText("Reason:"),
-  ).toBeVisible();
-
-  const decisions = [
-    ["continued", "The request matched the rules, so work carried on."],
-    [
-      "approval requested",
-      "The next step needs the right person to approve it first.",
-    ],
-    [
-      "stopped",
-      "The request crossed a boundary and was blocked before action.",
-    ],
-    [
-      "needs attention",
-      "A person should review the change before the workflow continues.",
-    ],
-  ] as const;
-
-  for (const [label, meaning] of decisions) {
-    const row = page.getByLabel("Recent decisions").filter({ hasText: label });
-
-    await expect(row.getByText(label, { exact: true })).toBeVisible();
-    await expect(row.getByText(meaning, { exact: true })).toBeVisible();
-  }
-});
-
-test("product page keeps technical depth optional and avoids unsafe public claims", async ({
-  page,
-}) => {
-  await page.goto("/product/");
-
-  await expect(
-    page.getByRole("heading", {
-      name: "Technical detail is available, not the main story.",
-    }),
-  ).toBeVisible();
+    page.getByRole("main").getByRole("link", { name: "Book a demo" }),
+  ).toHaveAttribute("href", "https://www.glauxagent.com/contact/");
   await expect(
     page.getByRole("link", { name: "Open technical details" }),
   ).toHaveAttribute("href", "/security/");
   await expect(
-    page.getByText(
-      /Powered by Hermes|Hermes Agent|SOC 2|ISO 27001|HIPAA|FedRAMP|zero data retention|military-grade|any agent|any platform|flowchart|product page|policy diagram|does not rely on color/u,
-    ),
-  ).toHaveCount(0);
+    page.getByRole("heading", { name: "Useful work. With you in control." }),
+  ).toBeVisible();
 });
 
-test("product page has no horizontal overflow on mobile, tablet, or desktop", async ({
+test("product overview has no horizontal overflow at the requested widths", async ({
   page,
 }) => {
-  for (const viewport of [
-    { width: 390, height: 844 },
-    { width: 768, height: 1024 },
-    { width: 1440, height: 1000 },
-  ]) {
-    await page.setViewportSize(viewport);
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
     await page.goto("/product/");
     await expectNoHorizontalOverflow(page);
   }

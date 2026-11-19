@@ -1,6 +1,7 @@
 ---
 import { getEntry } from "astro:content";
 import Button from "../components/Button.astro";
+import ProductSection from "../components/ProductSection.astro";
 import SiteLayout from "../components/SiteLayout.astro";
 import { buildPageHeadMetadata } from "../lib/site";
 
@@ -11,114 +12,6 @@ if (!productEntry) {
 }
 
 const pageHead = buildPageHeadMetadata(productEntry.data);
-
-const workModes = [
-  {
-    title: "Ask",
-    body: "Ask questions across approved company knowledge and see the answer in the same work thread.",
-  },
-  {
-    title: "Research",
-    body: "Collect source notes, compare options, and keep open questions visible for the team.",
-  },
-  {
-    title: "Write",
-    body: "Draft briefs, replies, summaries, and handoffs from the context your team has approved.",
-  },
-  {
-    title: "Analyze",
-    body: "Turn notes, documents, and work history into clear patterns without hiding the source trail.",
-  },
-  {
-    title: "Browse",
-    body: "Use approved browsing paths when the task needs fresh external context.",
-  },
-  {
-    title: "Create artifacts",
-    body: "Leave with the memo, plan, table, or checklist the work actually needs.",
-  },
-] as const;
-
-const approvedToolsCapability = {
-  title: "Approved tools",
-  body: "Use the tools an administrator has approved for the workspace and task.",
-  label: "Approved before use",
-} as const;
-
-const automationsCapability = {
-  title: "Automations",
-  body: "Run repeated work with the same boundaries as one-off requests.",
-  label: "Governed workflow",
-} as const;
-
-const previewCapabilitySpecs = [
-  ["skills-library-preview", "Shared skills"],
-  ["enterprise-mcp-preview", "Enterprise connections"],
-  ["observability-preview", "Observability"],
-  ["model-studio-coming-soon", "Model Studio"],
-] as const satisfies ReadonlyArray<readonly [string, string]>;
-
-const previewCapabilities = await Promise.all(
-  previewCapabilitySpecs.map(async ([id, title]) => {
-    const entry = await getEntry("claims", id);
-
-    if (!entry) {
-      throw new Error(`Missing product capability claim: ${id}.`);
-    }
-
-    if (
-      entry.data.classification !== "preview" &&
-      entry.data.classification !== "coming-soon"
-    ) {
-      throw new Error(
-        `Product capability claim ${entry.data.id} must be Preview or Coming soon.`,
-      );
-    }
-
-    return {
-      claimId: entry.data.id,
-      title,
-      body: entry.data.statement,
-      label:
-        entry.data.classification === "preview" ? "Preview" : "Coming soon",
-    };
-  }),
-);
-
-const capabilityCards = [approvedToolsCapability, automationsCapability];
-
-const adminScopes = [
-  "People",
-  "Groups",
-  "Tools",
-  "Models",
-  "Skills",
-  "Usage",
-  "Activity",
-] as const;
-
-const recentDecisions = [
-  {
-    label: "continued",
-    item: "Renewal-risk brief",
-    meaning: "The request matched the rules, so work carried on.",
-  },
-  {
-    label: "approval requested",
-    item: "External customer email",
-    meaning: "The next step needs the right person to approve it first.",
-  },
-  {
-    label: "stopped",
-    item: "Unapproved data export",
-    meaning: "The request crossed a boundary and was blocked before action.",
-  },
-  {
-    label: "needs attention",
-    item: "Automation source changed",
-    meaning: "A person should review the change before the workflow continues.",
-  },
-] as const;
 ---
 
 <SiteLayout
@@ -138,12 +31,14 @@ const recentDecisions = [
         <p class="product-lede">
           Employees work in the Glaux desktop app, with each agent on its own
           governed machine. Ask, research, write, analyze, browse, and create
-          artifacts with approved company knowledge and approved tools,
-          including MCP tools. Production databases stay in a separate hosted
-          service, accessible only through approved MCP tools.
+          artifacts with the tools your admin approved, including MCP tools.
+          Production databases stay in a separate hosted service, accessible
+          only through approved MCP tools.
         </p>
         <div class="product-actions" aria-label="Primary product actions">
-          <Button href="/contact/" variant="primary">Book a demo</Button>
+          <Button href="https://www.glauxagent.com/contact/" variant="primary"
+            >Book a demo</Button
+          >
           <Button href="/security/" variant="ghost"
             >Read security details</Button
           >
@@ -174,165 +69,7 @@ const recentDecisions = [
       </figure>
     </section>
 
-    <section class="product-work-section" aria-labelledby="work-heading">
-      <div class="section-heading">
-        <h2 id="work-heading">What employees can do.</h2>
-        <p>
-          The work starts like a normal request and ends with a brief, plan,
-          table, or next step someone can use.
-        </p>
-      </div>
-      <div class="work-mode-grid">
-        {
-          workModes.map((mode) => (
-            <article>
-              <h3>{mode.title}</h3>
-              <p>{mode.body}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section
-      class="governance-section access-section"
-      aria-labelledby="access-heading"
-    >
-      <div
-        class="section-heading section-heading--compact access-section__copy"
-      >
-        <p class="plain-label">Access and approval</p>
-        <h2 id="access-heading">Ask without leaving the work.</h2>
-        <p>
-          In the desktop app, if a task needs a new tool, source, or sensitive
-          action, Glaux keeps the request attached to the work so the approver
-          sees the reason and the user sees what happens next.
-        </p>
-      </div>
-      <div
-        class="surface approval-preview"
-        aria-label="Approval request preview"
-      >
-        <div>
-          <span class="badge">Approval requested</span>
-          <h3>Send external customer summary</h3>
-          <p>
-            Reason: share the final launch brief with the account team after
-            review.
-          </p>
-        </div>
-        <div class="approval-preview__steps">
-          <span>1. Request stays with the task</span>
-          <span>2. Approver reviews the reason</span>
-          <span>3. Work continues or stops with an explanation</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="capability-section" aria-labelledby="capability-heading">
-      <div class="section-heading">
-        <h2 id="capability-heading">
-          Approved tools, skills, and automations.
-        </h2>
-        <p>
-          Teams can make useful capabilities available without implying every
-          tool is open to every person.
-        </p>
-      </div>
-      <div class="platform-grid capability-grid">
-        {
-          capabilityCards.map((capability) => (
-            <article
-              class="platform-card capability-card"
-              data-claim-id={
-                "claimId" in capability ? capability.claimId : undefined
-              }
-            >
-              <div class="capability-card__header">
-                <h3>{capability.title}</h3>
-                <span class="badge">{capability.label}</span>
-              </div>
-              <p>{capability.body}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section class="admin-section" aria-labelledby="admin-heading">
-      <div class="section-heading section-heading--compact">
-        <h2 id="admin-heading">What administrators can manage.</h2>
-        <p>
-          Administrators get a plain operating view of who can use what, how
-          work is changing, and where attention is needed.
-        </p>
-      </div>
-      <div
-        class="surface admin-scope-list"
-        aria-label="Administrator management scope"
-      >
-        {adminScopes.map((scope) => <span class="badge">{scope}</span>)}
-      </div>
-    </section>
-
-    <section class="decision-section" aria-labelledby="decision-heading">
-      <div class="section-heading">
-        <h2 id="decision-heading">Recent decisions in everyday language.</h2>
-        <p>
-          See what moved ahead, what needs a person, and what stopped before
-          action.
-        </p>
-      </div>
-      <div
-        class="preview-list__items decision-list"
-        aria-label="Recent decisions"
-      >
-        {
-          recentDecisions.map((decision) => (
-            <article class="preview-row decision-row">
-              <div>
-                <span class="badge">{decision.label}</span>
-                <h3>{decision.item}</h3>
-              </div>
-              <p>{decision.meaning}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section
-      class="capability-section"
-      id="what-comes-next"
-      aria-labelledby="next-heading"
-    >
-      <div class="section-heading">
-        <p class="plain-label">What comes next</p>
-        <h2 id="next-heading">A look ahead, clearly labeled.</h2>
-        <p>
-          Preview capabilities and future plans. Availability belongs in your
-          demo conversation.
-        </p>
-      </div>
-      <div class="platform-grid capability-grid">
-        {
-          previewCapabilities.map((capability) => (
-            <article
-              class="platform-card capability-card"
-              data-claim-id={capability.claimId}
-            >
-              <div class="capability-card__header">
-                <>
-                  <h3>{capability.title}</h3>
-                  <span class="badge">{capability.label}</span>
-                </>
-              </div>
-              <p>{capability.body}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
+    <ProductSection />
 
     <section
       class="security-cta technical-depth"
