@@ -1,182 +1,22 @@
 ---
-const frames = [
-  {
-    title: "Glaux desktop app",
-    image: "/product/desktop-window.webp",
-    width: 2560,
-    height: 1640,
-    alt: "The Glaux desktop app, ready for a new work session.",
-    caption: "Your coworker works on its own machine.",
-    note: "Real product capture.",
-  },
-  {
-    title: "Glaux admin console",
-    image: "/product/connected-tools-catalog.webp",
-    width: 1420,
-    height: 1273,
-    alt: "The Glaux admin console's catalog detail for the fictitious Acme database, with published list_tables and describe_table tools.",
-    caption: "Review the tools in the catalog.",
-    note: "Real local catalog detail with synthetic Acme data.",
-  },
-];
+import DesktopAppMock from "./mocks/DesktopAppMock.astro";
+import ControlTowerMock from "./mocks/ControlTowerMock.astro";
+import { sections } from "../lib/content/product-mocks";
+import "../styles/product-mocks.css";
 ---
 
 <section
-  class="hero-showcase"
-  aria-roledescription="carousel"
-  aria-label="Glaux product views"
-  data-hero-showcase
+  class="product-mocks hero-showcase"
+  aria-label="Glaux product previews"
 >
-  <div id="hero-product-frames" aria-live="off" data-showcase-frames>
-    {
-      frames.map((frame, index) => (
-        <figure
-          role="group"
-          aria-roledescription="slide"
-          aria-label={`${index + 1} of ${frames.length}: ${frame.title}`}
-          hidden={index !== 0}
-          data-showcase-frame
-        >
-          <img
-            src={frame.image}
-            alt={frame.alt}
-            width={frame.width}
-            height={frame.height}
-            loading="eager"
-            fetchpriority={index === 0 ? "high" : "low"}
-            decoding="async"
-          />
-          <figcaption>
-            <span class="plain-label">{frame.title}</span>
-            <p>{frame.caption}</p>
-            <small>{frame.note}</small>
-          </figcaption>
-        </figure>
-      ))
-    }
+  <div class="hero-product">
+    <h2 class="plain-label">{sections.desktop.label}</h2><DesktopAppMock
+      preview
+    />
   </div>
-  <div class="hero-showcase__controls" data-showcase-controls hidden>
-    <button
-      type="button"
-      class="button button--ghost"
-      aria-controls="hero-product-frames"
-      data-rotation-toggle>Pause slideshow</button
-    >
-    <button
-      type="button"
-      class="button button--ghost"
-      aria-controls="hero-product-frames"
-      data-showcase-next>Next view</button
-    >
+  <div class="hero-product">
+    <h2 class="plain-label">{sections.admin.label}</h2><ControlTowerMock
+      preview
+    />
   </div>
 </section>
-
-<script>
-  for (const showcase of document.querySelectorAll<HTMLElement>(
-    "[data-hero-showcase]",
-  )) {
-    const frames = [
-      ...showcase.querySelectorAll<HTMLElement>("[data-showcase-frame]"),
-    ];
-    const host = showcase.querySelector<HTMLElement>("[data-showcase-frames]");
-    const controls = showcase.querySelector<HTMLElement>(
-      "[data-showcase-controls]",
-    );
-    const toggle = showcase.querySelector<HTMLButtonElement>(
-      "[data-rotation-toggle]",
-    );
-    const next = showcase.querySelector<HTMLButtonElement>(
-      "[data-showcase-next]",
-    );
-    if (!host || !controls || !toggle || !next || frames.length < 2) continue;
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let current = 0;
-    let paused = false;
-    const show = (index: number) => {
-      frames.forEach((frame, position) => {
-        frame.hidden = position !== index;
-      });
-      current = index;
-    };
-    const syncControls = () => {
-      toggle.hidden = reducedMotion.matches;
-      toggle.textContent = paused ? "Resume slideshow" : "Pause slideshow";
-      host.setAttribute(
-        "aria-live",
-        paused || reducedMotion.matches ? "polite" : "off",
-      );
-    };
-    controls.hidden = false;
-    syncControls();
-    toggle.addEventListener("click", () => {
-      paused = !paused;
-      syncControls();
-    });
-    next.addEventListener("click", () => {
-      paused = true;
-      syncControls();
-      show((current + 1) % frames.length);
-    });
-    reducedMotion.addEventListener("change", () => {
-      if (reducedMotion.matches) show(0);
-      syncControls();
-    });
-    window.setInterval(() => {
-      if (
-        paused ||
-        reducedMotion.matches ||
-        showcase.matches(":hover") ||
-        showcase.contains(document.activeElement)
-      )
-        return;
-      show((current + 1) % frames.length);
-    }, 9000);
-  }
-</script>
-
-<style>
-  .hero-showcase {
-    width: 100%;
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-md);
-    background: var(--color-primary-wash);
-    padding: var(--space-4);
-  }
-  .hero-showcase [hidden] {
-    display: none;
-  }
-  figure {
-    margin: 0;
-  }
-  img {
-    width: 100%;
-    height: auto;
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-sm);
-  }
-  figcaption {
-    display: grid;
-    gap: var(--space-2);
-    padding-block-start: var(--space-4);
-  }
-  figcaption p {
-    color: var(--color-primary-ink);
-    font-size: var(--text-lede);
-  }
-  figcaption small {
-    color: var(--color-body);
-  }
-  .hero-showcase__controls {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: var(--space-3);
-    margin-block-start: var(--space-4);
-  }
-  @media (max-width: 48rem) {
-    .hero-showcase {
-      padding: var(--space-3);
-    }
-  }
-</style>

@@ -118,81 +118,6 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
 
     <ProductSection />
 
-    <section
-      class="scenario-section"
-      id="cleanup"
-      aria-labelledby="scenario-heading"
-    >
-      <div class="section-heading">
-        <p class="plain-label">One cleanup. Two responsibilities.</p>
-        <h2 id="scenario-heading">“Clean up this old database table.”</h2>
-        <p>
-          The production database lives in a separate hosted service. The agent
-          can reach it only through approved MCP tools.
-        </p>
-      </div>
-      <div class="scenario-grid">
-        <article class="scenario-outcome">
-          <p class="plain-label">Glaux desktop app</p>
-          <h3>Inspect. Then explain the limit.</h3>
-          <p>
-            The agent finds legacy_sessions_2024, then tells Sam its tools
-            cannot delete data. No deletion is attempted.
-          </p>
-          <div
-            class="scenario-capture"
-            role="region"
-            tabindex="0"
-            aria-label="Cleanup scenario agent reply"
-          >
-            <img
-              src="/product/desktop-no-delete.webp"
-              alt="The Glaux desktop app tells Sam that its tools can inspect legacy_sessions_2024 but cannot delete data."
-              width="1012"
-              height="137"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <p class="capture-scroll-note">Scroll to read the full reply.</p>
-        </article>
-        <figure>
-          <figcaption>
-            <span class="plain-label">Glaux admin console</span>
-            <h3>Two tools for inspection.</h3>
-            <p>
-              This synthetic catalog entry publishes list_tables and
-              describe_table.
-            </p>
-          </figcaption>
-          <div
-            class="scenario-capture"
-            role="region"
-            tabindex="0"
-            aria-label="Cleanup scenario tool catalog example"
-          >
-            <img
-              src="/product/connected-tools-catalog.webp"
-              class="scenario-tools"
-              alt="Glaux admin console catalog details for the fictitious Acme database, with published list_tables and describe_table tools."
-              width="1420"
-              height="1273"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <p class="capture-scroll-note">
-            Scroll to inspect the full catalog detail.
-          </p>
-        </figure>
-      </div>
-      <p class="capture-note">
-        Real two-turn desktop conversation with synthetic demo data. The agent
-        offers help drafting SQL; no write tool is available. The catalog
-        capture is a separate local example.
-      </p>
-    </section>
-
     <section class="security-cta" aria-labelledby="security-heading">
       <div class="section-heading section-heading--compact">
         <p class="plain-label">Security, honestly</p>
@@ -218,8 +143,8 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     <section class="closing-cta" aria-labelledby="close-heading">
       <h2 id="close-heading">Real work. Your guardrails.</h2>
       <p>
-        Walk through one workflow: read-only inspection, a clear stop, and
-        admin-approved tool access.
+        Walk through one workflow: useful work, a clear stop, and tool access
+        chosen in Glaux Control Tower.
       </p>
       <Button href="https://www.glauxagent.com/contact/" variant="primary"
         >Book a demo</Button
@@ -255,16 +180,11 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     justify-content: center;
     gap: var(--space-6);
   }
-  figure {
-    margin: 0;
-  }
-  .incident-section,
-  .scenario-section {
+  .incident-section {
     padding-block: var(--space-20);
     border-top: 1px solid var(--color-hairline);
   }
-  .incident-grid,
-  .scenario-grid {
+  .incident-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-8);
@@ -280,7 +200,6 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     font-size: var(--text-h3);
   }
   .incident-grid article > p:not(.plain-label),
-  .scenario-grid figcaption > p,
   .runtime-contrast p {
     color: var(--color-body);
   }
@@ -321,52 +240,6 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
   .runtime-contrast p {
     color: var(--color-hairline);
   }
-  .scenario-capture {
-    display: grid;
-    align-items: center;
-    overflow: hidden;
-    border: 1px solid var(--color-hairline);
-    border-radius: var(--radius-sm);
-    background: var(--color-soft);
-  }
-  .scenario-capture img {
-    width: 100%;
-    height: auto;
-  }
-  .capture-note {
-    max-width: 65rem;
-    margin-block-start: var(--space-6);
-    color: var(--color-body);
-    font-size: 0.8rem;
-  }
-  .scenario-grid figcaption {
-    display: grid;
-    gap: var(--space-3);
-    margin-block-end: var(--space-6);
-  }
-  .scenario-capture {
-    overflow-x: auto;
-  }
-  .scenario-capture img {
-    width: auto;
-    min-width: 650px;
-    max-width: none;
-  }
-  .scenario-capture .scenario-tools {
-    width: 100%;
-  }
-  .capture-scroll-note {
-    color: var(--color-body);
-    font-size: 0.8rem;
-  }
-  .scenario-outcome {
-    display: grid;
-    align-content: start;
-    gap: var(--space-4);
-  }
-  .scenario-outcome > p:not(.plain-label) {
-    color: var(--color-body);
-  }
   .stage-note {
     display: grid;
     gap: var(--space-3);
@@ -402,12 +275,10 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     }
   }
   @media (max-width: 48rem) {
-    .incident-grid,
-    .scenario-grid {
+    .incident-grid {
       grid-template-columns: minmax(0, 1fr);
     }
-    .incident-section,
-    .scenario-section {
+    .incident-section {
       padding-block: var(--space-12);
     }
     .runtime-section {

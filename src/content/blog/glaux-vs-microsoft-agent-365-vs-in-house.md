@@ -51,7 +51,7 @@ It's licensed per user. Microsoft lists it at $15 per user per month standalone,
 Glaux is a governed AI coworker. It includes both the agent employees use and the governance around it, as one product.
 
 - **The Glaux desktop app** is the agent people work in.
-- **Glaux admin console** handles identity, policy, approvals, access requests, and an append-only audit store.
+- **Glaux Control Tower** handles identity, policy, approvals, access requests, and an append-only audit store.
 - **The Glaux AI Gateway** holds your own model provider keys, hands out 30-minute session keys, limits which models are available, and enforces an organization budget.
 - **The Glaux tools gateway** governs MCP tool access and checks policy on every call.
 - **The Glaux skills library** lets you review and promote shared skills, and the agent runs an exact, verified version of each one.
@@ -76,7 +76,7 @@ Glaux is a governed AI coworker. It includes both the agent employees use and th
 
 You assemble the pieces yourself. This is a legitimate choice, and many of the building blocks are open source. Here's what the job looks like, layer by layer, next to the Glaux part that covers each one.
 
-![The eight layers you would build in-house, and the Glaux part that covers each: agent app (Glaux desktop app), sign-in (Glaux SSO), policy, approvals and requests (Glaux admin console), model gateway, keys and budget (Glaux AI Gateway), tool governance (Glaux tools gateway), skills registry (Glaux skills library), audit store and export (Glaux audit), and traces (Glaux observability).](/blog/images/glaux-vs-microsoft-agent-365-vs-in-house/in-house-stack.svg)
+![The eight layers you would build in-house, and the Glaux part that covers each: agent app (Glaux desktop app), sign-in (Glaux SSO), policy, approvals and requests (Glaux Control Tower), model gateway, keys and budget (Glaux AI Gateway), tool governance (Glaux tools gateway), skills registry (Glaux skills library), audit store and export (Glaux audit), and traces (Glaux observability).](/blog/images/glaux-vs-microsoft-agent-365-vs-in-house/in-house-stack.svg)
 
 ### Where it shines
 

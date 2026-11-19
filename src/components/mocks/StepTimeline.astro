@@ -1,0 +1,43 @@
+---
+import type { Step } from "../../lib/content/product-mocks";
+interface Props {
+  steps: Step[];
+  animated?: boolean;
+}
+const { steps, animated = false } = Astro.props;
+const times = [1800, 2200, 2600, 3200, 3800];
+---
+
+<ol class="mock-timeline">
+  {
+    steps.map((step, i) => (
+      <li
+        class:list={[step.blocked && "is-blocked"]}
+        data-at={animated ? times[i] : undefined}
+      >
+        <span class="mock-step-icon" aria-hidden="true">
+          {step.blocked ? "⊘" : "✓"}
+        </span>
+        <div>
+          <>
+            <div class="mock-step-title">
+              <>
+                <strong>{step.name}</strong>
+                <span
+                  class:list={[
+                    "mock-pill",
+                    step.blocked ? "mock-pill--red" : "mock-pill--green",
+                  ]}
+                >
+                  {step.blocked ? "Blocked" : "Completed"}
+                </span>
+                <time>{step.duration}</time>
+              </>
+            </div>
+            <p>{step.outcome}</p>
+          </>
+        </div>
+      </li>
+    ))
+  }
+</ol>

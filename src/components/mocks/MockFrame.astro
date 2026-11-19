@@ -1,0 +1,196 @@
+---
+import { productSection } from "../../lib/content/product-section";
+import {
+  people,
+  traces,
+  workspace,
+  type MockView,
+} from "../../lib/content/product-mocks";
+interface Props {
+  kind: "desktop" | "admin";
+  views: MockView[];
+  initial: string;
+  preview?: boolean;
+}
+const { kind, views, initial, preview = false } = Astro.props;
+const desktop = kind === "desktop";
+const product = desktop ? "Glaux desktop app" : "Glaux Control Tower";
+const name = `${product} ${desktop ? "views" : "panes"}${preview ? " preview" : ""}`;
+const Item = preview ? "span" : "button";
+const icons: Record<string, string> = {
+  "desktop-app": "M12 5v14M5 12h14",
+  "desktop-app-capabilities":
+    "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
+  "desktop-app-traces": "M3 12h4l3-7 4 14 3-7h4",
+  "desktop-app-artifacts": "M6 3h8l4 4v14H6zM14 3v5h5M9 12h6M9 16h6",
+  "desktop-app-automations": "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2",
+  "people-access":
+    "M9 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6M3 21v-4a6 6 0 0 1 12 0v4M17 4a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 5v2",
+  "ai-gateway": "M4 3h16v7H4zM4 14h16v7H4zM7 6h1M7 17h1",
+  skills:
+    "M4 4h7a3 3 0 0 1 3 3v14a3 3 0 0 0-3-3H4zM14 7a3 3 0 0 1 3-3h3v14h-3a3 3 0 0 0-3 3",
+  "connected-tools": "M8 3v5M16 3v5M6 8h12v3a6 6 0 0 1-12 0zM12 17v4",
+  observability: "M3 12h4l3-7 4 14 3-7h4",
+  audit: "M5 3h14v18H5zM8 7h8M8 12h8M8 17h5",
+};
+---
+
+<div
+  class:list={["mock-frame", `mock-frame--${kind}`, preview && "mock-preview"]}
+  data-mock={preview ? undefined : kind}
+  data-mock-preview={preview ? kind : undefined}
+>
+  {
+    desktop && (
+      <div class="mock-titlebar">
+        <>
+          <span class="mock-dots" aria-hidden="true">
+            <>
+              <i />
+              <i />
+              <i />
+            </>
+          </span>
+          <span>Glaux</span>
+          <span class="mock-example">Example data</span>
+        </>
+      </div>
+    )
+  }
+  <div class="mock-window">
+    <nav class="mock-sidebar" aria-label={name}>
+      <div class="mock-brand">
+        <img src="/brand/glaux-mark.svg" width="26" height="26" alt="" /><div>
+          <strong>Glaux</strong>{!desktop && <small>Control Tower</small>}
+        </div>
+      </div>
+      {
+        views.map((view, i) => (
+          <Item
+            class="mock-nav-item"
+            type={preview ? undefined : "button"}
+            data-view={preview ? undefined : view.id}
+            aria-pressed={
+              preview ? undefined : view.id === initial ? "true" : "false"
+            }
+            aria-current={preview && view.id === initial ? "page" : undefined}
+            aria-disabled={preview ? "true" : undefined}
+            aria-controls={preview ? undefined : `${kind}-view`}
+            title={
+              productSection.panes.find((pane) => pane.id === view.id)?.summary
+            }
+          >
+            <span>{view.name}</span>
+            <svg
+              viewBox="0 0 24 24"
+              width="17"
+              height="17"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <>
+                <path d={icons[view.id]} />
+              </>
+            </svg>
+            {desktop && i === 0 && !preview && <kbd>⌘N</kbd>}
+          </Item>
+        ))
+      }
+      {
+        !preview &&
+          (desktop ? (
+            <>
+              <>
+                <div class="mock-recents">
+                  <p>Recent sessions</p>
+                  {traces.slice(0, 3).map((trace) => (
+                    <span>{trace.task}</span>
+                  ))}
+                </div>
+                <div class="mock-user">
+                  <span class="mock-avatar">SL</span> {people[1].name}
+                </div>
+              </>
+            </>
+          ) : (
+            <div class="mock-soon" data-coming-soon>
+              <p id="product-soon-heading">Coming soon</p>
+              {productSection.comingSoon.items.map((item) => (
+                <span aria-disabled="true" title={item.teaser}>
+                  {item.name}
+                  <small>Soon</small>
+                </span>
+              ))}
+            </div>
+          ))
+      }
+    </nav>
+    <div class="mock-workspace">
+      {
+        !desktop && (
+          <div class="mock-topbar">
+            <>
+              <span>
+                {workspace.organization} <span aria-hidden="true">/</span>{" "}
+                {workspace.name}
+              </span>
+              <span class="mock-example">Example data</span>
+              <span class="mock-avatar" aria-label={people[0].name}>
+                MO
+              </span>
+            </>
+          </div>
+        )
+      }
+      <div
+        class="mock-main"
+        id={`${preview ? "hero-" : ""}${kind}-view`}
+        role="region"
+        aria-label={`${preview ? `${product}: ` : ""}${views.find((view) => view.id === initial)?.name}, with example data`}
+        tabindex={preview ? undefined : "-1"}
+      >
+        <slot />
+      </div>
+    </div>
+  </div>
+  {
+    !preview && (
+      <p class="mock-toast" role="status" hidden>
+        Example only: nothing changes.
+      </p>
+    )
+  }
+</div>
+{
+  !preview && (
+    <>
+      <div class="mock-caption" aria-live="polite" aria-atomic="true">
+        {views.map((view) => (
+          <div data-caption={view.id} hidden={view.id !== initial}>
+            <div>
+              <h3>{view.caption}</h3>
+              <p>{view.takeaway}</p>
+            </div>
+            <ul aria-label="Highlights">
+              {view.chips.map((chip) => (
+                <li>
+                  <span aria-hidden="true">✓</span> {chip}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      {!desktop && (
+        <p class="mock-mobile-soon">
+          Coming soon:{" "}
+          {productSection.comingSoon.items.map((item) => item.name).join(", ")}
+        </p>
+      )}
+    </>
+  )
+}

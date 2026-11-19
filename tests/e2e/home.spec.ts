@@ -37,7 +37,7 @@ test("home page explains the governed desktop runtime and offers an honest next 
   const demoLinks = page
     .getByRole("main")
     .getByRole("link", { name: "Book a demo" });
-  await expect(demoLinks).toHaveCount(2);
+  await expect(demoLinks).toHaveCount(3);
   for (const link of await demoLinks.all()) {
     await expect(link).toHaveAttribute(
       "href",
@@ -48,99 +48,79 @@ test("home page explains the governed desktop runtime and offers an honest next 
     page.getByText("Coming soon · video not yet available"),
   ).toHaveCount(0);
   await expect(page.getByText("Watch the walkthrough")).toHaveCount(0);
-  const hero = page.getByRole("img", {
-    name: "The Glaux desktop app, ready for a new work session.",
+  await expect(page.locator(".home-hero [data-mock-preview]")).toHaveCount(2);
+  await expect(page.locator('main img[src^="/product/"]')).toHaveCount(0);
+});
+
+test("hero shows both static product mocks together without playback controls or duplicate IDs", async ({
+  page,
+  browser,
+  baseURL,
+}) => {
+  await page.clock.install();
+  await page.goto("/");
+  const hero = page.getByRole("region", {
+    name: "Glaux product previews",
     exact: true,
   });
-  await expect(hero).toBeVisible();
-  expect(
-    await hero.evaluate(
-      (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
-    ),
-  ).toBe(true);
-  await expect(hero).toHaveAttribute("src", /^\/product\//u);
-});
-
-test("hero carousel shows real product captures and honors playback controls and reduced motion", async ({
-  page,
-}) => {
-  await page.clock.install({ time: new Date("2026-11-18T12:00:00Z") });
-  await page.clock.pauseAt(new Date("2026-11-18T12:00:01Z"));
-  await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
-  const showcase = page.getByRole("region", { name: "Glaux product views" });
-  const desktop = showcase.getByRole("group", {
-    name: "1 of 2: Glaux desktop app",
-  });
-  const admin = showcase.getByRole("group", {
-    name: "2 of 2: Glaux admin console",
-  });
+  const desktop = hero.locator('[data-mock-preview="desktop"]');
+  const tower = hero.locator('[data-mock-preview="admin"]');
   await expect(desktop).toBeVisible();
-  await expect(admin).toBeHidden();
+  await expect(tower).toBeVisible();
+  await expect(desktop).toContainText("18,204 rows deleted");
+  await expect(tower).toContainText("drop_table");
+  await expect(tower).toContainText("Not granted");
+  await expect(hero.getByRole("button")).toHaveCount(0);
   await expect(
-    desktop.getByText("Your coworker works on its own machine."),
-  ).toBeVisible();
-  const expectedDimensions = [
-    [2560, 1640],
-    [1420, 1273],
-  ];
-  for (const [index, image] of (
-    await showcase.locator("img").all()
-  ).entries()) {
-    await expect(image).toHaveAttribute("alt", /Glaux/u);
-    expect(
-      await image.evaluate((img: HTMLImageElement) => [
-        img.naturalWidth,
-        img.naturalHeight,
-      ]),
-    ).toEqual(expectedDimensions[index]);
+    page.getByRole("button", {
+      name: /(?:play|pause|replay).*(?:demo|slideshow)|next view|previous view/iu,
+    }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("progressbar")).toHaveCount(0);
+  const before = await hero.innerText();
+  await page.clock.fastForward(20000);
+  expect(await hero.innerText()).toBe(before);
+  const duplicateIds = await page.locator("[id]").evaluateAll((elements) => {
+    const ids = elements.map((element) => element.id);
+    return ids.filter((id, index) => ids.indexOf(id) !== index);
+  });
+  expect(duplicateIds).toEqual([]);
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    const left = await desktop.boundingBox();
+    const right = await tower.boundingBox();
+    if (!left || !right) throw new Error("Both previews must be rendered.");
+    if (width === 1440)
+      expect(right.x).toBeGreaterThanOrEqual(left.x + left.width);
+    else expect(right.y).toBeGreaterThanOrEqual(left.y + left.height);
+    await expectNoHorizontalOverflow(page);
+    for (const frame of [desktop, tower]) {
+      const fits = await frame
+        .locator(".mock-main")
+        .evaluate((region) => region.scrollHeight <= region.clientHeight);
+      expect(fits).toBe(true);
+    }
   }
-  await page.clock.fastForward(9000);
-  await expect(admin).toBeVisible();
-  await expect(desktop).toBeHidden();
-  await expect(
-    admin.getByText("Review the tools in the catalog."),
-  ).toBeVisible();
-
-  await showcase.hover();
-  await page.clock.fastForward(9000);
-  await expect(admin).toBeVisible();
-  await page.mouse.move(0, 0);
-  await page.clock.fastForward(9000);
-  await expect(desktop).toBeVisible();
-
-  await showcase.getByRole("button", { name: "Pause slideshow" }).click();
-  await page.getByRole("heading", { level: 1 }).click();
-  await page.clock.fastForward(18000);
-  await expect(desktop).toBeVisible();
-  await showcase.getByRole("button", { name: "Resume slideshow" }).click();
-  await page.getByRole("heading", { level: 1 }).click();
-  await page.clock.fastForward(9000);
-  await expect(admin).toBeVisible();
-
-  await showcase.getByRole("button", { name: "Pause slideshow" }).focus();
-  await page.clock.fastForward(9000);
-  await expect(admin).toBeVisible();
-  await showcase.getByRole("button", { name: "Next view" }).click();
-  await expect(desktop).toBeVisible();
-  await expect(
-    showcase.getByRole("button", { name: "Resume slideshow" }),
-  ).toBeVisible();
-
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.reload();
-  await expect(desktop).toBeVisible();
-  await expect(
-    showcase.getByRole("button", { name: /slideshow/u }),
-  ).toBeHidden();
-  await page.clock.fastForward(27000);
-  await expect(desktop).toBeVisible();
-  await expect(admin).toBeHidden();
-  await showcase.getByRole("button", { name: "Next view" }).click();
-  await expect(admin).toBeVisible();
+  if (!baseURL) throw new Error("The preview URL is required.");
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    baseURL,
+  });
+  const fallback = await context.newPage();
+  await fallback.goto("/");
+  await expect(fallback.locator(".home-hero [data-mock-preview]")).toHaveCount(
+    2,
+  );
+  await expect(fallback.locator('[data-mock-preview="desktop"]')).toContainText(
+    "18,204 rows deleted",
+  );
+  await expect(fallback.locator('[data-mock-preview="admin"]')).toContainText(
+    "Not granted",
+  );
+  await context.close();
 });
 
-test("home page connects sourced incidents, four product pillars, and a staged cleanup", async ({
+test("home page connects sourced incidents with the coherent cleanup mock", async ({
   page,
   request,
 }) => {
@@ -169,42 +149,15 @@ test("home page connects sourced incidents, four product pillars, and a staged c
   await expect(
     page.getByRole("heading", { name: "Glaux is the governed runtime" }),
   ).toBeVisible();
-  const scenario = page.getByRole("region", {
-    name: "“Clean up this old database table.”",
-  });
-  await expect(scenario.getByRole("img")).toHaveCount(2);
-  await expect(
-    scenario.getByText(
-      /production database lives in a separate hosted service/u,
-    ),
-  ).toBeVisible();
-  await expect(
-    scenario.getByText(
-      /finds legacy_sessions_2024, then tells Sam its tools cannot delete data/u,
-    ),
-  ).toBeVisible();
-  await expect(
-    scenario.getByRole("img", {
-      name: /catalog details for the fictitious Acme database/u,
-    }),
-  ).toBeVisible();
-  const replies = scenario.getByRole("img", {
-    name: /Glaux desktop app tells Sam.*legacy_sessions_2024.*cannot delete/u,
-  });
-  await expect(replies).toHaveCount(1);
-  for (const reply of await replies.all()) {
-    await reply.scrollIntoViewIfNeeded();
-    await expect
-      .poll(() =>
-        reply.evaluate(
-          (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
-        ),
-      )
-      .toBe(true);
-  }
-  await expect(scenario).toContainText(
-    "The agent offers help drafting SQL; no write tool is available.",
+  const desktop = page.locator('[data-mock="desktop"]');
+  await expect(desktop).toContainText("18,204 rows deleted");
+  await expect(desktop).toContainText(
+    "drop_table isn't included in this database access. Nothing was changed.",
   );
+  const tower = page.locator('[data-mock="admin"]');
+  await expect(tower).toContainText("Acme production database");
+  await expect(tower).toContainText("Not granted");
+  await expect(page.locator('main img[src^="/product/"]')).toHaveCount(0);
   await expect(
     page.getByRole("link", { name: "Read security details" }),
   ).toHaveAttribute("href", "/security/");
@@ -404,61 +357,34 @@ test("desktop hover crosses into Product and click pins it until explicitly clos
   await expect(trigger).toBeFocused();
 });
 
-test("Product links select every home pane on arrival and same-page hash changes", async ({
+test("Product links select and focus every mock pane from another page and the home page", async ({
   page,
 }) => {
-  await page.goto("/#feature-audit");
-  const guide = page.locator("[data-product-section]");
-  await expect(guide.locator("[data-feature-panel]:visible")).toHaveAttribute(
-    "id",
-    "feature-audit",
-  );
-  await page.goto("/product/");
-  for (const pane of productSection.panes) {
-    const trigger = page.locator(".nav-dropdown__trigger");
-    await trigger.focus();
-    await page.keyboard.press("Enter");
-    const menu = page.getByRole("navigation", {
-      name: "Product sections",
-      exact: true,
-    });
-    await menu
-      .getByRole("link", { name: `${pane.name} ${pane.summary}`, exact: true })
-      .click();
-    await expect(page).toHaveURL(new RegExp(`/#feature-${pane.id}$`, "u"));
-    await expect(menu).toBeHidden();
-    await expect(guide.locator("[data-feature-panel]:visible")).toHaveAttribute(
-      "id",
-      `feature-${pane.id}`,
-    );
-    await expect(
-      guide.locator("[data-feature-panel]:visible"),
-    ).toBeInViewport();
-    await expect(
-      guide
-        .getByRole("navigation", { name: "Glaux product panes" })
-        .getByRole("link", { name: pane.name, exact: true }),
-    ).toHaveAttribute("aria-current", "true");
-  }
-  await guide
-    .getByRole("navigation", { name: "Glaux product panes" })
-    .getByRole("link", { name: "Skills", exact: true })
-    .click();
-  await page.locator(".nav-dropdown__trigger").click();
-  await page
-    .getByRole("navigation", { name: "Product sections", exact: true })
-    .getByRole("link", { name: /^Audit /u })
-    .click();
-  await expect(guide.locator("[data-feature-panel]:visible")).toHaveAttribute(
-    "id",
-    "feature-audit",
-  );
-  for (const label of ["Product", "How it works", "Security"]) {
-    await expect(
-      page
-        .getByRole("navigation", { name: "Footer", exact: true })
-        .getByRole("link", { name: label, exact: true }),
-    ).toBeAttached();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const source of ["/product/", "/"]) {
+    await page.goto(source);
+    for (const pane of productSection.panes) {
+      await page.locator(".nav-dropdown__trigger").click();
+      const menu = page.getByRole("navigation", {
+        name: "Product sections",
+        exact: true,
+      });
+      await menu
+        .getByRole("link", {
+          name: `${pane.name} ${pane.summary}`,
+          exact: true,
+        })
+        .click();
+      await expect(page).toHaveURL(new RegExp(`/#feature-${pane.id}$`, "u"));
+      await expect(menu).toBeHidden();
+      const panel = page.locator(`[data-pane="${pane.id}"]`);
+      await expect(panel).toBeVisible();
+      const region = page.locator(
+        pane.id === "desktop-app" ? "#desktop-view" : "#admin-view",
+      );
+      await expect(region).toBeFocused();
+      await expect(region).toBeInViewport();
+    }
   }
 });
 
@@ -496,9 +422,9 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   await product.getByRole("link", { name: /^Audit /u }).click();
   await expect(page).toHaveURL(/\/#feature-audit$/u);
   await expect(mobileNav).toBeHidden();
-  await expect(page.locator("[data-feature-panel]:visible")).toHaveAttribute(
+  await expect(page.locator('[data-pane="audit"]')).toHaveAttribute(
     "id",
-    "feature-audit",
+    "mock-pane-audit",
   );
   await menu.click();
   await expect(
@@ -514,29 +440,10 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
     mobileNav.getByRole("link", { name: "Book a demo", exact: true }),
   ).toHaveCount(1);
   await menu.click();
-  await page.locator("[data-feature-detail] .feature-capture").last().focus();
-  for (const name of ["Cleanup scenario agent reply"]) {
-    const replyCapture = page.getByRole("region", { name, exact: true });
-    await page.keyboard.press("Tab");
-    await expectVisibleFocusOutline(replyCapture);
-    await expect
-      .poll(() =>
-        replyCapture
-          .getByRole("img")
-          .evaluate(
-            (image: HTMLImageElement) =>
-              image.complete && image.naturalWidth > 0,
-          ),
-      )
-      .toBe(true);
-    expect(
-      (await replyCapture.getByRole("img").boundingBox())?.width,
-    ).toBeGreaterThanOrEqual(1000);
-    await page.keyboard.press("ArrowRight");
-    await expect
-      .poll(() => replyCapture.evaluate((element) => element.scrollLeft))
-      .toBeGreaterThan(0);
-  }
+  await page.keyboard.press("Tab");
+  const audit = page.locator("#admin-view");
+  await audit.focus();
+  await expectVisibleFocusOutline(audit);
   await expectNoHorizontalOverflow(page);
 });
 

@@ -1,0 +1,90 @@
+---
+import StepTimeline from "./StepTimeline.astro";
+import { run, cleanupSteps, traces } from "../../lib/content/product-mocks";
+interface Props {
+  preview?: boolean;
+}
+const { preview = false } = Astro.props;
+const cleanupTrace = traces[0];
+---
+
+<article
+  data-pane={preview ? undefined : "desktop-app"}
+  id={preview ? undefined : "mock-pane-desktop-app"}
+>
+  <header class="mock-view-header">
+    <h3>{run.task}</h3><span class="mock-pill">{run.model}</span>
+  </header>
+  <div class="mock-session">
+    <div class="mock-chat">
+      {
+        !preview && (
+          <div class="mock-message" data-at={preview ? undefined : 1500}>
+            <>
+              <small>{cleanupTrace.person}</small>
+              <p>{run.prompt}</p>
+            </>
+          </div>
+        )
+      }
+      <p class="mock-run-label" data-at={preview ? undefined : 1800}>
+        <img src="/brand/glaux-mark.svg" width="18" height="18" alt="" /> Glaux
+        <span data-run-status>Done</span>
+      </p>
+      <StepTimeline steps={cleanupSteps} animated={!preview} />
+      <div class="mock-reply" data-at={preview ? undefined : 4300}>
+        <p>{run.reply}</p>
+      </div>
+    </div>
+    {
+      !preview && (
+        <aside
+          class="mock-run-card"
+          aria-label="This run"
+          data-at={preview ? undefined : 4600}
+        >
+          <>
+            <h4>This run</h4>
+            <dl>
+              <>
+                <dt>Tools used</dt>
+                <dd>{run.database}</dd>
+                <dt>Model</dt>
+                <dd>{run.model}</dd>
+                <dt>Steps</dt>
+                <dd>
+                  {cleanupTrace.steps} ·{" "}
+                  <span class="mock-danger">1 blocked</span>
+                </dd>
+                <dt>Duration</dt>
+                <dd>{cleanupTrace.duration}</dd>
+              </>
+            </dl>
+            <button
+              type="button"
+              class="mock-text-button"
+              data-jump="desktop-app-traces"
+              data-trace={cleanupTrace.id}
+            >
+              Open trace →
+            </button>
+          </>
+        </aside>
+      )
+    }
+  </div>
+  {
+    !preview && (
+      <div class="mock-composer" aria-hidden="true">
+        <>
+          <span class="mock-placeholder">Ask Glaux to do something…</span>
+          <span class="mock-typed">{run.prompt}</span>
+          <span class="mock-send">↑</span>
+        </>
+        <span class="mock-cursor" aria-hidden="true">
+          ➤
+        </span>
+      </div>
+    )
+  }
+</article>

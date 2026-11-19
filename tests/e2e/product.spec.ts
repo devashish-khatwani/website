@@ -30,13 +30,13 @@ test("product overview keeps its metadata, real desktop capture, demo, and secur
     )
     .toBe(true);
   await expect(
-    page.getByRole("main").getByRole("link", { name: "Book a demo" }),
+    page.getByRole("main").getByRole("link", { name: "Book a demo" }).first(),
   ).toHaveAttribute("href", "https://www.glauxagent.com/contact/");
   await expect(
     page.getByRole("link", { name: "Open technical details" }),
   ).toHaveAttribute("href", "/security/");
   await expect(
-    page.getByRole("heading", { name: "Useful work. With you in control." }),
+    page.getByRole("heading", { name: "Give it the work. See every step." }),
   ).toBeVisible();
 });
 

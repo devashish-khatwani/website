@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1120" role="img" aria-labelledby="t d" font-family="Inter, ui-sans-serif, system-ui, sans-serif">
   <title id="t">The path of one AI request through Glaux</title>
-  <desc id="d">An employee asks the Glaux desktop app. Glaux admin console checks identity and policy and issues a signed run envelope. Model calls go through the Glaux AI Gateway with a 30-minute key, approved models and an organization budget. Tool calls go through the Glaux tools gateway, which re-checks every call. Decisions land in the append-only Glaux audit store.</desc>
+  <desc id="d">An employee asks the Glaux desktop app. Glaux Control Tower checks identity and policy and issues a signed run envelope. Model calls go through the Glaux AI Gateway with a 30-minute key, approved models and an organization budget. Tool calls go through the Glaux tools gateway, which re-checks every call. Decisions land in the append-only Glaux audit store.</desc>
   <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#0a0a0a"/></marker></defs>
   <rect width="800" height="1120" fill="#ffffff"/>
   <text x="40" y="60" font-size="30" font-weight="700" fill="#0a0a0a">One request, one governed path</text>
@@ -12,7 +12,7 @@
   <path d="M400 230v46" stroke="#0a0a0a" stroke-width="3" marker-end="url(#a)"/>
   <!-- 2 -->
   <rect x="40" y="286" width="720" height="170" rx="16" fill="#0a0a0a"/>
-  <text x="70" y="334" font-size="25" font-weight="700" fill="#60a5fa" letter-spacing="1">2 · Glaux admin console</text>
+  <text x="70" y="334" font-size="25" font-weight="700" fill="#60a5fa" letter-spacing="1">2 · Glaux Control Tower</text>
   <text x="70" y="368" font-size="26" font-weight="700" fill="#ffffff">Who is this, and what may they do?</text>
   <text x="70" y="400" font-size="20" fill="#e5e5e5">SSO identity, workspace, policy.</text>
   <text x="70" y="430" font-size="20" fill="#e5e5e5">Result: a signed, expiring run envelope.</text>

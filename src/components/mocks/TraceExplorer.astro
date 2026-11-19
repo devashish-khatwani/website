@@ -1,0 +1,84 @@
+---
+import type { Trace } from "../../lib/content/product-mocks";
+import { run } from "../../lib/content/product-mocks";
+import StepTimeline from "./StepTimeline.astro";
+interface Props {
+  id: string;
+  traces: Trace[];
+  admin?: boolean;
+}
+const { id, traces, admin = false } = Astro.props;
+---
+
+<div class="mock-browser mock-traces" data-browser>
+  <div data-detail-list>
+    <div class="mock-table-head mock-trace-row" aria-hidden="true">
+      <span>{admin ? "Person · Task" : "Task"}</span><span>When</span><span
+        class="mock-secondary">Steps</span
+      ><span>Result</span>
+    </div>
+    {
+      traces.map((trace) => (
+        <button
+          type="button"
+          class="mock-trace-row mock-row"
+          data-open={`${id}-${trace.id}`}
+          aria-expanded="false"
+          aria-controls={`${id}-${trace.id}`}
+          data-trace-id={trace.id}
+        >
+          <>
+            <span>
+              {admin && <small>{trace.person}</small>}
+              <strong>{trace.task}</strong>
+            </span>
+            <span class="mock-muted">{trace.when}</span>
+            <span class="mock-secondary">{trace.steps}</span>
+            <span
+              class:list={[
+                "mock-pill",
+                trace.blocked ? "mock-pill--red" : "mock-pill--green",
+              ]}
+            >
+              {trace.blocked ? "1 blocked" : "Completed"}
+            </span>
+          </>
+        </button>
+      ))
+    }
+  </div>
+  {
+    traces.map((trace) => (
+      <section
+        class="mock-detail"
+        id={`${id}-${trace.id}`}
+        data-detail
+        hidden
+        aria-label={`${trace.task} trace`}
+        tabindex="-1"
+      >
+        <div class="mock-trace-heading">
+          <button type="button" class="mock-back" data-close>
+            ← All traces
+          </button>
+          <p class="mock-mono">{trace.id}</p>
+        </div>
+        <h4>{trace.task}</h4>
+        <p class="mock-muted">
+          {trace.when} · {trace.duration} · {run.model}
+        </p>
+        <p class="mock-note">
+          {trace.steps} steps · {trace.blocked ? "1 blocked" : "Completed"}
+          {trace.timeline.length < trace.steps && " · Key steps shown"}
+        </p>
+        <StepTimeline steps={trace.timeline} />
+        {admin && (
+          <p class="mock-note">
+            Prompts and tool data stay with the run. The console shows steps and
+            outcomes.
+          </p>
+        )}
+      </section>
+    ))
+  }
+</div>

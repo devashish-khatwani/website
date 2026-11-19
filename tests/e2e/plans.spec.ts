@@ -106,7 +106,7 @@ test("plans page preserves plan feature vectors and expected features", async ({
       "Business",
       "/plans/plan-business.svg",
       "A central policy control plane governing connected workspaces",
-      "Glaux admin console",
+      "Glaux Control Tower",
     ],
     [
       "Enterprise",

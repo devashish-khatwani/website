@@ -1,6 +1,12 @@
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { assert, expect, test, vi } from "vitest";
 import ProductSection from "../../src/components/ProductSection.astro";
+import {
+  models,
+  traces,
+  automation,
+  connections,
+} from "../../src/lib/content/product-mocks";
 
 vi.mock("../../src/lib/content/product-section", async (importOriginal) => {
   const original =
@@ -8,58 +14,37 @@ vi.mock("../../src/lib/content/product-section", async (importOriginal) => {
       typeof import("../../src/lib/content/product-section")
     >();
   const copy = structuredClone(original.productSection);
-  copy.statement = "A platform statement edited by the copy author.";
-  const feature = copy.panes[0];
-  assert(feature);
-  feature.name = "Edited feature";
-  feature.summary = "An edited feature explanation.";
-  feature.headline = "An edited deep dive.";
-  feature.explanation = ["Edited first line.", "Edited second line."];
-  feature.flow = [
-    "Edited first step",
-    "Edited second step",
-    "Edited third step",
-  ];
-  if (feature.capture) feature.capture.alt = "An edited capture description.";
-  const soon = copy.comingSoon.items[0];
-  assert(soon);
-  soon.name = "Edited future feature";
-  soon.teaser = "An edited future teaser.";
+  assert(copy.panes[1]);
+  assert(copy.comingSoon.items[0]);
+  copy.panes[1].name = "Edited directory name";
+  copy.panes[1].summary = "Edited directory summary";
+  copy.comingSoon.items[0].teaser = "Edited future teaser";
   return { ...original, productSection: copy };
 });
 
-test("renders author edits across the whole feature guide with a complete no-JS fallback", async () => {
+test("server renders complete default examples and uses shared product copy", async () => {
   const container = await AstroContainer.create();
   const html = await container.renderToString(ProductSection);
-  for (const text of [
-    "A platform statement edited by the copy author.",
-    "Edited feature",
-    "An edited feature explanation.",
-    "An edited deep dive.",
-    "Edited first line.",
-    "Edited second line.",
-    "Edited first step",
-    "Edited second step",
-    "Edited third step",
-    "An edited capture description.",
-    "Edited future feature",
-    "An edited future teaser.",
-  ]) {
-    expect(html).toContain(text);
-  }
-  expect(html.match(/data-feature-panel[\s>]/gu)).toHaveLength(7);
-  expect(html.match(/data-feature-detail[\s>]/gu)).toHaveLength(7);
-  const panels = [
-    ...html.matchAll(/<article\b[^>]*data-feature-panel[^>]*>/gu),
-  ];
-  expect(panels).toHaveLength(7);
-  for (const panel of panels)
-    expect(panel[0]).not.toMatch(/\shidden(?:\s|=|>)/u);
-  const soonGroups = [
-    ...html.matchAll(/<ul[^>]*data-coming-soon[^>]*>(.*?)<\/ul>/gsu),
-  ];
-  expect(soonGroups).toHaveLength(2);
-  for (const group of soonGroups) {
-    expect(group[1]).not.toMatch(/<(?:a|button|img)\b/u);
-  }
+  expect(html).toContain("Edited directory name");
+  expect(html).toContain("Edited directory summary");
+  expect(html).toContain("Edited future teaser");
+  expect(html).toContain("18,204 rows deleted");
+  expect(html).toContain("Not granted");
+  expect(html.match(/<nav\b/gu)).toHaveLength(2);
+  expect(html).not.toMatch(
+    /A closer look at the work|Scroll inside the capture|Website product guide/u,
+  );
+});
+
+test("example costs, grants and distinct manual and scheduled runs agree", () => {
+  expect(
+    models.reduce((total, model) => total + Math.round(model.spend * 100), 0),
+  ).toBe(128450);
+  const denied = connections[0].tools
+    .filter((tool) => !tool.allowed)
+    .map((tool) => tool.name);
+  expect(denied).toEqual(["drop_table", "alter_table"]);
+  expect(traces[0].timeline.at(-1)?.blocked).toBe(true);
+  expect(automation.trace.id).not.toBe(traces[0].id);
+  expect(automation.trace.timeline[3]?.outcome).toContain("4,112");
 });

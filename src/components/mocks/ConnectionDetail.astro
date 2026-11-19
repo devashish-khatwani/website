@@ -1,0 +1,46 @@
+---
+import { connections, people } from "../../lib/content/product-mocks";
+interface Props {
+  connection: (typeof connections)[number];
+  preview?: boolean;
+}
+const { connection, preview = false } = Astro.props;
+---
+
+<h4>{connection.name}</h4>
+<p class="mock-note">
+  Granted to {connection.group} · by {people[0].name} · Nov 12
+</p>
+<table class="mock-table mock-tool-table">
+  <thead
+    ><tr><th>Tool</th>{!preview && <th>What it does</th>}<th>Access</th></tr
+    ></thead
+  >
+  <tbody
+    >{
+      connection.tools.map((tool) => (
+        <tr>
+          <th scope="row">
+            <code>{tool.name}</code>
+          </th>
+          {!preview && <td>{tool.description}</td>}
+          <td>
+            <span
+              class:list={["mock-pill", tool.allowed && "mock-pill--green"]}
+            >
+              {tool.allowed ? "Allowed" : "Not granted"}
+            </span>
+          </td>
+        </tr>
+      ))
+    }</tbody
+  >
+</table>
+{
+  !preview && (
+    <p class="mock-note">
+      The coworker only gets the tools on this list. There's no terminal to work
+      around it.
+    </p>
+  )
+}

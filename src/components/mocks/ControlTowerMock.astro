@@ -1,0 +1,468 @@
+---
+import MockFrame from "./MockFrame.astro";
+import TraceExplorer from "./TraceExplorer.astro";
+import ConnectionDetail from "./ConnectionDetail.astro";
+import {
+  adminViews,
+  connections,
+  people,
+  groups,
+  models,
+  skills,
+  ownTraces,
+  teamTraces,
+  workspaceTraces,
+  auditEvents,
+  workspace,
+} from "../../lib/content/product-mocks";
+interface Props {
+  preview?: boolean;
+}
+const { preview = false } = Astro.props;
+const spend = models.reduce((sum, model) => sum + model.spend, 0);
+const names = new Map(adminViews.map((view) => [view.id, view.name]));
+const money = (value: number) =>
+  value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+---
+
+{
+  preview ? (
+    <MockFrame
+      kind="admin"
+      views={adminViews}
+      initial="connected-tools"
+      preview
+    >
+      <article class="mock-preview-tools">
+        <>
+          <header class="mock-view-header">
+            <h3>{names.get("connected-tools")}</h3>
+          </header>
+          <ConnectionDetail connection={connections[0]} preview />
+        </>
+      </article>
+    </MockFrame>
+  ) : (
+    <MockFrame kind="admin" views={adminViews} initial="connected-tools">
+      <article data-pane="people-access" id="mock-pane-people-access" hidden>
+        <header class="mock-view-header">
+          <>
+            <h3>{names.get("people-access")}</h3>
+            <span class="mock-pill">
+              {workspace.organization} · {people.length} people
+            </span>
+          </>
+        </header>
+        <div class="mock-segments" aria-label="Directory view">
+          <>
+            <button
+              type="button"
+              data-directory="people"
+              aria-pressed="true"
+              aria-controls="mock-people"
+            >
+              People
+            </button>
+            <button
+              type="button"
+              data-directory="groups"
+              aria-pressed="false"
+              aria-controls="mock-groups"
+            >
+              Groups
+            </button>
+          </>
+        </div>
+        <div
+          id="mock-people"
+          data-directory-panel="people"
+          class="mock-browser"
+          data-browser
+        >
+          <div data-detail-list>
+            <div class="mock-table-head mock-person-row" aria-hidden="true">
+              <>
+                <span>Name · Email</span>
+                <span>Groups</span>
+                <span>Role</span>
+                <span class="mock-secondary">Last active</span>
+              </>
+            </div>
+            {people.map((person, i) => (
+              <button
+                type="button"
+                class="mock-row mock-person-row"
+                data-open={`person-${i}`}
+                aria-expanded="false"
+                aria-controls={`person-${i}`}
+              >
+                <>
+                  <span>
+                    <>
+                      <strong>{person.name}</strong>
+                      <small>{person.email}</small>
+                    </>
+                  </span>
+                  <span>{person.groups}</span>
+                  <span class="mock-pill">{person.role}</span>
+                  <span class="mock-secondary mock-muted">{person.active}</span>
+                </>
+              </button>
+            ))}
+          </div>
+          {people.map((person, i) => (
+            <section
+              id={`person-${i}`}
+              class="mock-detail mock-person-detail"
+              data-detail
+              hidden
+              tabindex="-1"
+              aria-label={`${person.name} access`}
+            >
+              <>
+                <button type="button" class="mock-back" data-close>
+                  ← Back to people <span aria-hidden="true">×</span>
+                </button>
+                <span class="mock-avatar">
+                  {person.name
+                    .split(" ")
+                    .map((part) => part[0])
+                    .join("")}
+                </span>
+                <h4>{person.name}</h4>
+                <p class="mock-muted">{person.email}</p>
+                <dl>
+                  <>
+                    <dt>Groups</dt>
+                    <dd>{person.groups}</dd>
+                    <dt>Role</dt>
+                    <dd>{person.role}</dd>
+                    <dt>What they can use</dt>
+                    <dd>{person.access}</dd>
+                    <dt>Trace visibility</dt>
+                    <dd>{person.visibility}</dd>
+                  </>
+                </dl>
+              </>
+            </section>
+          ))}
+        </div>
+        <div id="mock-groups" data-directory-panel="groups" hidden>
+          <table class="mock-table">
+            <>
+              <thead>
+                <tr>
+                  <>
+                    <th>Group</th>
+                    <th>Members</th>
+                    <th>Can use</th>
+                  </>
+                </tr>
+              </thead>
+              <tbody>
+                {groups.map((group) => (
+                  <tr>
+                    <>
+                      <th scope="row">{group.name}</th>
+                      <td>{group.members} members</td>
+                      <td>{group.access}</td>
+                    </>
+                  </tr>
+                ))}
+              </tbody>
+            </>
+          </table>
+        </div>
+      </article>
+      <article data-pane="ai-gateway" id="mock-pane-ai-gateway" hidden>
+        <header class="mock-view-header">
+          <>
+            <h3>{names.get("ai-gateway")}</h3>
+            <span class="mock-pill">
+              This month: {money(spend)} of{" "}
+              {money(workspace.monthlyBudget).replace(".00", "")}
+            </span>
+          </>
+        </header>
+        <div
+          class="mock-budget"
+          role="meter"
+          aria-label="Monthly budget used"
+          aria-valuemin="0"
+          aria-valuemax={workspace.monthlyBudget}
+          aria-valuenow={spend}
+          aria-valuetext={`${money(spend)} of ${money(workspace.monthlyBudget)}`}
+        >
+          <span style={`width: ${(spend / workspace.monthlyBudget) * 100}%`} />
+        </div>
+        <table class="mock-table mock-model-table">
+          <>
+            <thead>
+              <tr>
+                <>
+                  <th>Model</th>
+                  <th class="mock-secondary">Provider</th>
+                  <th>Used by</th>
+                  <th>Spend this month</th>
+                  <th>Available</th>
+                </>
+              </tr>
+            </thead>
+            <tbody>
+              {models.map((model) => (
+                <tr>
+                  <>
+                    <th scope="row">{model.name}</th>
+                    <td class="mock-secondary">{model.provider}</td>
+                    <td>{model.groups}</td>
+                    <td class="mock-money">{money(model.spend)}</td>
+                    <td>
+                      <button
+                        type="button"
+                        class="mock-switch"
+                        role="switch"
+                        aria-label={`${model.name} available`}
+                        aria-checked={model.enabled ? "true" : "false"}
+                        data-model-toggle
+                      >
+                        <>
+                          <span class="mock-switch-track" aria-hidden="true" />
+                          <span data-switch-text>
+                            {model.enabled ? "Enabled" : "Off"}
+                          </span>
+                        </>
+                      </button>
+                    </td>
+                  </>
+                </tr>
+              ))}
+            </tbody>
+          </>
+        </table>
+        <p class="mock-note">
+          Model availability for this workspace. Example changes stay in this
+          mock.
+        </p>
+      </article>
+      <article data-pane="skills" id="mock-pane-skills" hidden>
+        <header class="mock-view-header">
+          <>
+            <h3>{names.get("skills")}</h3>
+            <span class="mock-pill">{skills.length} skills</span>
+          </>
+        </header>
+        <div class="mock-browser" data-browser>
+          <div class="mock-card-grid" data-detail-list>
+            {skills.map((skill, i) => (
+              <button
+                type="button"
+                class="mock-card mock-skill"
+                data-open={`skill-${i}`}
+                aria-expanded="false"
+                aria-controls={`skill-${i}`}
+              >
+                <>
+                  <span class="mock-skill-top">
+                    <>
+                      <span aria-hidden="true">▧</span>
+                      <span class="mock-pill">v{skill.version}</span>
+                    </>
+                  </span>
+                  <strong>{skill.name}</strong>
+                  <span>{skill.description}</span>
+                  <small>Used by {skill.group}</small>
+                </>
+              </button>
+            ))}
+          </div>
+          {skills.map((skill, i) => (
+            <section
+              id={`skill-${i}`}
+              class="mock-detail"
+              data-detail
+              hidden
+              tabindex="-1"
+              aria-label={`${skill.name} details`}
+            >
+              <>
+                <button type="button" class="mock-back" data-close>
+                  ← Back to skills
+                </button>
+                <h4>{skill.name}</h4>
+                <p>{skill.description}</p>
+                <dl>
+                  <>
+                    <dt>Live version</dt>
+                    <dd>v{skill.version}</dd>
+                    <dt>What's inside</dt>
+                    <dd>
+                      <ul class="mock-package">
+                        {skill.files.map((file) => (
+                          <li>
+                            <code>{file}</code>
+                          </li>
+                        ))}
+                      </ul>
+                    </dd>
+                    <dt>Version history</dt>
+                    <dd>{skill.history}</dd>
+                    <dt>Groups that can use it</dt>
+                    <dd>{skill.group}</dd>
+                  </>
+                </dl>
+              </>
+            </section>
+          ))}
+        </div>
+      </article>
+      <article data-pane="connected-tools" id="mock-pane-connected-tools">
+        <header class="mock-view-header">
+          <>
+            <h3>{names.get("connected-tools")}</h3>
+            <span class="mock-pill">{connections.length} connections</span>
+          </>
+        </header>
+        <div
+          class="mock-connections mock-browser has-detail"
+          data-browser
+          data-connections
+        >
+          <div class="mock-connection-list" data-detail-list>
+            {connections.map((connection, i) => (
+              <button
+                type="button"
+                class="mock-card"
+                data-open={`connection-${i}`}
+                aria-expanded={i === 0 ? "true" : "false"}
+                aria-controls={`connection-${i}`}
+              >
+                <>
+                  <span class="mock-connection-icon" aria-hidden="true">
+                    {i === 0 ? "▱" : "⌘"}
+                  </span>
+                  <strong>{connection.name}</strong>
+                  <span>{connection.context}</span>
+                  <small>{connection.group}</small>
+                </>
+              </button>
+            ))}
+          </div>
+          {connections.map((connection, i) => (
+            <section
+              id={`connection-${i}`}
+              class="mock-detail"
+              data-detail
+              hidden={i !== 0}
+              tabindex="-1"
+              aria-label={`${connection.name} access`}
+            >
+              <>
+                <button type="button" class="mock-back" data-close>
+                  ← All connections
+                </button>
+                <ConnectionDetail connection={connection} />
+              </>
+            </section>
+          ))}
+        </div>
+      </article>
+      <article data-pane="observability" id="mock-pane-observability" hidden>
+        <header class="mock-view-header">
+          <>
+            <h3>{names.get("observability")}</h3>
+            <span class="mock-pill">{workspace.organization} workspace</span>
+          </>
+        </header>
+        <div class="mock-segments mock-scope" aria-label="Trace scope">
+          <>
+            <button
+              type="button"
+              data-scope="own"
+              aria-pressed="true"
+              aria-controls="scope-own"
+            >
+              My traces
+            </button>
+            <button
+              type="button"
+              data-scope="group"
+              aria-pressed="false"
+              aria-controls="scope-group"
+            >
+              Group: Engineering
+            </button>
+            <button
+              type="button"
+              data-scope="workspace"
+              aria-pressed="false"
+              aria-controls="scope-workspace"
+            >
+              Workspace: Acme
+            </button>
+          </>
+        </div>
+        <p class="mock-note">
+          You see other people's traces only where you've been given access.
+        </p>
+        {[
+          { id: "own", traces: ownTraces },
+          { id: "group", traces: teamTraces },
+          { id: "workspace", traces: workspaceTraces },
+        ].map((scope) => (
+          <div
+            id={`scope-${scope.id}`}
+            data-scope-panel={scope.id}
+            hidden={scope.id !== "own"}
+          >
+            <TraceExplorer
+              id={`admin-trace-${scope.id}`}
+              traces={scope.traces}
+              admin
+            />
+          </div>
+        ))}
+      </article>
+      <article data-pane="audit" id="mock-pane-audit" hidden>
+        <header class="mock-view-header">
+          <>
+            <h3>{names.get("audit")}</h3>
+            <span class="mock-pill">Last 7 days</span>
+          </>
+        </header>
+        <div class="mock-audit-list">
+          {auditEvents.map((event) => (
+            <details
+              name="mock-audit-events"
+              class="mock-audit-event"
+              open={event.id === "evt_31d9a07c"}
+            >
+              <>
+                <summary>
+                  <>
+                    <time>{event.when}</time>
+                    <span>{people[0].name}</span>
+                    <strong>{event.what}</strong>
+                    <span aria-hidden="true">⌄</span>
+                  </>
+                </summary>
+                <div>
+                  <p>
+                    <strong>Who:</strong> {people[0].name} (Admin)
+                  </p>
+                  <p>
+                    <strong>Change:</strong> {event.before} → {event.after}
+                  </p>
+                  {"note" in event && <p>{event.note}</p>}
+                  <p>
+                    <strong>When:</strong> {event.timestamp}
+                  </p>
+                  <p class="mock-mono">{event.id}</p>
+                </div>
+              </>
+            </details>
+          ))}
+        </div>
+      </article>
+    </MockFrame>
+  )
+}

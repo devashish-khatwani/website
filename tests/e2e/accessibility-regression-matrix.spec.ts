@@ -183,7 +183,7 @@ for (const route of routes) {
       });
       await page.goto(route.path);
       expect(await page.content()).not.toMatch(
-        /control\s+tower|hermes|litellm|toolhive|skillhub|laminar|workos/iu,
+        /hermes|litellm|toolhive|skillhub|laminar|workos/iu,
       );
       await expectExactlyOneVisibleH1(page, route.h1);
       await expect(page.getByRole("main")).toBeVisible();
