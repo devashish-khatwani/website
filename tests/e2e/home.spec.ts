@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
+import { productSection } from "../../src/lib/content/product-section";
 import {
   expectNoHorizontalOverflow,
   expectVisibleFocusOutline,
@@ -263,36 +264,161 @@ test("home page preserves shell navigation and focus behavior", async ({
   await expectVisibleFocusOutline(footerProductLink);
 });
 
-test("desktop navigation groups product sections in an accessible dropdown", async ({
+async function expectProductMenu(menu: Locator) {
+  const links = menu.locator(".product-menu__live a");
+  await expect(links).toHaveCount(productSection.panes.length);
+  for (const [index, pane] of productSection.panes.entries()) {
+    await expect(links.nth(index)).toHaveAttribute(
+      "href",
+      `/#feature-${pane.id}`,
+    );
+    await expect(links.nth(index).locator("strong")).toHaveText(pane.name);
+    await expect(links.nth(index).locator("p")).toHaveText(pane.summary);
+  }
+  const soon = menu.getByRole("region", { name: "Coming soon", exact: true });
+  await expect(soon.getByRole("listitem")).toHaveCount(4);
+  await expect(
+    soon.locator("a, button, input, select, textarea, [tabindex]"),
+  ).toHaveCount(0);
+  for (const item of productSection.comingSoon.items) {
+    const row = soon.getByRole("listitem").filter({ hasText: item.name });
+    await expect(row.locator("strong")).toHaveText(item.name);
+    await expect(row.locator("p")).toHaveText(item.teaser);
+    await expect(row.getByText("Soon", { exact: true })).toBeVisible();
+  }
+  await expect(
+    menu.getByRole("link", { name: "Book a demo", exact: true }),
+  ).toHaveAttribute("href", "/contact/");
+}
+
+test("desktop Product supports click, keyboard, Escape and outside dismissal", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
-
-  const primaryNavigation = page.getByRole("navigation", { name: "Primary" });
-  const productTrigger = primaryNavigation.locator("summary", {
-    hasText: "Product",
-  });
-  const productSections = page.getByRole("navigation", {
+  const trigger = page.locator(".nav-dropdown__trigger");
+  const menu = page.getByRole("navigation", {
     name: "Product sections",
+    exact: true,
   });
-
-  await expect(productSections).toBeHidden();
-  await productTrigger.click();
-  await expect(productSections).toBeVisible();
-  await expect(productSections.getByRole("link")).toHaveCount(3);
-  await expect(
-    productSections.getByRole("link", { name: /Product overview/u }),
-  ).toHaveAttribute("href", "/product/");
-  await expect(
-    productSections.getByRole("link", { name: /How it works/u }),
-  ).toHaveAttribute("href", "/how-it-works/");
-  await expect(
-    productSections.getByRole("link", { name: /Security/u }),
-  ).toHaveAttribute("href", "/security/");
-
+  await expect(menu).toBeHidden();
+  await expect(trigger).toHaveAttribute(
+    "aria-controls",
+    "desktop-product-menu",
+  );
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await trigger.click();
+  await expect(menu).toBeVisible();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expectProductMenu(menu);
+  await expectNoHorizontalOverflow(page);
   await page.keyboard.press("Escape");
-  await expect(productSections).toBeHidden();
-  await expect(productTrigger).toBeFocused();
+  await expect(menu).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press("Enter");
+  const links = menu.getByRole("link");
+  for (const link of await links.all()) {
+    await page.keyboard.press("Tab");
+    await expectVisibleFocusOutline(link);
+  }
+  await page.keyboard.press("Escape");
+  await expect(menu).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(menu).toBeVisible();
+  await page.mouse.click(20, 800);
+  await expect(menu).toBeHidden();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+});
+
+test("desktop hover crosses into Product and click pins it until explicitly closed", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/");
+  const trigger = page.locator(".nav-dropdown__trigger");
+  const menu = page.getByRole("navigation", {
+    name: "Product sections",
+    exact: true,
+  });
+  await trigger.hover();
+  await expect(menu).toBeVisible();
+  await menu.getByRole("link").first().hover();
+  await expect(menu).toBeVisible();
+  await page.mouse.move(0, 600);
+  await expect(menu).toBeHidden();
+  await trigger.hover();
+  await trigger.click();
+  await page.mouse.move(0, 600);
+  await expect(menu).toBeVisible();
+  await trigger.click();
+  await expect(menu).toBeHidden();
+  await page.keyboard.press("Enter");
+  await expect(menu).toBeVisible();
+  await page.keyboard.press("Tab");
+  await page.mouse.move(0, 600);
+  await expect(menu).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(menu).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test("Product links select every home pane on arrival and same-page hash changes", async ({
+  page,
+}) => {
+  await page.goto("/#feature-audit");
+  const guide = page.locator("[data-product-section]");
+  await expect(guide.locator("[data-feature-panel]:visible")).toHaveAttribute(
+    "id",
+    "feature-audit",
+  );
+  await page.goto("/product/");
+  for (const pane of productSection.panes) {
+    const trigger = page.locator(".nav-dropdown__trigger");
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+    const menu = page.getByRole("navigation", {
+      name: "Product sections",
+      exact: true,
+    });
+    await menu
+      .getByRole("link", { name: `${pane.name} ${pane.summary}`, exact: true })
+      .click();
+    await expect(page).toHaveURL(new RegExp(`/#feature-${pane.id}$`, "u"));
+    await expect(menu).toBeHidden();
+    await expect(guide.locator("[data-feature-panel]:visible")).toHaveAttribute(
+      "id",
+      `feature-${pane.id}`,
+    );
+    await expect(
+      guide.locator("[data-feature-panel]:visible"),
+    ).toBeInViewport();
+    await expect(
+      guide
+        .getByRole("navigation", { name: "Glaux product panes" })
+        .getByRole("link", { name: pane.name, exact: true }),
+    ).toHaveAttribute("aria-current", "true");
+  }
+  await guide
+    .getByRole("navigation", { name: "Glaux product panes" })
+    .getByRole("link", { name: "Skills", exact: true })
+    .click();
+  await page.locator(".nav-dropdown__trigger").click();
+  await page
+    .getByRole("navigation", { name: "Product sections", exact: true })
+    .getByRole("link", { name: /^Audit /u })
+    .click();
+  await expect(guide.locator("[data-feature-panel]:visible")).toHaveAttribute(
+    "id",
+    "feature-audit",
+  );
+  for (const label of ["Product", "How it works", "Security"]) {
+    await expect(
+      page
+        .getByRole("navigation", { name: "Footer", exact: true })
+        .getByRole("link", { name: label, exact: true }),
+    ).toBeAttached();
+  }
 });
 
 test("home page stays within viewport across responsive widths", async ({
@@ -319,17 +445,23 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   await expect(page.getByRole("navigation", { name: "Primary" })).toBeHidden();
   await menu.click();
   const mobileNav = page.getByRole("navigation", { name: "Mobile primary" });
+  const product = mobileNav.locator(".mobile-product");
+  const productTrigger = product.locator("summary");
+  await expect(product.locator(".product-menu")).toBeHidden();
+  await productTrigger.focus();
+  await page.keyboard.press("Enter");
+  await expectProductMenu(product);
+  await expectNoHorizontalOverflow(page);
+  await product.getByRole("link", { name: /^Audit /u }).click();
+  await expect(page).toHaveURL(/\/#feature-audit$/u);
+  await expect(mobileNav).toBeHidden();
+  await expect(page.locator("[data-feature-panel]:visible")).toHaveAttribute(
+    "id",
+    "feature-audit",
+  );
+  await menu.click();
   await expect(
-    mobileNav.getByRole("link", { name: "Product overview" }),
-  ).toHaveAttribute("href", "/product/");
-  await expect(
-    mobileNav.getByRole("link", { name: "How it works" }),
-  ).toHaveAttribute("href", "/how-it-works/");
-  await expect(
-    mobileNav.getByRole("link", { name: "Security" }),
-  ).toHaveAttribute("href", "/security/");
-  await expect(
-    mobileNav.getByRole("link", { name: "Company" }),
+    mobileNav.getByRole("link", { name: "Company", exact: true }),
   ).toHaveAttribute("href", "/company/");
   await expect(
     mobileNav.getByRole("link", { name: "Sign in" }),
@@ -337,6 +469,9 @@ test("mobile home page exposes navigation without horizontal overflow", async ({
   await expect(
     mobileNav.getByRole("link", { name: "Book a demo" }),
   ).toHaveAttribute("href", "/contact/");
+  await expect(
+    mobileNav.getByRole("link", { name: "Book a demo", exact: true }),
+  ).toHaveCount(1);
   await menu.click();
   await page.locator("[data-feature-detail] .feature-capture").last().focus();
   for (const name of ["Cleanup scenario agent reply"]) {

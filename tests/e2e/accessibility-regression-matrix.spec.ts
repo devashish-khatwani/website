@@ -1,6 +1,7 @@
 import { expect, test, type ConsoleMessage, type Page } from "@playwright/test";
 import { expectVisibleFocusOutline } from "./assertions";
 import { blogPosts } from "./blog-posts";
+import { productSection } from "../../src/lib/content/product-section";
 
 const routes = [
   { path: "/", h1: "Your agent shouldn't reach production unless you say so." },
@@ -32,11 +33,10 @@ const hubSpotScriptUrl = "https://js.hsforms.net/forms/embed/v2.js";
 const productionContactUrl = `http://www.glauxagent.com:${
   process.env.GLAUX_PAGES_PORT ?? "8788"
 }/contact/`;
-const productLinks = [
-  { name: "Product overview", href: "/product/" },
-  { name: "How it works", href: "/how-it-works/" },
-  { name: "Security", href: "/security/" },
-] as const;
+const productLinks = productSection.panes.map((pane) => ({
+  name: `${pane.name} ${pane.summary}`,
+  href: `/#feature-${pane.id}`,
+}));
 const primaryLinks = [
   { name: "Install", href: "/install/" },
   { name: "Plans", href: "/plans/" },
@@ -100,15 +100,23 @@ async function expectNavigationForViewport(
     const mobileNavigation = page.getByRole("navigation", {
       name: "Mobile primary",
     });
+    const productSummary = mobileNavigation.locator(
+      ".mobile-product > summary",
+    );
+    await page.keyboard.press("Tab");
+    await expectVisibleFocusOutline(productSummary);
+    await page.keyboard.press("Enter");
     for (const link of [...productLinks, ...primaryLinks]) {
       await expect(
-        mobileNavigation.getByRole("link", { name: link.name }),
+        mobileNavigation.getByRole("link", { name: link.name, exact: true }),
       ).toHaveAttribute("href", link.href);
     }
     await page.keyboard.press("Tab");
     await expect(
-      mobileNavigation.getByRole("link", { name: "Product overview" }),
+      mobileNavigation.locator(".product-menu__live a").first(),
     ).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(productSummary).toBeFocused();
     await page.keyboard.press("Shift+Tab");
     await expect(summary).toBeFocused();
     await page.keyboard.press("Enter");
@@ -131,24 +139,24 @@ async function expectNavigationForViewport(
   });
   for (const link of productLinks) {
     await expect(
-      productNavigation.getByRole("link", { name: link.name }),
+      productNavigation.getByRole("link", { name: link.name, exact: true }),
     ).toHaveAttribute("href", link.href);
   }
   for (const link of primaryLinks) {
     await expect(
-      primaryNavigation.getByRole("link", { name: link.name }),
+      primaryNavigation.getByRole("link", { name: link.name, exact: true }),
     ).toHaveAttribute("href", link.href);
   }
   await expect(
     primaryNavigation.getByRole("link", { name: "Sign in" }),
   ).toHaveAttribute("href", "https://app.glauxagent.com/login");
 
-  const demoLink = primaryNavigation.getByRole("link", { name: "Book a demo" });
+  const demoLink = primaryNavigation
+    .locator(".site-nav__actions")
+    .getByRole("link", { name: "Book a demo" });
   await expect(demoLink).toHaveAttribute("href", "/contact/");
   await demoLink.focus();
   await expectVisibleFocusOutline(demoLink);
-  await productSummary.focus();
-  await page.keyboard.press("Enter");
   await expect(productDetails).not.toHaveAttribute("open", "");
 }
 

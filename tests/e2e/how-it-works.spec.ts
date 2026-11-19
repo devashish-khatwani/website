@@ -66,29 +66,18 @@ test("how it works keeps preview capabilities labeled and public copy claim-safe
   ).toHaveCount(0);
 });
 
-test("how it works is active in desktop and mobile navigation", async ({
+test("how it works stays reachable in the footer across desktop and mobile", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("/how-it-works/");
-
-  const desktopNavigation = page.getByRole("navigation", { name: "Primary" });
-  await desktopNavigation.locator("summary", { hasText: "Product" }).click();
-  await expect(
-    page
-      .getByRole("navigation", { name: "Product sections" })
-      .getByRole("link", { name: /How it works/u }),
-  ).toHaveAttribute("aria-current", "page");
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.reload();
-
-  await page.getByLabel("Open navigation").click();
-  await expect(
-    page
-      .getByRole("navigation", { name: "Mobile primary" })
-      .getByRole("link", { name: "How it works" }),
-  ).toHaveAttribute("aria-current", "page");
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/how-it-works/");
+    await expect(
+      page
+        .getByRole("navigation", { name: "Footer", exact: true })
+        .getByRole("link", { name: "How it works", exact: true }),
+    ).toHaveAttribute("href", "/how-it-works/");
+  }
 });
 
 for (const viewport of [

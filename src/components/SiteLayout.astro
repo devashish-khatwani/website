@@ -2,11 +2,11 @@
 import "../styles/global.css";
 import BrandLogo from "./BrandLogo.astro";
 import Button from "./Button.astro";
+import ProductMenu from "./ProductMenu.astro";
 import {
   buildAppLoginUrl,
   footerNavigation,
   primaryNavigation,
-  productNavigation,
 } from "../lib/site";
 
 interface Props {
@@ -35,9 +35,7 @@ const {
 } = Astro.props;
 const signInUrl = buildAppLoginUrl();
 const currentPath = Astro.url.pathname;
-const isProductSection = productNavigation.some(
-  (item) => item.href === currentPath,
-);
+const isProductSection = currentPath === "/product/";
 ---
 
 <!doctype html>
@@ -82,6 +80,8 @@ const isProductSection = productNavigation.some(
                   "nav-dropdown__trigger",
                   { "nav-dropdown__trigger--active": isProductSection },
                 ]}
+                aria-expanded="false"
+                aria-controls="desktop-product-menu"
               >
                 Product
                 <svg
@@ -93,37 +93,12 @@ const isProductSection = productNavigation.some(
                   <path d="M1 1.5 6 6.5l5-5"></path>
                 </svg>
               </summary>
-              <div class="nav-dropdown__panel">
+              <div class="nav-dropdown__panel" id="desktop-product-menu">
                 <nav
                   class="nav-dropdown__content"
                   aria-label="Product sections"
                 >
-                  <a
-                    class="nav-dropdown__featured"
-                    href={productNavigation[0].href}
-                    aria-current={currentPath === productNavigation[0].href
-                      ? "page"
-                      : undefined}
-                  >
-                    <strong>{productNavigation[0].label}</strong>
-                    <p>{productNavigation[0].description}</p>
-                    <span>Explore product</span>
-                  </a>
-                  <div class="nav-dropdown__links">
-                    {
-                      productNavigation.slice(1).map((item) => (
-                        <a
-                          href={item.href}
-                          aria-current={
-                            currentPath === item.href ? "page" : undefined
-                          }
-                        >
-                          <strong>{item.label}</strong>
-                          <p>{item.description}</p>
-                        </a>
-                      ))
-                    }
-                  </div>
+                  <ProductMenu />
                 </nav>
               </div>
             </details>
@@ -150,22 +125,16 @@ const isProductSection = productNavigation.some(
             Menu
           </summary>
           <nav class="mobile-nav__panel" aria-label="Mobile primary">
-            <div class="mobile-nav__section">
-              <span class="mobile-nav__label">Product</span>
-              {
-                productNavigation.map((item) => (
-                  <a
-                    class="site-nav__link"
-                    href={item.href}
-                    aria-current={
-                      currentPath === item.href ? "page" : undefined
-                    }
-                  >
-                    {item.label}
-                  </a>
-                ))
-              }
-            </div>
+            <details class="mobile-product">
+              <summary
+                class="site-nav__link"
+                aria-expanded="false"
+                aria-controls="mobile-product-menu">Product</summary
+              >
+              <div id="mobile-product-menu">
+                <ProductMenu />
+              </div>
+            </details>
             {
               primaryNavigation.map((item) => (
                 <a
@@ -178,7 +147,6 @@ const isProductSection = productNavigation.some(
               ))
             }
             <a class="site-nav__link" href={signInUrl}>Sign in</a>
-            <Button href="/contact/" variant="primary">Book a demo</Button>
           </nav>
         </details>
       </header>
@@ -207,27 +175,113 @@ const isProductSection = productNavigation.some(
     </div>
 
     <script>
-      const navigationDropdowns = document.querySelectorAll<HTMLDetailsElement>(
+      for (const dropdown of document.querySelectorAll<HTMLDetailsElement>(
         "[data-nav-dropdown]",
-      );
-
-      for (const dropdown of navigationDropdowns) {
+      )) {
         const trigger = dropdown.querySelector<HTMLElement>("summary");
+        let hoverOpened = false;
+        let pinned = false;
+        let closeTimer: ReturnType<typeof setTimeout>;
+        const setOpen = (open: boolean) => {
+          clearTimeout(closeTimer);
+          dropdown.open = open;
+          trigger?.setAttribute("aria-expanded", String(open));
+          if (!open) {
+            pinned = false;
+            hoverOpened = false;
+          }
+        };
 
-        document.addEventListener("click", (event) => {
-          if (dropdown.open && !dropdown.contains(event.target as Node)) {
-            dropdown.open = false;
+        dropdown.addEventListener("pointerenter", () => {
+          clearTimeout(closeTimer);
+          if (
+            window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+            !dropdown.open
+          ) {
+            hoverOpened = true;
+            setOpen(true);
           }
         });
-
-        dropdown.addEventListener("keydown", (event) => {
+        dropdown.addEventListener("pointerleave", () => {
+          closeTimer = setTimeout(() => {
+            if (!pinned && !dropdown.contains(document.activeElement))
+              setOpen(false);
+          }, 180);
+        });
+        trigger?.addEventListener("click", (event) => {
+          event.preventDefault();
+          if (hoverOpened && event.detail > 0) {
+            hoverOpened = false;
+            pinned = true;
+          } else {
+            setOpen(!dropdown.open);
+            pinned = dropdown.open;
+          }
+        });
+        dropdown.addEventListener("toggle", () => {
+          trigger?.setAttribute("aria-expanded", String(dropdown.open));
+        });
+        dropdown.addEventListener("focusout", () => {
+          requestAnimationFrame(() => {
+            if (
+              !dropdown.contains(document.activeElement) &&
+              !dropdown.matches(":hover")
+            )
+              setOpen(false);
+          });
+        });
+        document.addEventListener("click", (event) => {
+          if (!dropdown.contains(event.target as Node)) setOpen(false);
+        });
+        document.addEventListener("keydown", (event) => {
           if (event.key === "Escape" && dropdown.open) {
             event.preventDefault();
-            dropdown.open = false;
+            setOpen(false);
             trigger?.focus();
           }
         });
+        dropdown.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", (event) => {
+            if (
+              !event.metaKey &&
+              !event.ctrlKey &&
+              !event.shiftKey &&
+              !event.altKey
+            )
+              setOpen(false);
+          });
+        });
       }
+
+      const mobileNavigation =
+        document.querySelector<HTMLDetailsElement>(".mobile-nav");
+      const mobileProduct =
+        document.querySelector<HTMLDetailsElement>(".mobile-product");
+      mobileProduct?.addEventListener("toggle", () => {
+        mobileProduct
+          .querySelector("summary")
+          ?.setAttribute("aria-expanded", String(mobileProduct.open));
+      });
+      mobileNavigation?.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          if (
+            !event.metaKey &&
+            !event.ctrlKey &&
+            !event.shiftKey &&
+            !event.altKey
+          )
+            mobileNavigation.open = false;
+        });
+      });
+      mobileNavigation?.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          const disclosure = mobileProduct?.open
+            ? mobileProduct
+            : mobileNavigation;
+          disclosure.open = false;
+          disclosure.querySelector<HTMLElement>("summary")?.focus();
+        }
+      });
     </script>
   </body>
 </html>

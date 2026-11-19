@@ -15,13 +15,16 @@ import {
 
 describe("site shell navigation contract", () => {
   it("keeps the primary navigation to the approved launch items", () => {
-    expect(productNavigation).toEqual([
-      expect.objectContaining({ label: "Product overview", href: "/product/" }),
-      expect.objectContaining({
-        label: "How it works",
-        href: "/how-it-works/",
-      }),
-      expect.objectContaining({ label: "Security", href: "/security/" }),
+    expect(
+      productNavigation.map(({ label, href }) => ({ label, href })),
+    ).toEqual([
+      { label: "Glaux desktop app", href: "/#feature-desktop-app" },
+      { label: "People and Access", href: "/#feature-people-access" },
+      { label: "AI Gateway", href: "/#feature-ai-gateway" },
+      { label: "Skills", href: "/#feature-skills" },
+      { label: "Connected Tools", href: "/#feature-connected-tools" },
+      { label: "Observability", href: "/#feature-observability" },
+      { label: "Audit", href: "/#feature-audit" },
     ]);
     expect(primaryNavigation).toEqual([
       { label: "Install", href: "/install/" },

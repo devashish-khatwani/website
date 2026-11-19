@@ -213,6 +213,7 @@ import { productSection as copy } from "../lib/content/product-section";
         const selected = select(link.hash.slice(1));
         if (!selected) return;
         event.preventDefault();
+        history.replaceState(history.state, "", link.hash);
         selected.focus({ preventScroll: true });
         selected.scrollIntoView({ block: "nearest", behavior: "instant" });
       });

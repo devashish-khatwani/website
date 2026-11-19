@@ -1,0 +1,40 @@
+---
+import { productNavigation } from "../lib/site";
+import { productSection } from "../lib/content/product-section";
+
+const { comingSoon } = productSection;
+---
+
+<div class="product-menu">
+  <ul class="product-menu__live">
+    {
+      productNavigation.map((item) => (
+        <li>
+          <a class="product-menu__entry" href={item.href}>
+            <strong>{item.label}</strong>
+            <p>{item.description}</p>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <section class="product-menu__soon" aria-label={comingSoon.heading}>
+    <p class="product-menu__label">{comingSoon.heading}</p>
+    <ul>
+      {
+        comingSoon.items.map((item) => (
+          <li class="product-menu__entry">
+            <div class="product-menu__name">
+              <strong>{item.name}</strong>
+              <span class="product-menu__tag">{comingSoon.tag}</span>
+            </div>
+            <p>{item.teaser}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+  <div class="product-menu__footer">
+    <a class="site-nav__link" href="/contact/">Book a demo</a>
+  </div>
+</div>

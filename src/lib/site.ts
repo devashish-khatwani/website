@@ -1,3 +1,4 @@
+import { productSection } from "./content/product-section.ts";
 import type { PageMetadata } from "./content/schemas.ts";
 
 type SiteEnvironment = Readonly<Record<string, string | undefined>>;
@@ -8,24 +9,11 @@ const productionBranch = "main";
 
 export const publishedRoutes = ["/blog/"] as const;
 
-export const productNavigation = [
-  {
-    label: "Product overview",
-    href: "/product/",
-    description: "What employees and administrators can do with Glaux.",
-  },
-  {
-    label: "How it works",
-    href: "/how-it-works/",
-    description:
-      "Follow a request from approved context to a reviewable result.",
-  },
-  {
-    label: "Security",
-    href: "/security/",
-    description: "See how rules, access, approvals, and activity stay visible.",
-  },
-] as const;
+export const productNavigation = productSection.panes.map((pane) => ({
+  label: pane.name,
+  href: `/#feature-${pane.id}`,
+  description: pane.summary,
+}));
 
 export const primaryNavigation = [
   { label: "Install", href: "/install/" },
