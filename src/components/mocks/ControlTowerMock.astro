@@ -1,4 +1,5 @@
 ---
+import MockIcon from "./MockIcon.astro";
 import MockFrame from "./MockFrame.astro";
 import TraceExplorer from "./TraceExplorer.astro";
 import ConnectionDetail from "./ConnectionDetail.astro";
@@ -14,6 +15,7 @@ import {
   workspaceTraces,
   auditEvents,
   workspace,
+  accessExample,
 } from "../../lib/content/product-mocks";
 interface Props {
   preview?: boolean;
@@ -36,7 +38,18 @@ const money = (value: number) =>
       <article class="mock-preview-tools">
         <>
           <header class="mock-view-header">
-            <h3>{names.get("connected-tools")}</h3>
+            <div class="mock-heading-copy">
+              <>
+                <p class="mock-context">{workspace.organization} workspace</p>
+                <h3>{names.get("connected-tools")}</h3>
+                <p class="mock-description">
+                  {
+                    adminViews.find((view) => view.id === "connected-tools")
+                      ?.description
+                  }
+                </p>
+              </>
+            </div>
           </header>
           <ConnectionDetail connection={connections[0]} preview />
         </>
@@ -47,7 +60,18 @@ const money = (value: number) =>
       <article data-pane="people-access" id="mock-pane-people-access" hidden>
         <header class="mock-view-header">
           <>
-            <h3>{names.get("people-access")}</h3>
+            <div class="mock-heading-copy">
+              <>
+                <p class="mock-context">{workspace.organization} workspace</p>
+                <h3>{names.get("people-access")}</h3>
+                <p class="mock-description">
+                  {
+                    adminViews.find((view) => view.id === "people-access")
+                      ?.description
+                  }
+                </p>
+              </>
+            </div>
             <span class="mock-pill">
               {workspace.organization} · {people.length} people
             </span>
@@ -97,11 +121,17 @@ const money = (value: number) =>
                 aria-controls={`person-${i}`}
               >
                 <>
-                  <span>
-                    <>
+                  <span class="mock-identity">
+                    <span class="mock-avatar" aria-hidden="true">
+                      {person.name
+                        .split(" ")
+                        .map((part) => part[0])
+                        .join("")}
+                    </span>
+                    <span>
                       <strong>{person.name}</strong>
                       <small>{person.email}</small>
-                    </>
+                    </span>
                   </span>
                   <span>{person.groups}</span>
                   <span class="mock-pill">{person.role}</span>
@@ -148,7 +178,7 @@ const money = (value: number) =>
           ))}
         </div>
         <div id="mock-groups" data-directory-panel="groups" hidden>
-          <table class="mock-table">
+          <table class="mock-table mock-groups-table">
             <>
               <thead>
                 <tr>
@@ -164,7 +194,10 @@ const money = (value: number) =>
                   <tr>
                     <>
                       <th scope="row">{group.name}</th>
-                      <td>{group.members} members</td>
+                      <td>
+                        {group.members}{" "}
+                        {group.members === 1 ? "member" : "members"}
+                      </td>
                       <td>{group.access}</td>
                     </>
                   </tr>
@@ -177,23 +210,52 @@ const money = (value: number) =>
       <article data-pane="ai-gateway" id="mock-pane-ai-gateway" hidden>
         <header class="mock-view-header">
           <>
-            <h3>{names.get("ai-gateway")}</h3>
+            <div class="mock-heading-copy">
+              <>
+                <p class="mock-context">{workspace.organization} workspace</p>
+                <h3>{names.get("ai-gateway")}</h3>
+                <p class="mock-description">
+                  {
+                    adminViews.find((view) => view.id === "ai-gateway")
+                      ?.description
+                  }
+                </p>
+              </>
+            </div>
             <span class="mock-pill">
               This month: {money(spend)} of{" "}
               {money(workspace.monthlyBudget).replace(".00", "")}
             </span>
           </>
         </header>
-        <div
-          class="mock-budget"
-          role="meter"
-          aria-label="Monthly budget used"
-          aria-valuemin="0"
-          aria-valuemax={workspace.monthlyBudget}
-          aria-valuenow={spend}
-          aria-valuetext={`${money(spend)} of ${money(workspace.monthlyBudget)}`}
-        >
-          <span style={`width: ${(spend / workspace.monthlyBudget) * 100}%`} />
+        <div class="mock-summary-grid">
+          <div class="mock-card">
+            <>
+              <span class="mock-muted">Spend limits</span>
+              <strong>
+                {money(spend)} <small>used this month</small>
+              </strong>
+              <span class="mock-note">
+                of {money(workspace.monthlyBudget)} workspace limit
+              </span>
+            </>
+          </div>
+          <div class="mock-card">
+            <>
+              <span class="mock-muted">Gateway usage</span>
+              <strong>
+                {
+                  new Set(
+                    models
+                      .filter((model) => model.enabled)
+                      .map((model) => model.provider),
+                  ).size
+                }{" "}
+                <small>providers connected</small>
+              </strong>
+              <span class="mock-note">Workspace model availability</span>
+            </>
+          </div>
         </div>
         <table class="mock-table mock-model-table">
           <>
@@ -247,12 +309,20 @@ const money = (value: number) =>
       <article data-pane="skills" id="mock-pane-skills" hidden>
         <header class="mock-view-header">
           <>
-            <h3>{names.get("skills")}</h3>
+            <div class="mock-heading-copy">
+              <>
+                <p class="mock-context">{workspace.organization} workspace</p>
+                <h3>{names.get("skills")}</h3>
+                <p class="mock-description">
+                  {adminViews.find((view) => view.id === "skills")?.description}
+                </p>
+              </>
+            </div>
             <span class="mock-pill">{skills.length} skills</span>
           </>
         </header>
         <div class="mock-browser" data-browser>
-          <div class="mock-card-grid" data-detail-list>
+          <div class="mock-card-grid mock-catalog" data-detail-list>
             {skills.map((skill, i) => (
               <button
                 type="button"
@@ -264,13 +334,18 @@ const money = (value: number) =>
                 <>
                   <span class="mock-skill-top">
                     <>
-                      <span aria-hidden="true">▧</span>
+                      <span class="mock-icon-tile">
+                        <MockIcon name="skills" />
+                      </span>
                       <span class="mock-pill">v{skill.version}</span>
                     </>
                   </span>
                   <strong>{skill.name}</strong>
                   <span>{skill.description}</span>
-                  <small>Used by {skill.group}</small>
+                  <small>
+                    <span class="mock-catalog-status">Published</span> · @
+                    {workspace.organization.toLowerCase()} · {skill.group}
+                  </small>
                 </>
               </button>
             ))}
@@ -318,10 +393,48 @@ const money = (value: number) =>
       <article data-pane="connected-tools" id="mock-pane-connected-tools">
         <header class="mock-view-header">
           <>
-            <h3>{names.get("connected-tools")}</h3>
+            <div class="mock-heading-copy">
+              <>
+                <p class="mock-context">{workspace.organization} workspace</p>
+                <h3>{names.get("connected-tools")}</h3>
+                <p class="mock-description">
+                  {
+                    adminViews.find((view) => view.id === "connected-tools")
+                      ?.description
+                  }
+                </p>
+              </>
+            </div>
             <span class="mock-pill">{connections.length} connections</span>
           </>
         </header>
+        <div class="mock-tool-access-note">
+          <>
+            <MockIcon name="connected-tools" />
+            <p>
+              <>
+                <strong>Tool access</strong>
+                <span>{accessExample.note}</span>
+              </>
+            </p>
+          </>
+        </div>
+        <div class="mock-toolbar">
+          <>
+            <span class="mock-pill mock-pill--green">
+              {accessExample.revision}
+            </span>
+            <button
+              type="button"
+              class="mock-primary-button"
+              data-open-access
+              aria-expanded="false"
+              aria-controls="mock-access-drawer"
+            >
+              Manage access
+            </button>
+          </>
+        </div>
         <div
           class="mock-connections mock-browser has-detail"
           data-browser
@@ -338,7 +451,7 @@ const money = (value: number) =>
               >
                 <>
                   <span class="mock-connection-icon" aria-hidden="true">
-                    {i === 0 ? "▱" : "⌘"}
+                    <MockIcon name={i === 0 ? "database" : "connected-tools"} />
                   </span>
                   <strong>{connection.name}</strong>
                   <span>{connection.context}</span>
@@ -365,11 +478,90 @@ const money = (value: number) =>
             </section>
           ))}
         </div>
+        <section
+          class="mock-access-drawer"
+          id="mock-access-drawer"
+          hidden
+          tabindex="-1"
+          aria-label="Engineering tool access"
+        >
+          <button type="button" class="mock-back" data-close-access>
+            ← Back to connections <span aria-hidden="true">×</span>
+          </button>
+          <>
+            <p class="mock-context">Connected Tools</p>
+            <h4>{accessExample.title}</h4>
+            <p class="mock-note">{accessExample.check}</p>
+          </>
+          <dl class="mock-meta-grid">
+            <>
+              <div>
+                <>
+                  <dt>User or group</dt>
+                  <dd>{accessExample.subject}</dd>
+                </>
+              </div>
+              <div>
+                <>
+                  <dt>Permission</dt>
+                  <dd>{accessExample.permission}</dd>
+                </>
+              </div>
+              <div>
+                <>
+                  <dt>Connection</dt>
+                  <dd>{connections[0].name}</dd>
+                </>
+              </div>
+              <div>
+                <>
+                  <dt>Granted by</dt>
+                  <dd>
+                    {people[0].name} · {accessExample.grantedOn}
+                  </dd>
+                </>
+              </div>
+            </>
+          </dl>
+          <p class="mock-context">Current grant</p>
+          <ul class="mock-tool-list">
+            {connections[0].tools.map((tool) => (
+              <li>
+                <code>{tool.name}</code>
+                <span
+                  class:list={["mock-pill", tool.allowed && "mock-pill--green"]}
+                >
+                  {tool.allowed ? "Allowed" : "Not granted"}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div class="mock-access-reason">
+            <>
+              <strong>Reason</strong>
+              <p>{accessExample.reason}</p>
+            </>
+          </div>
+          <p class="mock-note">
+            Example access record. No changes are published.
+          </p>
+        </section>
       </article>
       <article data-pane="observability" id="mock-pane-observability" hidden>
         <header class="mock-view-header">
           <>
-            <h3>{names.get("observability")}</h3>
+            <div class="mock-heading-copy">
+              <>
+                <p class="mock-context">{workspace.organization} workspace</p>
+                <h3>{names.get("observability")}</h3>
+                <p class="mock-description">
+                  {
+                    adminViews.find((view) => view.id === "observability")
+                      ?.description
+                  }
+                </p>
+              </>
+            </div>
             <span class="mock-pill">{workspace.organization} workspace</span>
           </>
         </header>
@@ -397,7 +589,7 @@ const money = (value: number) =>
               aria-pressed="false"
               aria-controls="scope-workspace"
             >
-              Workspace: Acme
+              Workspace: {workspace.organization}
             </button>
           </>
         </div>
@@ -425,10 +617,43 @@ const money = (value: number) =>
       <article data-pane="audit" id="mock-pane-audit" hidden>
         <header class="mock-view-header">
           <>
-            <h3>{names.get("audit")}</h3>
+            <div class="mock-heading-copy">
+              <>
+                <p class="mock-context">{workspace.organization} workspace</p>
+                <h3>{names.get("audit")}</h3>
+                <p class="mock-description">
+                  {adminViews.find((view) => view.id === "audit")?.description}
+                </p>
+              </>
+            </div>
             <span class="mock-pill">Last 7 days</span>
           </>
         </header>
+        <div class="mock-audit-filters">
+          <>
+            <div>
+              <>
+                <span>Time range</span>
+                <strong>{workspace.auditRange}</strong>
+              </>
+            </div>
+            <div>
+              <>
+                <span>Area</span>
+                <strong>All areas</strong>
+              </>
+            </div>
+            <div>
+              <>
+                <span>Outcome</span>
+                <strong>All outcomes</strong>
+              </>
+            </div>
+          </>
+        </div>
+        <p class="mock-list-label">
+          Activity <span>{auditEvents.length} events · Newest first</span>
+        </p>
         <div class="mock-audit-list">
           {auditEvents.map((event) => (
             <details

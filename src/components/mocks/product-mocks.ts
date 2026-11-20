@@ -21,6 +21,7 @@ function selectPane(
   const pane = frame.querySelector<HTMLElement>(`[data-pane="${id}"]`);
   if (!pane) return;
   if (frame === desktop && stopDemo) finishDemo();
+  if (!pane.querySelector("[data-access-open]")) closeAccess(frame, false);
   frame.querySelectorAll<HTMLElement>("[data-pane]").forEach((item) => {
     item.hidden = item !== pane;
   });
@@ -54,6 +55,18 @@ function selectPane(
     });
   if (updateHash) history.replaceState(history.state, "", `#feature-${id}`);
   return required<HTMLElement>(frame, ".mock-main");
+}
+
+function closeAccess(frame: HTMLElement, restoreFocus = true) {
+  const panel = frame.querySelector<HTMLElement>("[data-access-open]");
+  if (!panel) return false;
+  panel.hidden = true;
+  delete panel.dataset.accessOpen;
+  panel.parentElement?.classList.remove("has-access");
+  const opener = frame.querySelector<HTMLButtonElement>("[data-open-access]");
+  opener?.setAttribute("aria-expanded", "false");
+  if (restoreFocus) opener?.focus({ preventScroll: true });
+  return true;
 }
 
 function closeDetails(browser: HTMLElement) {
@@ -103,6 +116,15 @@ for (const frame of frames) {
       if (row) openDetails(row);
     }
     if (button.dataset.open) openDetails(button);
+    if (button.hasAttribute("data-open-access")) {
+      const panel = required<HTMLElement>(frame, "#mock-access-drawer");
+      panel.hidden = false;
+      panel.dataset.accessOpen = "true";
+      panel.parentElement?.classList.add("has-access");
+      button.setAttribute("aria-expanded", "true");
+      panel.focus({ preventScroll: true });
+    }
+    if (button.hasAttribute("data-close-access")) closeAccess(frame);
     if (button.hasAttribute("data-close")) {
       const browser = button.closest<HTMLElement>("[data-browser]");
       if (browser) closeDetails(browser);
@@ -159,6 +181,10 @@ for (const frame of frames) {
   frame.addEventListener("keydown", (event) => {
     if (frame === desktop) finishDemo();
     if (event.key === "Escape") {
+      if (closeAccess(frame)) {
+        event.preventDefault();
+        return;
+      }
       const browser = (event.target as Element).closest<HTMLElement>(
         "[data-browser].has-detail",
       );
@@ -221,23 +247,23 @@ if (desktop) {
       ),
     );
     frame.dataset.demoPhase =
-      elapsed < 200
+      elapsed < 400
         ? "empty"
-        : elapsed < 1200
+        : elapsed < 2400
           ? "compose"
-          : elapsed < 1500
+          : elapsed < 3000
             ? "send"
             : "run";
     frame.dataset.demoStep =
-      elapsed >= 3200 && elapsed < 3600
+      elapsed >= 6400 && elapsed < 7200
         ? "deleting"
-        : elapsed >= 3800 && elapsed < 3950
+        : elapsed >= 7600 && elapsed < 7900
           ? "blocked"
           : "";
-    status.textContent = elapsed < 4300 ? "Working…" : "Done";
+    status.textContent = elapsed < 8600 ? "Working…" : "Done";
     required<HTMLElement>(frame, ".mock-send").toggleAttribute(
       "data-demo-press",
-      elapsed >= 1200 && elapsed < 1500,
+      elapsed >= 2400 && elapsed < 3000,
     );
   }
   function stop() {
@@ -253,7 +279,7 @@ if (desktop) {
     if (last) elapsed += now - last;
     last = now;
     render();
-    if (elapsed >= 4800) {
+    if (elapsed >= 9600) {
       finishDemo();
       return;
     }
@@ -262,7 +288,7 @@ if (desktop) {
   finishDemo = () => {
     finished = true;
     stop();
-    elapsed = 5000;
+    elapsed = 10000;
     render();
     frame.dataset.demoRunning = "false";
   };

@@ -1,4 +1,5 @@
 ---
+import MockIcon from "./MockIcon.astro";
 import MockFrame from "./MockFrame.astro";
 import SessionView from "./SessionView.astro";
 import TraceExplorer from "./TraceExplorer.astro";
@@ -41,19 +42,54 @@ const { preview = false } = Astro.props;
             <span class="mock-pill">Set by your admin</span>
           </>
         </header>
+        <div class="mock-segments" aria-label="Capability type">
+          <>
+            <button
+              type="button"
+              data-directory="skills"
+              aria-pressed="true"
+              aria-controls="desktop-skills"
+            >
+              Skills
+            </button>
+            <button
+              type="button"
+              data-directory="tools"
+              aria-pressed="false"
+              aria-controls="desktop-tools"
+            >
+              Connected tools
+            </button>
+          </>
+        </div>
         <div class="mock-capabilities">
-          <section class="mock-card">
+          <section
+            class="mock-card"
+            id="desktop-skills"
+            data-directory-panel="skills"
+          >
             <h4>Skills</h4>
             {skills.slice(0, 3).map((skill) => (
               <div class="mock-item">
                 <>
-                  <strong>{skill.name}</strong>
-                  <span class="mock-muted">v{skill.version}</span>
+                  <span class="mock-icon-tile">
+                    <MockIcon name="skills" />
+                  </span>
+                  <span>
+                    <strong>{skill.name}</strong>
+                    <small>{skill.description}</small>
+                  </span>
+                  <span class="mock-pill">v{skill.version}</span>
                 </>
               </div>
             ))}
           </section>
-          <section class="mock-card">
+          <section
+            class="mock-card"
+            id="desktop-tools"
+            data-directory-panel="tools"
+            hidden
+          >
             <h4>Connected Tools</h4>
             <details class="mock-disclosure">
               <>
@@ -132,7 +168,7 @@ const { preview = false } = Astro.props;
           </>
         </header>
         <div class="mock-browser" data-browser>
-          <div class="mock-card-grid" data-detail-list>
+          <div class="mock-card-grid mock-artifact-list" data-detail-list>
             {artifacts.map((artifact, i) => (
               <button
                 type="button"
@@ -143,7 +179,7 @@ const { preview = false } = Astro.props;
               >
                 <>
                   <span class="mock-file-icon" aria-hidden="true">
-                    ▤
+                    <MockIcon name="desktop-app-artifacts" />
                   </span>
                   <strong>{artifact.name}</strong>
                   <span>{artifact.task}</span>

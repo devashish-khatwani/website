@@ -1,15 +1,28 @@
 ---
-import { connections, people } from "../../lib/content/product-mocks";
+import {
+  connections,
+  people,
+  accessExample,
+} from "../../lib/content/product-mocks";
 interface Props {
   connection: (typeof connections)[number];
   preview?: boolean;
 }
 const { connection, preview = false } = Astro.props;
+const tools = preview
+  ? connection.tools.filter((_, index) => index === 0 || index >= 4)
+  : connection.tools;
 ---
 
-<h4>{connection.name}</h4>
+<div class="mock-connection-heading">
+  <h4>{connection.name}</h4><span class="mock-pill mock-pill--green"
+    >Connected</span
+  >
+</div>
 <p class="mock-note">
-  Granted to {connection.group} · by {people[0].name} · Nov 12
+  Granted to {connection.group} · by {people[0].name} · {
+    accessExample.grantedOn
+  }
 </p>
 <table class="mock-table mock-tool-table">
   <thead
@@ -18,7 +31,7 @@ const { connection, preview = false } = Astro.props;
   >
   <tbody
     >{
-      connection.tools.map((tool) => (
+      tools.map((tool) => (
         <tr>
           <th scope="row">
             <code>{tool.name}</code>
@@ -39,8 +52,7 @@ const { connection, preview = false } = Astro.props;
 {
   !preview && (
     <p class="mock-note">
-      The coworker only gets the tools on this list. There's no terminal to work
-      around it.
+      Only explicitly granted tools are available through this connection.
     </p>
   )
 }

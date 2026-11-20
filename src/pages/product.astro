@@ -1,6 +1,7 @@
 ---
 import { getEntry } from "astro:content";
 import Button from "../components/Button.astro";
+import HeroShowcase from "../components/HeroShowcase.astro";
 import ProductSection from "../components/ProductSection.astro";
 import SiteLayout from "../components/SiteLayout.astro";
 import { buildPageHeadMetadata } from "../lib/site";
@@ -45,28 +46,7 @@ const pageHead = buildPageHeadMetadata(productEntry.data);
         </div>
       </div>
 
-      <figure
-        class="product-story product-capture"
-        aria-label="Glaux desktop app capture"
-      >
-        <picture>
-          <source
-            media="(max-width: 48rem)"
-            srcset="/product/desktop-start-mobile.webp"
-            width="850"
-            height="275"
-          />
-          <img
-            src="/product/desktop-start.webp"
-            alt="The real Glaux desktop app, ready for a new work session."
-            width="935"
-            height="650"
-            loading="eager"
-            decoding="async"
-          />
-        </picture>
-        <figcaption>The Glaux desktop app · real product capture</figcaption>
-      </figure>
+      <HeroShowcase />
     </section>
 
     <ProductSection />
@@ -92,19 +72,11 @@ const pageHead = buildPageHeadMetadata(productEntry.data);
 </SiteLayout>
 
 <style>
-  .product-capture {
-    margin: 0;
-    background: var(--color-primary-wash);
-    border: 1px solid var(--color-hairline);
+  .product-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
   }
-  .product-capture img {
-    width: 100%;
-    height: auto;
-    border-radius: var(--radius-sm);
-  }
-  .product-capture figcaption {
-    padding: var(--space-4) var(--space-2) 0;
-    color: var(--color-primary-ink);
-    font-size: 0.85rem;
+  .product-hero__copy {
+    max-width: 760px;
   }
 </style>

@@ -3,6 +3,7 @@ import { productSection } from "./product-section";
 export type MockView = {
   id: string;
   name: string;
+  description?: string;
   caption: string;
   takeaway: string;
   chips: string[];
@@ -71,6 +72,8 @@ export const desktopViews: MockView[] = [
 export const adminViews: MockView[] = [
   {
     ...pane("people-access"),
+    description:
+      "See people in this workspace and review their groups and access.",
     caption: "The right access for each person.",
     takeaway:
       "See who's here, which group they're in, and what that lets them use.",
@@ -78,6 +81,8 @@ export const adminViews: MockView[] = [
   },
   {
     ...pane("ai-gateway"),
+    description:
+      "Manage AI providers, models, and spending for this workspace.",
     caption: "Choose the models for your workspace.",
     takeaway:
       "Turn models on or off for everyone, and see what each one costs.",
@@ -85,6 +90,8 @@ export const adminViews: MockView[] = [
   },
   {
     ...pane("skills"),
+    description:
+      "Browse skills, inspect their files, and see which version is published.",
     caption: "Know what goes into the work.",
     takeaway:
       "Every skill shows what's in it, which version is live, and who can use it.",
@@ -92,6 +99,7 @@ export const adminViews: MockView[] = [
   },
   {
     ...pane("connected-tools"),
+    description: "Manage MCP tools and access for this workspace.",
     caption: "Connect the tool. Choose the access.",
     takeaway:
       "Sam's coworker can clean up rows in production. It can't drop the table.",
@@ -99,6 +107,7 @@ export const adminViews: MockView[] = [
   },
   {
     ...pane("observability"),
+    description: "Inspect the steps and outcomes of runs you have access to.",
     caption: "See the work across your team.",
     takeaway:
       "Open any run you're allowed to see and find the step where it stopped.",
@@ -106,6 +115,7 @@ export const adminViews: MockView[] = [
   },
   {
     ...pane("audit"),
+    description: "Find out what happened, who was involved, and when.",
     caption: "Keep the decisions in view.",
     takeaway: "Every change says who made it, what it was, and when.",
     chips: ["Full change history"],
@@ -115,6 +125,7 @@ export const workspace = {
   organization: "Acme",
   name: "Production workspace",
   monthlyBudget: 2000,
+  auditRange: "Nov 12–19, 2026",
 };
 export const sections = {
   desktop: {
@@ -702,3 +713,16 @@ export const auditEvents = [
     id: "evt_2b14e519",
   },
 ];
+
+export const accessExample = {
+  title: "Manage access",
+  subject: "Engineering",
+  permission: "Use MCP tools",
+  revision: "Revision 5 · Confirmed",
+  grantedOn: "Nov 12",
+  reason:
+    "Let Engineering clean up expired sessions in the Acme production database.",
+  note: "Tool access is separate from connection readiness. A ready connection does not grant a tool call.",
+  check:
+    "Each tool is checked against the current grant. A matching block overrides an allow.",
+};

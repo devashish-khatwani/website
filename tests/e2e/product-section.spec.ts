@@ -40,6 +40,7 @@ for (const route of ["/", "/product/"]) {
           name,
           exact: name !== "New session",
         });
+        await expect(button.locator("svg")).toBeVisible();
         await button.focus();
         await expectVisibleFocusOutline(button);
         await page.keyboard.press("Enter");
@@ -98,6 +99,9 @@ test("desktop examples connect grants, traces, artifacts and the scheduled run",
   ).toBeFocused();
   await frame
     .getByRole("button", { name: "Capabilities", exact: true })
+    .click();
+  await frame
+    .getByRole("button", { name: "Connected tools", exact: true })
     .click();
   await frame.locator("summary").click();
   await expect(frame.locator("details")).toHaveAttribute("open", "");
@@ -228,6 +232,19 @@ test("mobile pills and panels reflow at 320, 390, 768, 1024 and 1440 pixels", as
         .getByRole("button", { name, exact: name !== "New session" });
       await button.click();
       await expectNoHorizontalOverflow(page);
+      if (width > 900) {
+        const clipped = await frame.locator(".mock-main").evaluate((main) => {
+          const pane = main.querySelector<HTMLElement>(
+            "[data-pane]:not([hidden])",
+          );
+          if (!pane) throw new Error("The active pane must be rendered.");
+          return (
+            pane.getBoundingClientRect().bottom >
+            main.getBoundingClientRect().bottom + 1
+          );
+        });
+        expect(clipped, `${name} at ${width}px must fit the frame`).toBe(false);
+      }
       if (width <= 900) {
         expect((await button.boundingBox())?.height).toBeGreaterThanOrEqual(44);
         if (width <= 390)
@@ -255,6 +272,27 @@ test("mobile pills and panels reflow at 320, 390, 768, 1024 and 1440 pixels", as
   await expect(
     admin.getByRole("button", { name: /Database cleanup checklist/ }),
   ).toBeFocused();
+  await admin
+    .getByRole("button", { name: "Connected Tools", exact: true })
+    .click();
+  const opener = admin.getByRole("button", {
+    name: "Manage access",
+    exact: true,
+  });
+  await expect(opener).toBeVisible();
+  await opener.click();
+  const drawer = admin.getByRole("region", {
+    name: "Engineering tool access",
+    exact: true,
+  });
+  await expect(drawer).toBeVisible();
+  await expect(drawer).toContainText("drop_table");
+  await expect(drawer).toContainText("Not granted");
+  await expect(admin.locator("[data-connections]:visible")).toHaveCount(0);
+  await expectNoHorizontalOverflow(page);
+  await page.keyboard.press("Escape");
+  await expect(drawer).toBeHidden();
+  await expect(opener).toBeFocused();
 });
 
 test("the short task sequence finishes once without playback controls or view rotation", async ({
@@ -266,15 +304,15 @@ test("the short task sequence finishes once without playback controls or view ro
   const frame = page.locator('[data-mock="desktop"]');
   await frame.scrollIntoViewIfNeeded();
   await expect(frame).toHaveCSS("--demo-play-state", "running");
-  await page.clock.runFor(2500);
-  await expect(frame.locator('[data-at="1500"]')).toBeVisible();
-  await expect(frame.locator('[data-at="4300"]')).toHaveCSS(
+  await page.clock.runFor(5000);
+  await expect(frame.locator('[data-at="3000"]')).toBeVisible();
+  await expect(frame.locator('[data-at="8600"]')).toHaveCSS(
     "visibility",
     "hidden",
   );
-  await page.clock.runFor(3000);
+  await page.clock.runFor(5000);
   await expect(frame).toHaveAttribute("data-demo-running", "false");
-  await expect(frame.locator('[data-at="4300"]')).toBeVisible();
+  await expect(frame.locator('[data-at="8600"]')).toBeVisible();
   await page.getByRole("heading", { level: 1 }).scrollIntoViewIfNeeded();
   await frame.scrollIntoViewIfNeeded();
   await page.clock.runFor(12000);
@@ -334,15 +372,15 @@ test("autoplay pauses off screen and any key in the mock ends it", async ({
   const frame = page.locator('[data-mock="desktop"]');
   await frame.scrollIntoViewIfNeeded();
   await expect(frame).toHaveCSS("--demo-play-state", "running");
-  await page.clock.runFor(2300);
-  await expect(frame.locator('[data-at="2200"]')).toHaveCSS(
+  await page.clock.runFor(4600);
+  await expect(frame.locator('[data-at="4400"]')).toHaveCSS(
     "visibility",
     "visible",
   );
   await page.getByRole("heading", { level: 1 }).scrollIntoViewIfNeeded();
   await expect(frame).toHaveCSS("--demo-play-state", "paused");
   await page.clock.runFor(12000);
-  await expect(frame.locator('[data-at="4300"]')).toHaveCSS(
+  await expect(frame.locator('[data-at="8600"]')).toHaveCSS(
     "visibility",
     "hidden",
   );
@@ -358,7 +396,7 @@ test("autoplay pauses off screen and any key in the mock ends it", async ({
     .focus();
   await page.keyboard.press("ArrowDown");
   await expect(frame).toHaveAttribute("data-demo-running", "false");
-  await expect(frame.locator('[data-at="4300"]')).toHaveCSS(
+  await expect(frame.locator('[data-at="8600"]')).toHaveCSS(
     "visibility",
     "visible",
   );

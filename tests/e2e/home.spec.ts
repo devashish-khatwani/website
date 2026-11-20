@@ -90,15 +90,32 @@ test("hero shows both static product mocks together without playback controls or
     const left = await desktop.boundingBox();
     const right = await tower.boundingBox();
     if (!left || !right) throw new Error("Both previews must be rendered.");
-    if (width === 1440)
+    if (width === 1440) {
       expect(right.x).toBeGreaterThanOrEqual(left.x + left.width);
-    else expect(right.y).toBeGreaterThanOrEqual(left.y + left.height);
+      expect(Math.abs(right.y - left.y)).toBeLessThanOrEqual(1);
+      expect(Math.abs(right.height - left.height)).toBeLessThanOrEqual(1);
+    } else {
+      expect(right.y).toBeGreaterThanOrEqual(left.y + left.height);
+      expect((await hero.boundingBox())?.height).toBeLessThanOrEqual(650);
+    }
     await expectNoHorizontalOverflow(page);
     for (const frame of [desktop, tower]) {
-      const fits = await frame
-        .locator(".mock-main")
-        .evaluate((region) => region.scrollHeight <= region.clientHeight);
-      expect(fits).toBe(true);
+      for (const item of await frame.locator(".mock-nav-item").all()) {
+        const icon = item.locator("svg");
+        await expect(icon).toHaveCount(1);
+        if (width === 1440) await expect(icon).toBeVisible();
+        else await expect(icon).toBeHidden();
+      }
+      expect(
+        await frame
+          .locator(".mock-main")
+          .evaluate((el) => getComputedStyle(el).transform),
+      ).toBe("none");
+      expect(
+        await frame
+          .locator(".mock-example")
+          .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+      ).toBeGreaterThanOrEqual(12);
     }
   }
   if (!baseURL) throw new Error("The preview URL is required.");
