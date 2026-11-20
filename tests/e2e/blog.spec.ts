@@ -7,7 +7,7 @@ const isProductionPagesBuild =
     process.env.CF_PAGES?.toLowerCase() === "true") &&
   process.env.CF_PAGES_BRANCH === "main";
 
-test("blog index presents all four published posts and shell navigation", async ({
+test("blog index presents all published posts and shell navigation", async ({
   page,
 }) => {
   const response = await page.goto("/blog/");
@@ -27,7 +27,7 @@ test("blog index presents all four published posts and shell navigation", async 
   }
 
   const cards = page.getByRole("main").getByRole("article");
-  await expect(cards).toHaveCount(4);
+  await expect(cards).toHaveCount(blogPosts.length);
   for (const post of blogPosts) {
     const card = cards.filter({
       has: page.getByRole("heading", { name: post.title, exact: true }),
@@ -38,14 +38,11 @@ test("blog index presents all four published posts and shell navigation", async 
     await expect(
       card.getByText(post.description, { exact: true }),
     ).toBeVisible();
-    await expect(card.locator("time")).toHaveAttribute(
-      "datetime",
-      "2026-11-11",
-    );
-    await expect(card.locator("time")).toHaveText("November 11, 2026");
+    await expect(card.locator("time")).toHaveAttribute("datetime", post.date);
+    await expect(card.locator("time")).toHaveText(post.displayDate);
     await expect(card.getByRole("img", { name: post.heroAlt })).toHaveAttribute(
       "src",
-      `/blog/images/${post.slug}/hero.svg`,
+      `/blog/images/${post.slug}/hero.${post.imageExtension}`,
     );
   }
 
@@ -100,21 +97,24 @@ for (const post of blogPosts) {
     ).toBeVisible();
     await expect(article.locator("time")).toHaveAttribute(
       "datetime",
-      "2026-11-11",
+      post.date,
     );
-    await expect(article.locator("time")).toHaveText("November 11, 2026");
+    await expect(article.locator("time")).toHaveText(post.displayDate);
     await expect(
       article.getByRole("list", { name: "Tags" }).getByRole("listitem"),
     ).toHaveText([...post.tags]);
 
     const images = article.getByRole("img");
-    await expect(images).toHaveCount(3);
+    await expect(images).toHaveCount(post.imageCount);
     await expect(images.first()).toHaveAttribute("alt", post.heroAlt);
     for (const image of await images.all()) {
       await expect(image).toHaveAttribute("alt", /\S/u);
       await expect(image).toHaveAttribute(
         "src",
-        new RegExp(`^/blog/images/${post.slug}/[^/]+\\.svg$`, "u"),
+        new RegExp(
+          `^/blog/images/${post.slug}/[^/]+\\.${post.imageExtension}$`,
+          "u",
+        ),
       );
       await image.scrollIntoViewIfNeeded();
       await expect(image).toBeVisible();
@@ -129,6 +129,22 @@ for (const post of blogPosts) {
     }
   });
 }
+
+test("cloud agents post retains its instance detail and demo CTA", async ({
+  page,
+}) => {
+  await page.goto("/blog/cloud-agents/");
+  const article = page.getByRole("main").getByRole("article");
+  await expect(
+    article.getByRole("img", {
+      name: "Instance detail in the Cloud Agents pane, with owner, email, groups, workspace, runtime status, activity, last seen, and recorded storage. Example data.",
+      exact: true,
+    }),
+  ).toHaveAttribute("src", "/blog/images/cloud-agents/instance-detail.png");
+  await expect(
+    article.getByRole("link", { name: "Book a demo", exact: true }),
+  ).toHaveAttribute("href", "https://www.glauxagent.com/contact/");
+});
 
 test("checklist links directly to the published audit post", async ({
   page,
@@ -146,7 +162,7 @@ test("checklist links directly to the published audit post", async ({
   await expect(page).toHaveURL(/\/blog\/audit-trail-for-ai-agents\/$/u);
 });
 
-test("sitemap includes the blog index and all four published posts", async ({
+test("sitemap includes the blog index and all published posts", async ({
   request,
 }) => {
   const sitemap = await request.get("/sitemap.xml");
