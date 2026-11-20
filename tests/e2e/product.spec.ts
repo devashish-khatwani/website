@@ -32,7 +32,14 @@ test("product overview keeps its metadata, shared example mocks, demo, and secur
     page.getByRole("link", { name: "Open technical details" }),
   ).toHaveAttribute("href", "/security/");
   await expect(
-    page.getByRole("heading", { name: "Give it the work. See every step." }),
+    page.locator("#desktop-app-mock").getByRole("heading", {
+      name: "Glaux desktop app",
+      level: 2,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Give it the work. See every step.", { exact: true }),
   ).toBeVisible();
 });
 

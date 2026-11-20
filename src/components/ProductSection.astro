@@ -3,6 +3,7 @@ import DesktopAppMock from "./mocks/DesktopAppMock.astro";
 import ControlTowerMock from "./mocks/ControlTowerMock.astro";
 import Button from "./Button.astro";
 import { sections } from "../lib/content/product-mocks";
+import { brandAssets } from "../lib/design-system";
 import "../styles/product-mocks.css";
 ---
 
@@ -13,11 +14,17 @@ import "../styles/product-mocks.css";
     aria-labelledby="desktop-mock-heading"
   >
     <header class="product-mock-heading">
-      <p class="plain-label">{sections.desktop.label}</p><h2
-        id="desktop-mock-heading"
-      >
-        {sections.desktop.heading}
-      </h2><p>{sections.desktop.lede}</p>
+      <h2 id="desktop-mock-heading" class="named-section-title">
+        <img
+          src={brandAssets.mark.src}
+          width={brandAssets.mark.width}
+          height={brandAssets.mark.height}
+          alt=""
+        />
+        {sections.desktop.label}
+      </h2>
+      <p class="named-section-subhead">{sections.desktop.heading}</p>
+      <p>{sections.desktop.lede}</p>
     </header>
     <DesktopAppMock />
   </section>
@@ -27,11 +34,17 @@ import "../styles/product-mocks.css";
     aria-labelledby="admin-mock-heading"
   >
     <header class="product-mock-heading">
-      <p class="plain-label">{sections.admin.label}</p><h2
-        id="admin-mock-heading"
-      >
-        {sections.admin.heading}
-      </h2><p>{sections.admin.lede}</p>
+      <h2 id="admin-mock-heading" class="named-section-title">
+        <img
+          src={brandAssets.mark.src}
+          width={brandAssets.mark.width}
+          height={brandAssets.mark.height}
+          alt=""
+        />
+        {sections.admin.label}
+      </h2>
+      <p class="named-section-subhead">{sections.admin.heading}</p>
+      <p>{sections.admin.lede}</p>
     </header>
     <ControlTowerMock />
   </section>

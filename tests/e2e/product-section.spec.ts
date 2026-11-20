@@ -1,8 +1,76 @@
 import { expect, test } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 import {
   expectNoHorizontalOverflow,
   expectVisibleFocusOutline,
+  expectMockCurrencyTotals,
 } from "./assertions";
+
+test("mock currency parts match totals on first paint and after scope, period and model filters", async ({
+  browser,
+  baseURL,
+}) => {
+  if (!baseURL) throw new Error("The preview URL is required.");
+  for (const javaScriptEnabled of [false, true]) {
+    const context = await browser.newContext({
+      baseURL,
+      javaScriptEnabled,
+      reducedMotion: "reduce",
+    });
+    try {
+      const page = await context.newPage();
+      await page.goto("/product/#feature-observability");
+      await expectMockCurrencyTotals(page);
+      if (!javaScriptEnabled) continue;
+      const observe = page.locator("[data-observe]");
+      for (const scope of [
+        "My traces",
+        "Group: Engineering",
+        "Workspace: Acme",
+      ]) {
+        await observe.getByRole("button", { name: scope, exact: true }).click();
+        for (const period of ["1", "3", "7"]) {
+          await observe.getByLabel("Observability period").selectOption(period);
+          await expectMockCurrencyTotals(page);
+        }
+      }
+      await observe
+        .getByRole("button", { name: "Deep Dive", exact: true })
+        .click();
+      await observe
+        .getByRole("button", { name: "Traces", exact: true })
+        .click();
+      const activeScope = observe.locator("[data-scope-panel]:visible");
+      await activeScope.getByLabel("Search traces").fill("no-matching-trace");
+      await expectMockCurrencyTotals(page);
+      await activeScope.getByLabel("Search traces").fill("");
+      const trace = activeScope
+        .locator("tr[data-observe-record]:not([hidden])")
+        .first();
+      const traceCost = await trace.locator('[data-column="cost"]').innerText();
+      await trace.getByRole("button").click();
+      await expect(
+        observe.locator("[data-detail]:visible [data-trace-cost]"),
+      ).toHaveText(traceCost);
+      await page.keyboard.press("Escape");
+      await page
+        .locator('[data-mock="admin"]')
+        .getByRole("navigation")
+        .getByRole("button", { name: "AI Gateway", exact: true })
+        .click();
+      const gateway = page.locator('[data-pane="ai-gateway"]');
+      for (const period of ["7", "30", "90"]) {
+        await gateway.getByLabel("Usage period").selectOption(period);
+        for (const model of ["all", "GPT-4.1", "Gemini 2.5 Pro"]) {
+          await gateway.getByLabel("Usage model").selectOption(model);
+          await expectMockCurrencyTotals(page);
+        }
+      }
+    } finally {
+      await context.close();
+    }
+  }
+});
 
 const desktopNames = [
   "New session",
@@ -16,9 +84,91 @@ const adminNames = [
   "AI Gateway",
   "Skills",
   "Connected Tools",
+  "Cloud agents",
   "Observability",
   "Audit",
 ];
+
+for (const width of [390, 1440]) {
+  test(`Cloud agents filters, instance storage and example files work at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/product/#feature-cloud-agents");
+    const pane = page.locator('[data-pane="cloud-agents"]');
+    const rows = pane.locator("[data-cloud-row]:visible");
+    await expect(page.locator("#admin-view")).toBeFocused();
+    await expect(
+      pane.getByRole("heading", { name: "Cloud agents", exact: true }),
+    ).toBeVisible();
+    await expect(rows).toHaveCount(6);
+    await expect(pane).toContainText("Production workspace");
+    const search = pane.getByLabel("Search agents");
+    await search.fill(" SAM@ACME.EXAMPLE ");
+    await expect(rows).toHaveCount(2);
+    await pane
+      .getByLabel("Runtime status", { exact: true })
+      .selectOption("Stopped");
+    await expect(rows).toHaveCount(1);
+    const stopped = pane.getByRole("button", {
+      name: "View details for Sam Lee, agt-1028",
+    });
+    await stopped.click();
+    const detail = pane.getByRole("region", {
+      name: "agt-1028 instance detail, with example data",
+    });
+    await expect(detail).toBeFocused();
+    await expect(detail).toContainText("A previous instance for Sam Lee");
+    await expect(detail).toContainText("sam@acme.example");
+    await expect(detail).toContainText("/workspace");
+    await expect(detail).toContainText("/opt/data");
+    await expect(detail.getByText(/Attachment not verified/)).toHaveCount(2);
+    await detail
+      .getByRole("button", { name: "Browse workspace files →" })
+      .click();
+    const files = detail.getByRole("region", {
+      name: "Workspace files, with example data",
+    });
+    await expect(files).toBeVisible();
+    await expect(files).toContainText(
+      "Agent state is sensitive. Its files are not listed.",
+    );
+    await files.locator("summary").filter({ hasText: "outputs/" }).click();
+    await files
+      .locator("summary")
+      .filter({ hasText: "release-readiness.md" })
+      .click();
+    await expect(files.locator("pre")).toContainText("Owner: Sam Lee");
+    const downloadPromise = page.waitForEvent("download");
+    await files.getByRole("link", { name: "Download example file" }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe("agt-1028-release-readiness.md");
+    const path = await download.path();
+    if (!path) throw new Error("The example download must be saved.");
+    expect(await readFile(path, "utf8")).toContain(
+      "No customer files are connected.",
+    );
+    await page.keyboard.press("Escape");
+    await expect(detail).toBeHidden();
+    await expect(stopped).toBeFocused();
+    await search.fill("no such agent");
+    await expect(rows).toHaveCount(0);
+    await expect(
+      pane.getByRole("status").filter({ hasText: "No agents match" }),
+    ).toBeVisible();
+    await search.fill("");
+    await pane
+      .getByLabel("Runtime status", { exact: true })
+      .selectOption("Unknown");
+    await expect(rows).toHaveCount(1);
+    await rows.click();
+    await expect(pane.locator("[data-detail]:visible")).toContainText(
+      "We can’t confirm whether this instance is still running.",
+    );
+    await expectNoHorizontalOverflow(page);
+  });
+}
 
 for (const route of ["/", "/product/"]) {
   test(`${route} mocks have one keyboard navigation each and a complete no-JS fallback`, async ({
@@ -192,13 +342,13 @@ test("admin examples show scoped outcomes, local model switches and event histor
   );
   await expect(
     frame.locator("[data-scope-panel]:visible [data-open]:visible"),
-  ).toHaveCount(1);
+  ).toHaveCount(72);
   await frame
     .getByRole("button", { name: "Group: Engineering", exact: true })
     .click();
   await expect(
     frame.locator("[data-scope-panel]:visible [data-open]:visible"),
-  ).toHaveCount(4);
+  ).toHaveCount(168);
   await frame
     .getByRole("button", { name: /Sam Lee Expired sessions cleanup/ })
     .click();
@@ -213,7 +363,7 @@ test("admin examples show scoped outcomes, local model switches and event histor
     .click();
   await expect(
     frame.locator("[data-scope-panel]:visible [data-open]:visible"),
-  ).toHaveCount(7);
+  ).toHaveCount(288);
   await frame.getByRole("button", { name: "Audit", exact: true }).click();
   const grant = frame.locator("details").filter({ hasText: "evt_31d9a07c" });
   await expect(grant).toHaveAttribute("open", "");
@@ -257,12 +407,12 @@ for (const width of [390, 1440]) {
       "Start date must be on or before end date",
     );
     await gateway.getByLabel("Usage period").selectOption("30");
-    await gateway.getByLabel("Usage model").selectOption("1");
+    await gateway.getByLabel("Usage model").selectOption("GPT-4.1");
     await expect(
-      gateway.getByRole("cell", { name: "$388.65", exact: true }),
+      gateway.getByRole("cell", { name: "$531.16", exact: true }),
     ).toBeVisible();
     await expect(gateway.locator(".dash-budget")).toContainText("$1,284.50");
-    await gateway.getByLabel("Usage model").selectOption("4");
+    await gateway.getByLabel("Usage model").selectOption("Gemini 2.5 Pro");
     await expect(gateway.locator("[data-usage-kpi=spend]")).toHaveText("$0.00");
     await expect(
       gateway.getByText("0 failed requests", { exact: true }),
@@ -532,6 +682,26 @@ for (const width of [390, 1440]) {
     await page.goto("/product/#feature-observability");
     const pane = page.locator('[data-pane="observability"]');
     await expect(pane.getByLabel("Filter users")).toBeDisabled();
+    const own = pane.locator('[data-scope-panel="own"]');
+    await expect(own.locator("[data-observe-stat=count]")).toHaveText("72");
+    await expect(
+      own.locator("[data-tab-panel=dashboard] [data-observe-stat=sessions]"),
+    ).toHaveText("12");
+    await expect(own.locator("[data-slowest]:visible")).toHaveCount(5);
+    expect(
+      await own.locator("[data-chart-line]").first().getAttribute("points"),
+    ).toMatch(/(?:\S+\s+){17}\S+/u);
+    await pane.getByRole("button", { name: "Deep Dive", exact: true }).click();
+    const conversation = pane.getByRole("region", {
+      name: "Conversation detail, with example data",
+    });
+    await expect(conversation.locator(".dash-turn-card:visible")).toHaveCount(
+      6,
+    );
+    await expect(conversation.locator("[data-session-turns]")).toHaveText(
+      "6 turns",
+    );
+    await pane.getByRole("button", { name: "Dashboard", exact: true }).click();
     await pane
       .getByRole("button", { name: "Group: Engineering", exact: true })
       .click();
@@ -541,11 +711,11 @@ for (const width of [390, 1440]) {
     ).toContainText("Sam Lee");
     await expect(
       pane.locator("[data-scope-panel]:visible [data-observe-stat=count]"),
-    ).toHaveText("2");
+    ).toHaveText("72");
     await pane.getByLabel("Observability period").selectOption("1");
     await expect(
       pane.locator("[data-scope-panel]:visible [data-observe-stat=count]"),
-    ).toHaveText("1");
+    ).toHaveText("9");
     await pane.getByRole("button", { name: "Deep Dive", exact: true }).click();
     await expect(
       pane.getByRole("button", { name: "Sessions", exact: true }),
@@ -554,7 +724,7 @@ for (const width of [390, 1440]) {
       pane
         .getByRole("region", { name: "Conversations, with example data" })
         .getByRole("button"),
-    ).toHaveCount(1);
+    ).toHaveCount(3);
     await pane.getByRole("button", { name: "Traces", exact: true }).click();
     await expect(
       pane.getByRole("img", { name: "Trace activity, with example data" }),
@@ -576,8 +746,10 @@ for (const width of [390, 1440]) {
       .getByLabel("Trace status")
       .selectOption("completed");
     await expect(
-      pane.getByRole("status").filter({ hasText: "No matching traces" }),
-    ).toBeVisible();
+      pane
+        .getByRole("table", { name: "Traces, with example data" })
+        .locator("tbody tr:visible"),
+    ).toHaveCount(7);
     await pane.getByRole("button", { name: "Remove status filter" }).click();
     await pane
       .locator("[data-scope-panel]:visible")
@@ -586,7 +758,8 @@ for (const width of [390, 1440]) {
     await expect(
       pane
         .getByRole("table", { name: "Traces, with example data" })
-        .getByRole("row"),
+        .getByRole("row")
+        .filter({ visible: true }),
     ).toHaveCount(2);
     await pane.getByRole("button", { name: "Remove search filter" }).click();
     await pane
@@ -615,19 +788,45 @@ for (const width of [390, 1440]) {
     await expect(
       pane
         .getByRole("table", { name: "Traces, with example data" })
-        .getByRole("row"),
-    ).toHaveCount(5);
+        .getByRole("row")
+        .filter({ visible: true }),
+    ).toHaveCount(169);
     await pane.getByLabel("Filter groups").selectOption("Finance");
     await expect(
       pane.getByRole("status").filter({ hasText: "No matching traces" }),
     ).toBeVisible();
     await pane.getByRole("button", { name: "Remove group filter" }).click();
+    await pane
+      .getByRole("button", { name: "Workspace: Acme", exact: true })
+      .click();
+    const workspace = pane.locator('[data-scope-panel="workspace"]');
+    await expect(
+      workspace.locator("[data-observe-stat=summary]").first(),
+    ).toHaveText("288 traces · 50 sessions");
+    const costs = await workspace
+      .locator("tbody [data-column=cost]")
+      .allTextContents();
+    expect(
+      costs.reduce(
+        (sum, cost) => sum + Math.round(Number(cost.replace("$", "")) * 100),
+        0,
+      ),
+    ).toBe(2862);
+    await pane.getByRole("button", { name: "Sessions", exact: true }).click();
+    await expect(
+      workspace.locator("[data-session-choice]:visible"),
+    ).toHaveCount(50);
+    await pane.getByRole("button", { name: "Traces", exact: true }).click();
+    await workspace.getByLabel("Trace status").selectOption("error");
+    await expect(workspace.locator("tbody tr:visible")).toHaveCount(6);
+    await pane.getByRole("button", { name: "Remove status filter" }).click();
     await pane.getByRole("button", { name: "My traces", exact: true }).click();
     await expect(
       pane
         .getByRole("table", { name: "Traces, with example data" })
-        .getByRole("row"),
-    ).toHaveCount(2);
+        .getByRole("row")
+        .filter({ visible: true }),
+    ).toHaveCount(73);
     await expect(pane).not.toContainText("Organization");
     await expectNoHorizontalOverflow(page);
   });

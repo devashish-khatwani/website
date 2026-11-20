@@ -1,53 +1,63 @@
 ---
+import { models, people, groups } from "../../lib/content/product-mocks";
 import {
-  models,
-  people,
-  groups,
-  run,
-  observabilityTimes,
-  type Trace,
-} from "../../lib/content/product-mocks";
+  weekStart,
+  weekEnd,
+  type ExampleTrace,
+} from "../../lib/content/product-mock-dataset";
+import {
+  money,
+  statistics,
+  series,
+  displayTraceCosts,
+} from "../../lib/content/product-mock-metrics";
 import SessionsWorkbench from "./SessionsWorkbench.astro";
 import DashboardChart from "./DashboardChart.astro";
 import TraceDashboardDetail from "./TraceDashboardDetail.astro";
 interface Props {
   id: string;
-  traces: Trace[];
+  traces: ExampleTrace[];
 }
-const { id, traces } = Astro.props;
-const cost = (trace: Trace) => trace.steps * 0.014;
-const money = (value: number) => `$${value.toFixed(3)}`;
-const totalCost = traces.reduce((sum, t) => sum + cost(t), 0);
-const duration = (trace: Trace) =>
-  trace.duration.includes("m")
-    ? parseInt(trace.duration) * 60 +
-      parseInt(trace.duration.split(" ")[1] || "0")
-    : parseInt(trace.duration);
-const activity = Array.from(
-  { length: 7 },
-  (_, i) =>
-    traces.filter(
-      (t) =>
-        (t.when.startsWith("Today")
-          ? 6
-          : t.when.startsWith("Yesterday")
-            ? 5
-            : 3) === i,
-    ).length,
+const { id, traces: rawTraces } = Astro.props;
+const traces = displayTraceCosts(rawTraces);
+const stats = statistics(traces);
+const buckets = series(
+  traces,
+  Date.parse(`${weekStart}Z`),
+  Date.parse(`${weekEnd}Z`),
 );
-const blocked = traces.filter((t) => t.blocked).length;
-const facts = traces.map((t) => ({
-  id: t.id,
-  person: t.person,
-  group: people.find((p) => p.name === t.person)?.groups ?? "",
-  time: observabilityTimes[t.id],
-  duration: duration(t),
-  cost: cost(t),
-  tokens: t.steps * 420,
-  blocked: Boolean(t.blocked),
-  search:
-    `${t.id} ${t.task} ${t.person} ${t.task === run.task ? run.prompt : t.task} ${t.timeline.map((step) => step.outcome).join(" ")}`.toLowerCase(),
-}));
+const activity = buckets.map((b) => b.count);
+const facts = rawTraces.map(
+  ({
+    id,
+    sessionId,
+    person,
+    group,
+    time,
+    durationSeconds,
+    costMillis,
+    tokens,
+    requests,
+    model,
+    blocked,
+    error,
+    search,
+  }) => ({
+    id,
+    sessionId,
+    person,
+    group,
+    time,
+    durationSeconds,
+    costMillis,
+    tokens,
+    requests,
+    model,
+    blocked,
+    error,
+    search,
+  }),
+);
 ---
 
 <div
@@ -81,13 +91,13 @@ const facts = traces.map((t) => ({
         </section>
         <section class="dash-card">
           <h5>Sessions</h5><div class="dash-observe-value">
-            <strong data-observe-stat="sessions">{traces.length}</strong><span
+            <strong data-observe-stat="sessions">{stats.sessions}</strong><span
               >Selected period</span
             >
           </div><DashboardChart
-            values={activity}
+            values={buckets.map((b) => b.sessions)}
             label="Session activity"
-            metric="count"
+            metric="sessions"
             compact
           />
         </section>
@@ -104,13 +114,11 @@ const facts = traces.map((t) => ({
         </section>
         <section class="dash-card">
           <h5>Latency (p95)</h5><div class="dash-observe-value">
-            <strong data-observe-stat="latency"
-              >{Math.max(...traces.map(duration))}s</strong
-            ><span>Selected period</span>
+            <strong data-observe-stat="latency">{stats.latency}s</strong><span
+              >Selected period</span
+            >
           </div><DashboardChart
-            values={activity.map((n) =>
-              n ? Math.max(...traces.map(duration)) : 0,
-            )}
+            values={buckets.map((b) => b.latency)}
             label="Trace latency"
             metric="latency"
             compact
@@ -118,13 +126,11 @@ const facts = traces.map((t) => ({
         </section>
         <section class="dash-card">
           <h5>Total cost</h5><div class="dash-observe-value">
-            <strong data-observe-stat="cost">{money(totalCost)}</strong><span
+            <strong data-observe-stat="cost">{money(stats.cost)}</strong><span
               >Selected traces</span
             >
           </div><DashboardChart
-            values={activity.map((n) =>
-              Number(((n * totalCost) / traces.length).toFixed(3)),
-            )}
+            values={buckets.map((b) => b.cost / 1000)}
             label="Trace cost"
             metric="cost"
             compact
@@ -132,27 +138,44 @@ const facts = traces.map((t) => ({
         </section>
         <section class="dash-card">
           <h5>Cost by model</h5><div class="dash-observe-value">
-            <strong data-observe-stat="cost">{money(totalCost)}</strong><span
-              data-observe-stat="models">1 model</span
+            <strong data-observe-stat="cost">{money(stats.cost)}</strong><span
+              data-observe-stat="models">{stats.models} models</span
             >
           </div><div class="dash-model-bars">
-            <span
-              >{models[0].name}<strong data-observe-stat="cost"
-                >{money(totalCost)}</strong
-              ></span
-            ><div class="dash-bar">
-              <i style="width:100%"></i>
-            </div>
+            {
+              models.map((m) => {
+                const cost = traces
+                  .filter((t) => t.model === m.name)
+                  .reduce((sum, t) => sum + t.costMillis, 0);
+                return (
+                  <div data-observe-model={m.name} hidden={!cost}>
+                    <>
+                      <span>
+                        {m.name}
+                        <strong data-model-cost>{money(cost)}</strong>
+                      </span>
+                      <div class="dash-bar">
+                        <i
+                          style={`width:${stats.cost ? (cost / stats.cost) * 100 : 0}%`}
+                        />
+                      </div>
+                    </>
+                  </div>
+                );
+              })
+            }
           </div><p>Usage within the selected scope.</p>
         </section>
         <section class="dash-card dash-slowest">
           <h5>Slowest traces</h5><p>Open a trace to inspect its execution.</p>{
             [...traces]
-              .sort((a, b) => duration(b) - duration(a))
-              .map((t) => (
+              .sort((a, b) => b.durationSeconds - a.durationSeconds)
+              .map((t, i) => (
                 <button
                   type="button"
                   data-observe-record={t.id}
+                  data-slowest
+                  hidden={i >= 5}
                   data-open={`observe-${id}-${t.id}`}
                   aria-controls={`observe-${id}-${t.id}`}
                   aria-expanded="false"
@@ -166,19 +189,16 @@ const facts = traces.map((t) => ({
           }
         </section>
         <section class="dash-card">
-          <h5>Blocked steps</h5><div class="dash-observe-value">
-            <strong data-observe-stat="blocked">{blocked}</strong><span
-              data-observe-stat="blocked-rate"
-              >{
-                blocked
-                  ? `${((blocked / traces.length) * 100).toFixed(0)}% of traces`
-                  : "No blocked steps"
-              }</span
+          <h5>Errors &amp; blocked steps</h5><div class="dash-observe-value">
+            <strong data-observe-stat="issues"
+              >{stats.errors + stats.blocked}</strong
+            ><span data-observe-stat="issue-detail"
+              >{stats.errors} errors · {stats.blocked} blocked</span
             >
           </div><DashboardChart
-            values={activity.map((_, i) => (i === 6 ? blocked : 0))}
-            label="Blocked step activity"
-            metric="blocked"
+            values={buckets.map((b) => b.errors + b.blocked)}
+            label="Errors and blocked step activity"
+            metric="issues"
             compact
           />
         </section>
@@ -198,7 +218,7 @@ const facts = traces.map((t) => ({
             Follow a session or inspect an individual trace.
           </p>
         </div><span class="mock-pill" data-observe-stat="summary"
-          >{traces.length} traces · {traces.length} sessions</span
+          >{stats.count} traces · {stats.sessions} sessions</span
         >
       </div>
       <div data-tabs={`records-${id}`}>
@@ -233,7 +253,9 @@ const facts = traces.map((t) => ({
             /><select aria-label="Trace status" data-observe-filter="status"
               ><option value="">All statuses</option><option value="completed"
                 >Completed</option
-              ><option value="blocked">Blocked</option></select
+              ><option value="blocked">Blocked</option><option value="error"
+                >Error</option
+              ></select
             ><button
               type="button"
               class="dash-button"
@@ -272,31 +294,26 @@ const facts = traces.map((t) => ({
           >
             <div class="dash-card-heading">
               <h5>Trace activity</h5><span class="dash-activity-legend"
-                >● Completed <span>● Blocked</span></span
+                >● Completed <span>● Errors / blocked</span></span
               >
             </div><DashboardChart
               values={activity}
               label="Trace activity"
               bars
-              errors={activity.map((_, i) => (i === 6 ? blocked : 0))}
+              errors={buckets.map((b) => b.errors + b.blocked)}
               metric="activity"
             /><div class="dash-activity-stats">
               <span
                 ><strong data-observe-stat="total">{traces.length}</strong> traces</span
               ><span
-                ><strong data-observe-stat="latency"
-                  >{Math.max(...traces.map(duration))}s</strong
-                > p95 latency</span
+                ><strong data-observe-stat="latency">{stats.latency}s</strong> p95
+                latency</span
               ><span
                 ><strong data-observe-stat="tokens"
-                  >{
-                    traces
-                      .reduce((sum, t) => sum + t.steps * 420, 0)
-                      .toLocaleString()
-                  }</strong
+                  >{stats.tokens.toLocaleString()}</strong
                 > tokens</span
               ><span
-                ><strong data-observe-stat="cost">{money(totalCost)}</strong> total
+                ><strong data-observe-stat="cost">{money(stats.cost)}</strong> total
                 cost</span
               >
             </div>
@@ -328,12 +345,16 @@ const facts = traces.map((t) => ({
                             <span
                               class:list={[
                                 "mock-pill",
-                                t.blocked
+                                t.blocked || t.error
                                   ? "mock-pill--red"
                                   : "mock-pill--green",
                               ]}
                             >
-                              {t.blocked ? "1 blocked" : "Completed"}
+                              {t.error
+                                ? "Error"
+                                : t.blocked
+                                  ? "1 blocked"
+                                  : "Completed"}
                             </span>
                           </td>
                           <th scope="row">
@@ -361,9 +382,9 @@ const facts = traces.map((t) => ({
                           </td>
                           <td data-column="duration">{t.duration}</td>
                           <td data-column="tokens">
-                            {(t.steps * 420).toLocaleString()}
+                            {t.tokens.toLocaleString()}
                           </td>
-                          <td data-column="cost">{money(cost(t))}</td>
+                          <td data-column="cost">{money(t.costMillis)}</td>
                           <td data-column="timestamp">{t.when}</td>
                         </>
                       </>
@@ -377,7 +398,7 @@ const facts = traces.map((t) => ({
             No matching traces. Try a different filter or date range.
           </p><footer class="dash-table-footer">
             <span data-observe-stat="summary"
-              >{traces.length} traces · {traces.length} sessions</span
+              >{stats.count} traces · {stats.sessions} sessions</span
             ><span>All times in PT · Example data</span>
           </footer>
         </div>
@@ -388,11 +409,7 @@ const facts = traces.map((t) => ({
   </div>
   {
     traces.map((t) => (
-      <TraceDashboardDetail
-        id={`observe-${id}-${t.id}`}
-        trace={t}
-        cost={cost(t)}
-      />
+      <TraceDashboardDetail id={`observe-${id}-${t.id}`} trace={t} />
     ))
   }
 </div>

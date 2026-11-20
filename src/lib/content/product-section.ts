@@ -37,6 +37,11 @@ export const productSection = {
         "Bring company tools into the work with access your admin chooses.",
     },
     {
+      id: "cloud-agents",
+      name: "Cloud Agents",
+      summary: "Inspect cloud agents, their owners, and workspace files.",
+    },
+    {
       id: "observability",
       name: "Observability",
       summary: "Review agent activity and who can see it.",

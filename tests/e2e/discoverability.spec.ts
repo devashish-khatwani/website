@@ -2,7 +2,41 @@ import { expect, test } from "@playwright/test";
 import {
   expectNoHorizontalOverflow,
   expectVisibleFocusOutline,
+  expectNoPlansInNavigation,
 } from "./assertions";
+import { blogPosts } from "./blog-posts";
+
+test("every page keeps Plans out of desktop, open mobile and footer navigation", async ({
+  page,
+}) => {
+  for (const route of [
+    "/",
+    "/product/",
+    "/company/",
+    "/install/",
+    "/how-it-works/",
+    "/security/",
+    "/contact/",
+    "/plans/",
+    "/blog/",
+    ...blogPosts.map((post) => `/blog/${post.slug}/`),
+    "/missing-page/",
+  ]) {
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.goto(route);
+      await expect(page.locator(".site-header")).toBeVisible();
+      await expect(page.locator(".site-footer")).toHaveCount(1);
+      if (width === 390) {
+        await page.getByLabel("Open navigation", { exact: true }).click();
+        await expect(
+          page.getByRole("navigation", { name: "Mobile primary", exact: true }),
+        ).toBeVisible();
+      }
+      await expectNoPlansInNavigation(page);
+    }
+  }
+});
 
 test("shared layout declares the direct Glaux SVG favicon asset", async ({
   page,

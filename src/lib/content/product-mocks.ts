@@ -105,6 +105,15 @@ export const adminViews: MockView[] = [
     chips: ["Approved tools only", "Per-group access"],
   },
   {
+    ...pane("cloud-agents"),
+    name: "Cloud agents",
+    description: "Running and stopped cloud agents you can inspect.",
+    caption: "See where the work runs.",
+    takeaway:
+      "Find an agent, see who owns it, and inspect its workspace files.",
+    chips: ["Owners and runtime status", "Workspace files"],
+  },
+  {
     ...pane("observability"),
     description: "Inspect the steps and outcomes of runs you have access to.",
     caption: "See the work across your team.",
@@ -573,76 +582,6 @@ export const groups = [
   { name: "On-call", members: 1, access: "Slack #eng-ops" },
   { name: "Admins", members: 1, access: "Glaux Control Tower" },
 ];
-export const teamTraces: Trace[] = [
-  traces[0],
-  {
-    id: "tr_7a30d1",
-    person: "Jordan Kim",
-    task: "API latency report",
-    when: "Today, 9:15 AM",
-    steps: 8,
-    duration: "36s",
-    timeline: completed("Saved the API latency report"),
-  },
-  {
-    ...traces[3],
-    id: "tr_3c8e18",
-    person: "Marcus Chen",
-    when: "Yesterday, 6:20 PM",
-  },
-  traces[1],
-];
-export const workspaceTraces: Trace[] = [
-  ...teamTraces,
-  {
-    id: "tr_1a90c3",
-    person: "Elena Rossi",
-    task: "Invoice review, batch 77",
-    when: "Yesterday, 3:02 PM",
-    steps: 6,
-    duration: "29s",
-    timeline: completed("Reviewed batch 77"),
-  },
-  {
-    id: "tr_5e74b9",
-    person: "Aisha Bello",
-    task: "Ticket summary #4821",
-    when: "Yesterday, 1:47 PM",
-    steps: 3,
-    duration: "18s",
-    timeline: completed("Added a ticket summary"),
-  },
-  {
-    id: "tr_0b12e6",
-    person: "Tom Becker",
-    task: "Month-end checklist",
-    when: "Mon, 5:30 PM",
-    steps: 9,
-    duration: "48s",
-    timeline: completed("Saved the month-end checklist"),
-  },
-];
-export const ownTraces: Trace[] = [
-  {
-    id: "tr_6d42f0",
-    person: "Maya Ortiz",
-    task: "Audit export for Q4",
-    when: "Today, 8:55 AM",
-    steps: 4,
-    duration: "16s",
-    timeline: completed("Exported the Q4 audit log"),
-  },
-];
-export const observabilityTimes: Record<string, string> = {
-  tr_8f2c41: "2026-11-19T09:42",
-  tr_7a30d1: "2026-11-19T09:15",
-  tr_3c8e18: "2026-11-18T18:20",
-  tr_6a19b2: "2026-11-18T16:10",
-  tr_1a90c3: "2026-11-18T15:02",
-  tr_5e74b9: "2026-11-18T13:47",
-  tr_0b12e6: "2026-11-16T17:30",
-  tr_6d42f0: "2026-11-19T08:55",
-};
 export const artifacts = [
   {
     name: "cleanup-summary.md",

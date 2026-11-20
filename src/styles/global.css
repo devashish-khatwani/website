@@ -637,7 +637,7 @@ a {
   font-size: var(--text-h2);
 }
 
-.section-heading > p:not(.plain-label),
+.section-heading > p:not(.plain-label, .named-section-subhead),
 .security-cta p,
 .closing-cta p,
 .route-panel p {
@@ -646,6 +646,27 @@ a {
 
 .section-heading--compact {
   margin-block-end: 0;
+}
+
+:is(h1, h2).named-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-graphite);
+  font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+  line-height: 1.2;
+}
+
+.named-section-title > img {
+  flex: none;
+  width: auto;
+  height: 1.2em;
+}
+
+p.named-section-subhead {
+  color: var(--color-graphite);
+  font-size: clamp(1.125rem, 0.85rem + 1vw, 1.5rem);
+  line-height: 1.4;
 }
 
 .preview-list__items,

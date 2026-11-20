@@ -17,7 +17,6 @@ export const productNavigation = productSection.panes.map((pane) => ({
 
 export const primaryNavigation = [
   { label: "Install", href: "/install/" },
-  { label: "Plans", href: "/plans/" },
   { label: "Company", href: "/company/" },
   { label: "Blog", href: "/blog/" },
 ] as const;

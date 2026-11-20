@@ -23,8 +23,24 @@ test("company page renders W-09 mission, maturity status, and contact path", asy
 
   await expect(
     page.getByRole("heading", {
-      name: "Building useful AI work with visible control.",
+      name: "Company",
+      level: 1,
+      exact: true,
     }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Building useful AI work with visible control.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Mission", level: 2, exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Make AI useful without moving control out of the organization.",
+      { exact: true },
+    ),
   ).toBeVisible();
   await expect(
     page.getByText(
@@ -85,8 +101,16 @@ test("company page invites a governance-focused conversation without promises", 
 
   await expect(
     page.getByRole("heading", {
-      name: "Design-partner conversations are for teams with real governance needs.",
+      name: "Who should talk to us",
+      level: 2,
+      exact: true,
     }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Design-partner conversations are for teams with real governance needs.",
+      { exact: true },
+    ),
   ).toBeVisible();
   await expect(
     page.getByText(

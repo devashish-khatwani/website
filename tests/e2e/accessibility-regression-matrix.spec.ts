@@ -4,12 +4,12 @@ import { blogPosts } from "./blog-posts";
 import { productSection } from "../../src/lib/content/product-section";
 
 const routes = [
-  { path: "/", h1: "Your agent shouldn't reach production unless you say so." },
+  { path: "/", h1: "An AI coworker you can actually trust." },
   { path: "/product/", h1: "From question to useful outcome." },
   { path: "/security/", h1: "You choose what Glaux can access and do." },
   {
     path: "/company/",
-    h1: "Building useful AI work with visible control.",
+    h1: "Company",
   },
   { path: "/contact/", h1: "Tell us what your team wants AI to help with." },
   { path: "/install/", h1: "Put Glaux to work." },
@@ -39,7 +39,6 @@ const productLinks = productSection.panes.map((pane) => ({
 }));
 const primaryLinks = [
   { name: "Install", href: "/install/" },
-  { name: "Plans", href: "/plans/" },
   { name: "Company", href: "/company/" },
   { name: "Blog", href: "/blog/" },
 ] as const;

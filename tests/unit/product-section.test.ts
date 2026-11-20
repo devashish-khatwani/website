@@ -8,6 +8,11 @@ import {
   connections,
 } from "../../src/lib/content/product-mocks";
 
+import {
+  ownTraces,
+  workspaceTraces,
+} from "../../src/lib/content/product-mock-dataset";
+
 vi.mock("../../src/lib/content/product-section", async (importOriginal) => {
   const original =
     await importOriginal<
@@ -20,6 +25,11 @@ vi.mock("../../src/lib/content/product-section", async (importOriginal) => {
   copy.panes[1].summary = "Edited directory summary";
   copy.comingSoon.items[0].teaser = "Edited future teaser";
   return { ...original, productSection: copy };
+});
+
+test("Observability opens with a full week for Maya and the workspace", () => {
+  expect(ownTraces).toHaveLength(72);
+  expect(workspaceTraces).toHaveLength(288);
 });
 
 test("server renders complete default examples and uses shared product copy", async () => {

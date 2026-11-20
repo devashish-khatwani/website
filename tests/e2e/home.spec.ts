@@ -18,9 +18,7 @@ test("home page explains the governed desktop runtime and offers an honest next 
   page,
 }) => {
   await page.goto("/");
-  await expect(page).toHaveTitle(
-    /Your agent shouldn't reach production unless you say so/u,
-  );
+  await expect(page).toHaveTitle(/An AI coworker you can actually trust/u);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
     "noindex, nofollow",
@@ -29,7 +27,13 @@ test("home page explains the governed desktop runtime and offers an honest next 
     page.getByRole("link", { name: "Glaux home" }).locator("img"),
   ).toHaveAttribute("src", "/brand/glaux-lockup.svg");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Your agent shouldn't reach production unless you say so.",
+    "An AI coworker you can actually trust.",
+  );
+  await expect(page.locator(".home-hero__copy > .plain-label")).toHaveText(
+    "Governed AI for teams",
+  );
+  await expect(page.locator('a[href*="/plans"], a[href="#plans"]')).toHaveCount(
+    0,
   );
   await expect(
     page.getByText(/Each agent runs in the Glaux desktop app/u),
@@ -479,7 +483,7 @@ test("home page exposes canonical and draft Open Graph metadata", async ({
   );
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
     "content",
-    "Glaux | Your agent shouldn't reach production unless you say so.",
+    "Glaux | An AI coworker you can actually trust.",
   );
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
     "content",
@@ -524,5 +528,8 @@ test("robots and sitemap keep the draft homepage out of published routes", async
   );
   expect(sitemapText).not.toContain(
     "<loc>https://www.glauxagent.com/privacy/</loc>",
+  );
+  expect(sitemapText).not.toContain(
+    "<loc>https://www.glauxagent.com/plans/</loc>",
   );
 });

@@ -1,12 +1,10 @@
 ---
+import { workspace, people, groups } from "../../lib/content/product-mocks";
 import {
   ownTraces,
   teamTraces,
   workspaceTraces,
-  workspace,
-  people,
-  groups,
-} from "../../lib/content/product-mocks";
+} from "../../lib/content/product-mock-dataset";
 import ObservabilityScope from "./ObservabilityScope.astro";
 import MockIcon from "./MockIcon.astro";
 const scopes = [
@@ -111,14 +109,14 @@ const scopes = [
           type="datetime-local"
           aria-label="Observability start date"
           data-observe-filter="start"
-          value="2026-11-12T18:00"
+          value="2026-11-13T00:00"
         /></label
       ><label
         >End date<input
           type="datetime-local"
           aria-label="Observability end date"
           data-observe-filter="end"
-          value="2026-11-19T18:00"
+          value="2026-11-19T23:59"
         /></label
       >
     </div>

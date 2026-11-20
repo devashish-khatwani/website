@@ -23,12 +23,12 @@ describe("site shell navigation contract", () => {
       { label: "AI Gateway", href: "/#feature-ai-gateway" },
       { label: "Skills", href: "/#feature-skills" },
       { label: "Connected Tools", href: "/#feature-connected-tools" },
+      { label: "Cloud Agents", href: "/#feature-cloud-agents" },
       { label: "Observability", href: "/#feature-observability" },
       { label: "Audit", href: "/#feature-audit" },
     ]);
     expect(primaryNavigation).toEqual([
       { label: "Install", href: "/install/" },
-      { label: "Plans", href: "/plans/" },
       { label: "Company", href: "/company/" },
       { label: "Blog", href: "/blog/" },
     ]);
@@ -39,7 +39,6 @@ describe("site shell navigation contract", () => {
       { label: "How it works", href: "/how-it-works/" },
       { label: "Security", href: "/security/" },
       { label: "Install", href: "/install/" },
-      { label: "Plans", href: "/plans/" },
       { label: "Company", href: "/company/" },
       { label: "Blog", href: "/blog/" },
     ]);

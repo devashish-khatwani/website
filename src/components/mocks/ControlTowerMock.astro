@@ -3,6 +3,7 @@ import MockIcon from "./MockIcon.astro";
 import MockFrame from "./MockFrame.astro";
 import GatewayDashboard from "./GatewayDashboard.astro";
 import ObservabilityDashboard from "./ObservabilityDashboard.astro";
+import CloudAgents from "./CloudAgents.astro";
 import ConnectionDetail from "./ConnectionDetail.astro";
 import {
   adminViews,
@@ -202,6 +203,7 @@ const names = new Map(adminViews.map((view) => [view.id, view.name]));
         </div>
       </article>
       <GatewayDashboard />
+      <CloudAgents />
       <article data-pane="skills" id="mock-pane-skills" hidden>
         <header class="mock-view-header">
           <>

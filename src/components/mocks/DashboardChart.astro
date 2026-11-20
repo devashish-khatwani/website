@@ -76,8 +76,8 @@ const points = values
           <>
             <rect
               data-chart-bar={i}
-              x={58 + i * 80}
-              width="34"
+              x={40 + (i * 540) / values.length}
+              width={(540 / values.length) * 0.6}
               y={140 - ((value - (errors[i] ?? 0)) / max) * 112}
               height={((value - (errors[i] ?? 0)) / max) * 112}
               fill="#3b82f6"
@@ -85,8 +85,8 @@ const points = values
             />
             <rect
               data-chart-error={i}
-              x={58 + i * 80}
-              width="34"
+              x={40 + (i * 540) / values.length}
+              width={(540 / values.length) * 0.6}
               y={140 - (value / max) * 112}
               height={((errors[i] ?? 0) / max) * 112}
               fill="#dc7272"

@@ -1,0 +1,363 @@
+---
+import { adminViews, people, workspace } from "../../lib/content/product-mocks";
+const view = adminViews.find((item) => item.id === "cloud-agents");
+if (!view) throw new Error("Missing Cloud agents pane");
+const agents = [
+  {
+    id: "agt-1042",
+    owner: people[0],
+    status: "Running",
+    activity: "Working",
+    uptime: "2h 18m",
+    seen: "8s ago",
+  },
+  {
+    id: "agt-1039",
+    owner: people[1],
+    status: "Running",
+    activity: "Idle",
+    uptime: "1h 42m",
+    seen: "12s ago",
+  },
+  {
+    id: "agt-1041",
+    owner: people[2],
+    status: "Running",
+    activity: "Working",
+    uptime: "54m",
+    seen: "5s ago",
+  },
+  {
+    id: "agt-1043",
+    owner: people[4],
+    status: "Starting",
+    activity: "Unknown",
+    uptime: "—",
+    seen: "15s ago",
+  },
+  {
+    id: "agt-1034",
+    owner: people[5],
+    status: "Unknown",
+    activity: "Unknown",
+    uptime: "—",
+    seen: "6m ago",
+  },
+  {
+    id: "agt-1028",
+    owner: people[1],
+    status: "Stopped",
+    activity: "—",
+    uptime: "—",
+    seen: "Yesterday",
+  },
+];
+const summaries = [
+  { status: "Running", note: "2 working · 1 idle" },
+  { status: "Starting", note: "Not included in running" },
+  { status: "Stopped", note: "Previous instances" },
+  { status: "Unknown", note: "Last status unknown" },
+];
+---
+
+<article
+  data-pane="cloud-agents"
+  id="mock-pane-cloud-agents"
+  class="mock-dashboard-pane cloud-agents"
+  hidden
+>
+  <header class="mock-view-header">
+    <div class="mock-heading-copy">
+      <p class="mock-context">{workspace.organization} · {workspace.name}</p>
+      <h3>{view.name}</h3>
+      <p class="mock-description">{view.description}</p>
+    </div>
+    <span class="dash-health">Example snapshot · Nov 19, 2026</span>
+  </header>
+  <div
+    class="dash-kpis"
+    role="group"
+    aria-label="Cloud agent snapshot, with example data"
+  >
+    {
+      summaries.map(({ status, note }) => (
+        <div class="mock-card dash-kpi">
+          <p>{status === "Unknown" ? "Status unknown" : status}</p>
+          <strong>
+            {agents.filter((agent) => agent.status === status).length}
+          </strong>
+          <small class="mock-muted">{note}</small>
+        </div>
+      ))
+    }
+  </div>
+  <div class="mock-card cloud-fleet" data-cloud-fleet>
+    <header class="cloud-fleet-header">
+      <div>
+        <h4>Agent instances</h4><p class="mock-muted">
+          One row per cloud runtime instance
+        </p>
+      </div>
+      <span class="mock-pill">{agents.length} instances</span>
+    </header>
+    <div class="cloud-filters">
+      <label
+        >Search agents<input
+          type="search"
+          placeholder="Name, email or instance"
+          data-cloud-search
+        /></label
+      >
+      <label
+        >Runtime status<select data-cloud-status aria-label="Runtime status">
+          <option value="">All statuses</option>
+          {
+            summaries.map(({ status }) => (
+              <option value={status}>
+                {status === "Unknown" ? "Last status unknown" : status}
+              </option>
+            ))
+          }
+        </select></label
+      >
+    </div>
+    <div class="mock-browser cloud-browser" data-browser>
+      <div data-detail-list>
+        <div class="mock-table-head cloud-agent-row" aria-hidden="true">
+          <span>User / Agent instance</span><span>Runtime status</span><span
+            >Activity</span
+          ><span>Uptime</span><span>Last seen</span><span></span>
+        </div>
+        {
+          agents.map((agent) => (
+            <button
+              type="button"
+              class="mock-row cloud-agent-row"
+              data-cloud-row
+              data-status={agent.status}
+              data-open={`cloud-${agent.id}`}
+              aria-expanded="false"
+              aria-controls={`cloud-${agent.id}`}
+              aria-label={`View details for ${agent.owner.name}, ${agent.id}`}
+            >
+              <span class="mock-identity">
+                <>
+                  <span class="mock-avatar" aria-hidden="true">
+                    {agent.owner.name
+                      .split(" ")
+                      .map((part) => part[0])
+                      .join("")}
+                  </span>
+                  <span>
+                    <>
+                      <strong>{agent.owner.name}</strong>
+                      <small>{agent.id}</small>
+                      <small class="cloud-owner-email">
+                        {agent.owner.email}
+                      </small>
+                    </>
+                  </span>
+                </>
+              </span>
+              <span
+                class:list={[
+                  "mock-pill",
+                  agent.status === "Running" && "cloud-running",
+                ]}
+              >
+                {agent.status === "Unknown"
+                  ? "Last status unknown"
+                  : agent.status}
+              </span>
+              <span>
+                <small class="cloud-mobile-label">Activity</small>
+                {agent.activity}
+              </span>
+              <span>
+                <small class="cloud-mobile-label">Uptime</small>
+                {agent.uptime}
+              </span>
+              <span>
+                <small class="cloud-mobile-label">Last seen</small>
+                {agent.seen}
+              </span>
+              <span class="cloud-inspect">View details →</span>
+            </button>
+          ))
+        }
+        <p class="cloud-empty" data-cloud-empty role="status" hidden>
+          No agents match these filters. Try another name or status.
+        </p>
+      </div>
+      {
+        agents.map((agent) => {
+          const report = `# Release readiness handoff\n\nOwner: ${agent.owner.name}\nWorkspace: Acme / Production\n\nService checks completed. Two follow-up tasks need review.\n\nExample data. No customer files are connected.\n`;
+          return (
+            <section
+              class="mock-detail cloud-detail"
+              id={`cloud-${agent.id}`}
+              data-detail
+              hidden
+              tabindex="-1"
+              aria-label={`${agent.id} instance detail, with example data`}
+            >
+              <button type="button" class="mock-back" data-close>
+                ← Back to agents <span aria-hidden="true">×</span>
+              </button>
+              <>
+                <h4>{agent.owner.name}</h4>
+                <p class="mock-muted">{agent.id} · Cloud agent instance</p>
+              </>
+              <div data-tabs={`cloud-${agent.id}`}>
+                <div class="dash-tabs" aria-label="Instance views">
+                  <button
+                    type="button"
+                    data-tab="instance"
+                    aria-pressed="true"
+                    aria-controls={`${agent.id}-instance`}
+                  >
+                    Instance detail
+                  </button>
+                  <button
+                    type="button"
+                    data-tab="files"
+                    aria-pressed="false"
+                    aria-controls={`${agent.id}-files`}
+                  >
+                    Workspace files
+                  </button>
+                </div>
+                <div id={`${agent.id}-instance`} data-tab-panel="instance">
+                  <dl class="cloud-detail-grid">
+                    <div>
+                      <>
+                        <dt>User</dt>
+                        <dd>
+                          {agent.owner.name}
+                          <small class="mock-muted">{agent.owner.email}</small>
+                        </dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Workspace</dt>
+                        <dd>{workspace.organization} · Production</dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Groups</dt>
+                        <dd>{agent.owner.groups}</dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Runtime status</dt>
+                        <dd>
+                          {agent.status === "Unknown"
+                            ? "Last status unknown"
+                            : agent.status}
+                        </dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Activity</dt>
+                        <dd>{agent.activity}</dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Last seen</dt>
+                        <dd>{agent.seen}</dd>
+                      </>
+                    </div>
+                  </dl>
+                  {agent.status === "Unknown" && (
+                    <p class="cloud-storage-note">
+                      We can’t confirm whether this instance is still running.
+                      It is excluded from the running count.
+                    </p>
+                  )}
+                  {agent.status === "Stopped" && (
+                    <p class="cloud-storage-note">
+                      A previous instance for Sam Lee. Recorded storage does not
+                      confirm current file availability.
+                    </p>
+                  )}
+                  <section
+                    class="cloud-storage"
+                    aria-label="Recorded storage, with example data"
+                  >
+                    <h5>Recorded storage</h5>
+                    <dl>
+                      <>
+                        <dt>Workspace files</dt>
+                        <dd>
+                          <code>/workspace</code> · Attachment not verified.
+                        </dd>
+                        <dt>Agent state</dt>
+                        <dd>
+                          <code>/opt/data</code> · Attachment not verified.
+                        </dd>
+                      </>
+                    </dl>
+                    <p class="mock-muted cloud-storage-note">
+                      A recorded mount does not prove storage is attached or
+                      healthy.
+                    </p>
+                    <button
+                      type="button"
+                      class="mock-text-button"
+                      data-tab-go="files"
+                    >
+                      Browse workspace files →
+                    </button>
+                  </section>
+                </div>
+                <section
+                  id={`${agent.id}-files`}
+                  data-tab-panel="files"
+                  aria-label="Workspace files, with example data"
+                  hidden
+                >
+                  <>
+                    <h5>Workspace files</h5>
+                    <p class="mock-muted cloud-storage-note">
+                      Example files in <code>/workspace</code>. Agent state is
+                      sensitive. Its files are not listed.
+                    </p>
+                  </>
+                  <details class="cloud-folder">
+                    <summary>
+                      outputs/ <span class="mock-muted">1 file</span>
+                    </summary>
+                    <details class="cloud-file">
+                      <>
+                        <summary>release-readiness.md</summary>
+                        <pre>{report}</pre>
+                        <a
+                          class="mock-text-button"
+                          download={`${agent.id}-release-readiness.md`}
+                          href={`data:text/markdown;charset=utf-8,${encodeURIComponent(report)}`}
+                        >
+                          Download example file
+                        </a>
+                      </>
+                    </details>
+                  </details>
+                  <p class="cloud-storage-note mock-muted">
+                    Fictional files only. Customer storage is not connected.
+                  </p>
+                </section>
+              </div>
+            </section>
+          );
+        })
+      }
+    </div>
+    <p class="mock-muted cloud-fleet-footer" data-cloud-count role="status">
+      Showing {agents.length} of {agents.length} instances · Example data
+    </p>
+  </div>
+</article>

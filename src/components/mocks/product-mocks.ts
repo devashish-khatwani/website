@@ -1,4 +1,13 @@
-export {};
+import {
+  statistics,
+  series,
+  money,
+  allocateCosts,
+  displayTraceCosts,
+  usageTotals,
+  type TraceFact,
+  type Usage,
+} from "../../lib/content/product-mock-metrics";
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 const frames = [...document.querySelectorAll<HTMLElement>("[data-mock]")];
 const desktop = frames.find((frame) => frame.dataset.mock === "desktop");
@@ -87,6 +96,10 @@ function openDetails(button: HTMLButtonElement) {
   const browser = button.closest<HTMLElement>("[data-browser]");
   if (!browser) return;
   const id = button.dataset.open;
+  const template = browser.querySelector<HTMLTemplateElement>(
+    `template[id="${id}"]`,
+  );
+  if (template) template.replaceWith(template.content.cloneNode(true));
   browser.querySelectorAll<HTMLElement>("[data-detail]").forEach((panel) => {
     panel.hidden = panel.id !== id;
     if (!panel.hidden) panel.focus({ preventScroll: true });
@@ -110,6 +123,23 @@ function selectTab(root: HTMLElement, id: string) {
   }
 }
 
+function updateCloudFleet(root: HTMLElement) {
+  const query = required<HTMLInputElement>(root, "[data-cloud-search]")
+    .value.trim()
+    .toLowerCase();
+  const status = required<HTMLSelectElement>(root, "[data-cloud-status]").value;
+  const rows = [...root.querySelectorAll<HTMLElement>("[data-cloud-row]")];
+  closeDetails(required(root, "[data-browser]"), false);
+  for (const row of rows)
+    row.hidden =
+      !row.textContent?.toLowerCase().includes(query) ||
+      Boolean(status && row.dataset.status !== status);
+  const count = rows.filter((row) => !row.hidden).length;
+  required(root, "[data-cloud-empty]").hidden = count > 0;
+  required(root, "[data-cloud-count]").textContent =
+    `Showing ${count} of ${rows.length} instances · Example data`;
+}
+
 function updateUsage(root: HTMLElement) {
   const period = required<HTMLSelectElement>(root, "[data-usage-period]").value;
   const start = required<HTMLInputElement>(root, "[data-usage-start]");
@@ -128,63 +158,74 @@ function updateUsage(root: HTMLElement) {
     !start.value ||
     !end.value ||
     start.value > end.value ||
-    end.value > "2026-11-19";
+    end.value > "2026-11-19" ||
+    start.value < "2026-08-22";
   error.hidden = !invalid;
   error.textContent =
     !start.value || !end.value
       ? "Choose both a start and end date."
       : start.value > end.value
         ? "Start date must be on or before end date."
-        : "Example usage is available through November 19, 2026.";
+        : "Example usage is available August 22–November 19, 2026.";
   for (const input of [start, end])
     input.setAttribute("aria-invalid", String(invalid));
   root.querySelectorAll<HTMLElement>("[data-usage-results]").forEach((el) => {
     el.hidden = invalid;
   });
   if (invalid) return;
-  const factor =
-    (1 + (Date.parse(end.value) - Date.parse(start.value)) / 86400000) / 30;
+  const usage: Usage[] = JSON.parse(root.dataset.usage ?? "[]");
+  const periodRows = usage.filter(
+    (row) => row.date >= start.value && row.date <= end.value,
+  );
   const model = required<HTMLSelectElement>(root, "[data-usage-model]").value;
   const metric = required(root, '[data-usage-metric][aria-pressed="true"]')
     .dataset.usageMetric;
-  const money = (value: number) =>
-    value.toLocaleString("en-US", { style: "currency", currency: "USD" });
-  let requests = 0,
-    spend = 0,
-    tokens = 0,
-    count = 0,
+  const selectedRows = periodRows.filter(
+    (row) => model === "all" || row.model === model,
+  );
+  const {
+    requests,
+    costMillis,
+    tokens,
+    failures,
+    inputTokens,
+    outputTokens,
+    cachedInputTokens,
+    cacheWriteTokens,
+  } = usageTotals(selectedRows);
+  let count = 0,
     latency = "642 ms";
   const rows = [...root.querySelectorAll<HTMLElement>("[data-usage-row]")];
-  rows.forEach((row) => {
+  const totalsByModel = rows.map((row) =>
+    usageTotals(selectedRows.filter((r) => r.model === row.dataset.usageRow)),
+  );
+  const modelCosts = allocateCosts(
+    totalsByModel.map((totals) => totals.costMillis),
+  );
+  rows.forEach((row, i) => {
     row.hidden = model !== "all" && row.dataset.usageRow !== model;
     if (row.hidden) return;
     count++;
-    const r = Math.round(Number(row.dataset.requests) * factor);
-    const s = Math.round(Number(row.dataset.spend) * factor * 100) / 100;
-    const t = Number(row.dataset.tokens) * factor;
-    requests += r;
-    spend += s;
-    tokens += t;
+    const totals = totalsByModel[i];
+    if (!totals) return;
     if (model !== "all")
       latency = Number(row.dataset.latency) ? `${row.dataset.latency} ms` : "—";
-    required(row, '[data-value="requests"]').textContent = r.toLocaleString();
-    required(row, '[data-value="spend"]').textContent = money(s);
+    required(row, '[data-value="requests"]').textContent =
+      totals.requests.toLocaleString();
+    required(row, '[data-value="spend"]').textContent = money(
+      modelCosts[i] ?? 0,
+    );
     required(row, '[data-value="tokens"]').textContent =
-      `${(t / 1e6).toFixed(1)}M`;
-  });
-  for (const row of rows.filter((row) => !row.hidden)) {
-    const share = requests
-      ? (Math.round(Number(row.dataset.requests) * factor) / requests) * 100
-      : 0;
+      `${(totals.tokens / 1e6).toFixed(1)}M`;
+    const share = requests ? (totals.requests / requests) * 100 : 0;
     required(row, ".dash-share span").textContent = `${share.toFixed(1)}%`;
     required(row, ".dash-share i").style.width = `${share}%`;
-  }
-  const failures = Math.round(requests * 0.0006);
+  });
   required(root, "[data-usage-failures]").textContent =
     `${failures.toLocaleString()} failed requests`;
   for (const [key, value] of Object.entries({
     requests: requests.toLocaleString(),
-    spend: money(spend),
+    spend: money(costMillis),
     latency,
     success: requests
       ? `${((100 * (requests - failures)) / requests).toFixed(2)}%`
@@ -193,10 +234,16 @@ function updateUsage(root: HTMLElement) {
     required(root, `[data-usage-kpi="${key}"]`).textContent = value;
   required(root, "[data-usage-count]").textContent =
     `${count} ${count === 1 ? "model" : "models"}`;
-  [14.8 / 21, 6.2 / 21, 4.1 / 21, 0.6 / 21].forEach((ratio, i) => {
-    required(root, `[data-usage-token="${i}"]`).textContent =
-      `${((tokens * ratio) / 1e6).toFixed(1)}M`;
-  });
+  [inputTokens, outputTokens, cachedInputTokens, cacheWriteTokens].forEach(
+    (value, i) => {
+      const element = required(root, `[data-usage-token="${i}"]`);
+      element.textContent = `${(value / 1e6).toFixed(1)}M`;
+      if (i < 2)
+        required(root, `[data-usage-token="${i}"] + small`).textContent = tokens
+          ? `${Math.round((100 * value) / tokens)}% of total`
+          : "—";
+    },
+  );
   const format = (value: string) =>
     new Date(`${value}T12:00:00Z`).toLocaleDateString("en-US", {
       month: "long",
@@ -212,16 +259,20 @@ function updateUsage(root: HTMLElement) {
     "aria-label",
     `${metric === "spend" ? "Spend" : "Requests"} over time, with example data`,
   );
-  const total = metric === "spend" ? spend : requests;
-  const weights =
-    metric === "spend"
-      ? [12, 17, 11, 20, 13, 15, 12]
-      : [11, 15, 12, 16, 14, 18, 14];
-  const max = (total * Math.max(...weights)) / 100;
-  const points = weights
+  const dayCount =
+    1 + (Date.parse(end.value) - Date.parse(start.value)) / 86400000;
+  const values = Array.from({ length: dayCount }, (_, i) => {
+    const date = new Date(Date.parse(start.value) + i * 86400000)
+      .toISOString()
+      .slice(0, 10);
+    const totals = usageTotals(selectedRows.filter((r) => r.date === date));
+    return metric === "spend" ? totals.costMillis / 1000 : totals.requests;
+  });
+  const max = Math.max(...values) || 1;
+  const points = values
     .map(
-      (w, i) =>
-        `${40 + i * 90},${140 - (max ? ((total * w) / 100 / max) * 112 : 0)}`,
+      (value, i) =>
+        `${40 + (i * 540) / Math.max(values.length - 1, 1)},${140 - (value / max) * 112}`,
     )
     .join(" ");
   required(chart, "[data-chart-line]").setAttribute("points", points);
@@ -229,23 +280,12 @@ function updateUsage(root: HTMLElement) {
     "points",
     `40,140 ${points} 580,140`,
   );
-  required(chart, ".dash-chart-previous").style.display =
-    metric === "spend" || !total ? "none" : "";
-  required(chart, ".dash-chart-previous").setAttribute(
-    "points",
-    weights
-      .map(
-        (w, i) =>
-          `${40 + i * 90},${140 - (max ? ((total * w) / 100 / max) * 86 : 0)}`,
-      )
-      .join(" "),
-  );
   required(root, ".dash-legend").textContent =
-    metric === "spend"
-      ? "● Estimated spend"
-      : "● This period　┄ Previous period";
+    metric === "spend" ? "● Estimated spend" : "● Model requests";
   required(chart, "[data-chart-max]").textContent =
-    metric === "spend" ? money(max) : Math.round(max).toLocaleString();
+    metric === "spend"
+      ? money(Math.round(Math.max(...values) * 1000))
+      : Math.max(...values).toLocaleString();
   const dates = [
     Date.parse(start.value),
     (Date.parse(start.value) + Date.parse(end.value)) / 2,
@@ -260,17 +300,6 @@ function updateUsage(root: HTMLElement) {
   });
 }
 
-type ObserveTrace = {
-  id: string;
-  person: string;
-  group: string;
-  time: string;
-  duration: number;
-  cost: number;
-  tokens: number;
-  blocked: boolean;
-  search: string;
-};
 function observeField(root: HTMLElement, key: string) {
   return required<HTMLInputElement | HTMLSelectElement>(
     root,
@@ -304,11 +333,13 @@ function selectConversation(browser: HTMLElement, id?: string) {
 function updateObservability(root: HTMLElement) {
   const period = observeField(root, "period").value;
   if (period !== "custom") {
-    setObserveField(root, "end", "2026-11-19T18:00");
+    setObserveField(root, "end", "2026-11-19T23:59");
     setObserveField(
       root,
       "start",
-      new Date(Date.parse("2026-11-19T18:00Z") - Number(period) * 86400000)
+      new Date(
+        Date.parse("2026-11-19T00:00Z") - (Number(period) - 1) * 86400000,
+      )
         .toISOString()
         .slice(0, 16),
     );
@@ -332,9 +363,7 @@ function updateObservability(root: HTMLElement) {
     root,
     "[data-scope-panel]:not([hidden]) [data-observe-traces]",
   );
-  const facts: ObserveTrace[] = JSON.parse(
-    browser.dataset.observeTraces ?? "[]",
-  );
+  const facts: TraceFact[] = JSON.parse(browser.dataset.observeTraces ?? "[]");
   for (const option of user.querySelectorAll("option"))
     option.disabled = Boolean(
       option.value && !facts.some((trace) => trace.person === option.value),
@@ -349,45 +378,101 @@ function updateObservability(root: HTMLElement) {
   const group = observeField(root, "group").value,
     query = observeField(root, "query").value.toLowerCase(),
     status = observeField(root, "status").value;
-  const rows = facts.filter(
-    (trace) =>
-      !invalid &&
-      Date.parse(`${trace.time}Z`) >= start &&
-      Date.parse(`${trace.time}Z`) <= end &&
-      (!user.value || trace.person === user.value) &&
-      (!group || trace.group.split(", ").includes(group)) &&
-      (!query || trace.search.includes(query)) &&
-      (!status || trace.blocked === (status === "blocked")),
+  const rows = displayTraceCosts(
+    facts.filter(
+      (trace) =>
+        !invalid &&
+        Date.parse(`${trace.time}Z`) >= start &&
+        Date.parse(`${trace.time}Z`) <= end &&
+        (!user.value || trace.person === user.value) &&
+        (!group || trace.group.split(", ").includes(group)) &&
+        (!query || trace.search.includes(query)) &&
+        (!status ||
+          (status === "error"
+            ? trace.error
+            : status === "blocked"
+              ? trace.blocked
+              : !trace.blocked && !trace.error)),
+    ),
   );
   if (browser.classList.contains("has-detail")) closeDetails(browser, false);
   browser
     .querySelectorAll<HTMLElement>("[data-observe-record]")
     .forEach((record) => {
-      record.hidden = !rows.some(
+      const trace = rows.find(
         (trace) => trace.id === record.dataset.observeRecord,
       );
+      record.hidden = !trace;
+      const cost = record.querySelector('[data-column="cost"]');
+      if (trace && cost) cost.textContent = money(trace.costMillis);
     });
-  const count = rows.length,
-    cost = rows.reduce((sum, trace) => sum + trace.cost, 0),
-    blocked = rows.filter((trace) => trace.blocked).length;
-  const stats: Record<string, string> = {
+  const traceCosts = new Map(rows.map((trace) => [trace.id, trace.costMillis]));
+  const costLabels = [
+    ...browser.querySelectorAll<HTMLElement>("[data-trace-cost]"),
+    ...[
+      ...browser.querySelectorAll<HTMLTemplateElement>("[data-trace-template]"),
+    ].flatMap((template) => [
+      ...template.content.querySelectorAll<HTMLElement>("[data-trace-cost]"),
+    ]),
+  ];
+  for (const label of costLabels) {
+    const cost = traceCosts.get(label.dataset.traceCost ?? "");
+    if (cost !== undefined) label.textContent = money(cost);
+  }
+  const stats = statistics(rows),
+    count = stats.count;
+  const slowest = [...rows]
+    .sort((a, b) => b.durationSeconds - a.durationSeconds)
+    .slice(0, 5);
+  browser.querySelectorAll<HTMLElement>("[data-slowest]").forEach((button) => {
+    button.hidden = !slowest.some((t) => t.id === button.dataset.observeRecord);
+  });
+  const values: Record<string, string> = {
     count: String(count),
     total: String(count),
-    tokens: rows.reduce((sum, trace) => sum + trace.tokens, 0).toLocaleString(),
-    sessions: String(count),
-    cost: `$${cost.toFixed(3)}`,
-    latency: count
-      ? `${Math.max(...rows.map((trace) => trace.duration))}s`
-      : "—",
-    blocked: String(blocked),
-    "blocked-rate": count
-      ? `${((blocked / count) * 100).toFixed(0)}% of traces`
-      : "No blocked steps",
-    models: count ? "1 model" : "0 models",
-    summary: `${count} traces · ${count} sessions`,
+    tokens: stats.tokens.toLocaleString(),
+    sessions: String(stats.sessions),
+    cost: money(stats.cost),
+    latency: count ? `${stats.latency}s` : "—",
+    issues: String(stats.errors + stats.blocked),
+    "issue-detail": `${stats.errors} errors · ${stats.blocked} blocked`,
+    models: `${stats.models} models`,
+    summary: `${count} traces · ${stats.sessions} sessions`,
   };
+  browser
+    .querySelectorAll<HTMLElement>("[data-observe-model]")
+    .forEach((model) => {
+      const cost = rows
+        .filter((t) => t.model === model.dataset.observeModel)
+        .reduce((sum, t) => sum + t.costMillis, 0);
+      model.hidden = !cost;
+      required(model, "[data-model-cost]").textContent = money(cost);
+      required(model, ".dash-bar i").style.width =
+        `${stats.cost ? (cost / stats.cost) * 100 : 0}%`;
+    });
+  browser
+    .querySelectorAll<HTMLElement>(
+      "[data-session-choice], [data-session-panel]",
+    )
+    .forEach((session) => {
+      const turns = rows.filter(
+        (t) =>
+          t.sessionId ===
+          (session.dataset.sessionChoice ?? session.dataset.sessionPanel),
+      );
+      if (session.dataset.sessionChoice) session.hidden = !turns.length;
+      session.querySelectorAll("[data-session-turns]").forEach((el) => {
+        el.textContent = `${turns.length} ${turns.length === 1 ? "turn" : "turns"}`;
+      });
+      const tokens = session.querySelector("[data-session-tokens]"),
+        cost = session.querySelector("[data-session-cost]");
+      const totals = statistics(turns);
+      if (tokens)
+        tokens.textContent = `${totals.tokens.toLocaleString()} tokens`;
+      if (cost) cost.textContent = money(totals.cost);
+    });
   browser.querySelectorAll<HTMLElement>("[data-observe-stat]").forEach((el) => {
-    const value = stats[el.dataset.observeStat ?? ""];
+    const value = values[el.dataset.observeStat ?? ""];
     if (value !== undefined) el.textContent = value;
   });
   browser
@@ -406,32 +491,24 @@ function updateObservability(root: HTMLElement) {
   browser
     .querySelectorAll<SVGSVGElement>("[data-observe-chart]")
     .forEach((chart) => {
-      const values = Array.from({ length: 7 }, () => 0);
-      const errors = Array.from({ length: 7 }, () => 0);
-      for (const trace of rows) {
-        const index = Math.min(
-          6,
-          Math.floor(
-            ((Date.parse(`${trace.time}Z`) - start) / (end - start)) * 7,
-          ),
-        );
-        const value =
-          chart.dataset.observeChart === "cost"
-            ? trace.cost
-            : chart.dataset.observeChart === "blocked"
-              ? Number(trace.blocked)
-              : chart.dataset.observeChart === "latency"
-                ? trace.duration
-                : 1;
-        errors[index] = (errors[index] ?? 0) + Number(trace.blocked);
-        values[index] =
-          chart.dataset.observeChart === "latency"
-            ? Math.max(values[index] ?? 0, value)
-            : (values[index] ?? 0) + value;
-      }
+      const buckets = series(rows, start, end);
+      const values = buckets.map((b) =>
+        chart.dataset.observeChart === "cost"
+          ? b.cost / 1000
+          : chart.dataset.observeChart === "issues"
+            ? b.errors + b.blocked
+            : chart.dataset.observeChart === "latency"
+              ? b.latency
+              : chart.dataset.observeChart === "sessions"
+                ? b.sessions
+                : b.count,
+      );
+      const errors = buckets.map((b) => b.errors + b.blocked);
       const max = Math.max(...values) || 1;
       const points = values
-        .map((value, i) => `${40 + i * 90},${140 - (value / max) * 112}`)
+        .map(
+          (value, i) => `${40 + (i * 540) / 17},${140 - (value / max) * 112}`,
+        )
         .join(" ");
       required(chart, "[data-chart-line]").setAttribute("points", points);
       required(chart, ".dash-chart-fill").setAttribute(
@@ -452,7 +529,10 @@ function updateObservability(root: HTMLElement) {
           bar.setAttribute("height", String(((errors[i] ?? 0) / max) * 112));
         });
       const axis = chart.querySelector("[data-chart-max]");
-      if (axis) axis.textContent = String(Math.max(...values));
+      if (axis)
+        axis.textContent = Math.max(...values).toLocaleString("en-US", {
+          maximumFractionDigits: 2,
+        });
       chart.querySelectorAll("[data-chart-tick]").forEach((tick, i) => {
         tick.textContent = invalid
           ? "—"
@@ -678,6 +758,8 @@ for (const frame of frames) {
       field instanceof HTMLInputElement || field instanceof HTMLSelectElement
     ))
       return;
+    const cloud = field.closest<HTMLElement>("[data-cloud-fleet]");
+    if (cloud) updateCloudFleet(cloud);
     const root = field.closest<HTMLElement>("[data-observe]");
     if (!root) return;
     if (field.dataset.observeFilter) {
@@ -698,6 +780,8 @@ for (const frame of frames) {
   });
   const observe = frame.querySelector<HTMLElement>("[data-observe]");
   if (observe) updateObservability(observe);
+  const usage = frame.querySelector<HTMLElement>("[data-usage]");
+  if (usage) updateUsage(usage);
   frame.addEventListener("change", (event) => {
     const usage = (event.target as Element).closest<HTMLElement>(
       "[data-usage]",

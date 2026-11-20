@@ -22,12 +22,10 @@
   scroll-margin-top: 112px;
 }
 .product-mock-heading {
+  display: grid;
+  gap: var(--space-4);
   max-width: 760px;
   margin-bottom: 32px;
-}
-.product-mock-heading h2 {
-  margin-block: 14px 18px;
-  font-size: var(--text-h2);
 }
 .product-mock-heading > p:last-child {
   max-width: 64ch;
@@ -1465,9 +1463,6 @@ button.mock-skill {
   .product-mock-section {
     padding-block: 64px 24px;
   }
-  .product-mock-heading h2 {
-    font-size: 30px;
-  }
   .mock-frame,
   .mock-frame--desktop {
     height: auto;
@@ -2546,9 +2541,12 @@ button.mock-skill {
   font-size: 11px;
 }
 .dash-model-bars {
-  margin-block: 25px 18px;
+  margin-block: 16px;
 }
-.dash-model-bars > span {
+.dash-model-bars > div {
+  margin-bottom: 12px;
+}
+.dash-model-bars > div > span {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
@@ -3093,6 +3091,8 @@ button.mock-skill {
   background: white;
 }
 .dash-conversations {
+  max-height: 680px;
+  overflow-y: auto;
   border-right: 1px solid var(--mock-line);
   background: #fafbfd;
   padding: 12px;
@@ -3135,6 +3135,8 @@ button.mock-skill {
   margin-top: 6px;
 }
 .dash-conversation-detail {
+  max-height: 680px;
+  overflow-y: auto;
   min-width: 0;
   padding: 18px;
 }
@@ -3428,4 +3430,160 @@ button.mock-skill {
 .dash-activity-stats strong {
   color: var(--mock-ink);
   font-weight: 500;
+}
+
+/* Fleet inspection uses the same window, list/detail behavior and mobile pills. */
+.cloud-agents .dash-kpi > small {
+  display: block;
+  margin-top: 8px;
+}
+.cloud-fleet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cloud-fleet-header h4 {
+  font-size: 16px;
+}
+.cloud-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 0.5fr);
+  gap: 12px;
+  margin-block: 18px;
+}
+.cloud-filters label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--mock-muted);
+}
+.cloud-filters :is(input, select) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--mock-line);
+  border-radius: 6px;
+  background: white;
+  color: var(--mock-ink);
+  font: inherit;
+}
+.cloud-agent-row {
+  display: grid;
+  grid-template-columns:
+    minmax(145px, 1.6fr) minmax(90px, 1fr)
+    58px 62px 64px 90px;
+  gap: 8px;
+  align-items: center;
+  padding: 14px 8px;
+  font-size: 12px;
+}
+.cloud-agent-row > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cloud-agent-row .mock-pill {
+  justify-self: start;
+}
+.cloud-running {
+  color: var(--mock-green);
+  background: #ecfdf5;
+}
+.cloud-owner-email,
+.cloud-mobile-label {
+  display: none !important;
+}
+.cloud-inspect {
+  color: var(--mock-blue);
+}
+.cloud-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+}
+.cloud-detail-grid small {
+  display: block;
+}
+.cloud-detail h5 {
+  font-size: 14px;
+  margin-top: 18px;
+}
+.cloud-storage-note {
+  margin-top: 12px;
+  line-height: 1.6;
+}
+.cloud-storage {
+  border-top: 1px solid var(--mock-line);
+  margin-top: 18px;
+}
+.cloud-folder {
+  margin-top: 16px;
+  border: 1px solid var(--mock-line);
+  border-radius: 6px;
+}
+.cloud-folder summary {
+  min-height: 44px;
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+.cloud-folder summary > span {
+  float: right;
+}
+.cloud-file {
+  border-top: 1px solid var(--mock-line);
+  padding-inline: 12px;
+}
+.cloud-file .mock-text-button {
+  display: inline-flex;
+  align-items: center;
+}
+.cloud-detail .dash-tabs {
+  margin-top: 18px;
+}
+.cloud-detail pre {
+  overflow-wrap: anywhere;
+}
+.cloud-empty {
+  padding: 24px 8px;
+}
+.cloud-fleet-footer {
+  margin-top: 18px;
+  font-size: 12px;
+}
+@media (max-width: 1100px) {
+  .cloud-agent-row {
+    grid-template-columns: minmax(120px, 1.5fr) minmax(80px, 1fr) 60px 80px;
+  }
+  .cloud-agent-row > span:nth-child(4),
+  .cloud-agent-row > span:nth-child(5) {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .cloud-agent-row.mock-table-head {
+    display: none;
+  }
+  .cloud-filters,
+  .cloud-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cloud-agent-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding-block: 16px;
+  }
+  .cloud-agent-row > .mock-identity {
+    grid-column: 1 / -1;
+  }
+  .cloud-agent-row > span:nth-child(4),
+  .cloud-agent-row > span:nth-child(5) {
+    display: block;
+  }
+  .cloud-agent-row .cloud-mobile-label {
+    display: block !important;
+    margin: 0 0 2px;
+    font-size: 11px;
+  }
 }
