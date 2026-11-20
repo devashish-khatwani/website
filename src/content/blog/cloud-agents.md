@@ -42,9 +42,9 @@ It shows recorded storage too: where workspace files and agent state are mounted
 
 A cloud agent inherits the same access as the person it belongs to. It can reach exactly what that person is allowed to reach, under the same policies, and no more. Maya doesn't have to invent a second permission model for the cloud. Sam's agent works with Sam's access, in his workspace, under the policy she already set.
 
-Audit gives Maya a reviewable record of activity, so she can inspect the decisions behind the work.
+When it runs, those runs show up in Control Tower's Observability, so Maya can see what it did.
 
-Cloud Agents sits alongside AI Gateway, Connected Tools, and Audit in Control Tower. Maya can find the runtime, see who owns it, inspect its files, and follow the work from the same place she already governs models, tools, and policy.
+Cloud Agents sits alongside AI Gateway, Connected Tools, Observability, and Audit in Control Tower. Maya can find the runtime, see who owns it, inspect its files, and follow the work from the same place she already governs models, tools, and policy.
 
 The laptop can close. The agent can keep going. Maya can still find it, and she can still stand behind what it was allowed to do.
 
