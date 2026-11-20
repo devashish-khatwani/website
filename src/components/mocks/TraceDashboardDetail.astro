@@ -1,0 +1,148 @@
+---
+import ExecutionWaterfall from "./ExecutionWaterfall.astro";
+import { run, type Trace } from "../../lib/content/product-mocks";
+interface Props {
+  id: string;
+  trace: Trace;
+  cost: number;
+}
+const { id, trace, cost } = Astro.props;
+const steps = trace.timeline.map((s) => ({
+  ...s,
+  name: s.name.includes(".") ? "Approved tool" : s.name,
+}));
+---
+
+<section
+  class="mock-detail dash-drawer dash-trace-detail"
+  id={id}
+  data-detail
+  hidden
+  tabindex="-1"
+  aria-label={`${trace.task} trace, with example data`}
+>
+  <button type="button" class="mock-back" data-close
+    >← All traces <span aria-hidden="true">×</span></button
+  >
+  <p class="mock-context">Trace <code>{trace.id}</code></p><h4>
+    {trace.task}
+  </h4><p class="mock-muted">{trace.person} · Acme · {trace.when}</p>
+  <div class="dash-detail-stats">
+    <span
+      class:list={[
+        "mock-pill",
+        trace.blocked ? "mock-pill--red" : "mock-pill--green",
+      ]}>{trace.blocked ? "1 blocked" : "Completed"}</span
+    ><span>{trace.duration}</span><span>{trace.steps * 420} tokens</span><span
+      >${cost.toFixed(3)}</span
+    >
+  </div>
+  <div class="dash-detail-toolbar">
+    <div class="mock-segments" aria-label="Trace presentation">
+      <button type="button" data-trace-mode="transcript" aria-pressed="true"
+        >Transcript</button
+      ><button type="button" data-trace-mode="tree" aria-pressed="false"
+        >Tree</button
+      >
+    </div><button
+      type="button"
+      class="dash-button"
+      data-timeline-toggle
+      aria-pressed="true">Timeline</button
+    >
+  </div>
+  <ExecutionWaterfall trace={trace} />
+  <div data-tabs={`span-${id}`} class="dash-span-layout">
+    <div class="dash-span-list">
+      <div class="dash-trace-input">
+        <small>INPUT</small><p>
+          {trace.task === run.task ? run.prompt : trace.task}
+        </p>
+      </div><p class="dash-tree-root" hidden data-tree-root>↳ {trace.task}</p>{
+        steps.map((s, i) => (
+          <button
+            type="button"
+            class:list={[
+              "dash-span-card",
+              s.blocked && "dash-span-card--blocked",
+            ]}
+            data-tab={`step-${i}`}
+            aria-pressed={i === 0 ? "true" : "false"}
+            aria-controls={`${id}-step-${i}`}
+          >
+            <>
+              <span>
+                <>
+                  <strong>{s.name}</strong>
+                  <small>{s.duration}</small>
+                </>
+              </span>
+              <p>{s.outcome}</p>
+              {s.blocked && <b>Not granted</b>}
+            </>
+          </button>
+        ))
+      }
+    </div>
+    {
+      steps.map((s, i) => (
+        <section
+          id={`${id}-step-${i}`}
+          data-tab-panel={`step-${i}`}
+          hidden={i !== 0}
+          class="dash-span-selected"
+          role="region"
+          aria-label="Selected span, with example data"
+        >
+          <>
+            <p class="mock-context">
+              {s.blocked ? "Blocked step" : "Span detail"}
+            </p>
+            <h5>{s.name}</h5>
+            <span class="mock-muted">
+              {s.duration} · {run.model}
+            </span>
+            <dl class="dash-pairs">
+              <>
+                <div>
+                  <>
+                    <dt>Trace</dt>
+                    <dd>
+                      <code>{trace.id}</code>
+                    </dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>Person</dt>
+                    <dd>{trace.person}</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>Workspace</dt>
+                    <dd>Acme</dd>
+                  </>
+                </div>
+              </>
+            </dl>
+            <h5>Output</h5>
+            <p
+              class:list={[
+                "dash-span-output",
+                s.blocked && "dash-span-output--blocked",
+              ]}
+            >
+              {s.outcome}
+            </p>
+          </>
+        </section>
+      ))
+    }
+  </div>
+  <p class="mock-note">
+    {trace.steps} steps{steps.length < trace.steps ? " · Key steps shown" : ""}.
+    Prompts and tool data stay with the run. The console shows steps and
+    outcomes.
+  </p>
+</section>

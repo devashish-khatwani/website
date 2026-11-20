@@ -1,18 +1,15 @@
 ---
 import MockIcon from "./MockIcon.astro";
 import MockFrame from "./MockFrame.astro";
-import TraceExplorer from "./TraceExplorer.astro";
+import GatewayDashboard from "./GatewayDashboard.astro";
+import ObservabilityDashboard from "./ObservabilityDashboard.astro";
 import ConnectionDetail from "./ConnectionDetail.astro";
 import {
   adminViews,
   connections,
   people,
   groups,
-  models,
   skills,
-  ownTraces,
-  teamTraces,
-  workspaceTraces,
   auditEvents,
   workspace,
   accessExample,
@@ -21,10 +18,7 @@ interface Props {
   preview?: boolean;
 }
 const { preview = false } = Astro.props;
-const spend = models.reduce((sum, model) => sum + model.spend, 0);
 const names = new Map(adminViews.map((view) => [view.id, view.name]));
-const money = (value: number) =>
-  value.toLocaleString("en-US", { style: "currency", currency: "USD" });
 ---
 
 {
@@ -207,105 +201,7 @@ const money = (value: number) =>
           </table>
         </div>
       </article>
-      <article data-pane="ai-gateway" id="mock-pane-ai-gateway" hidden>
-        <header class="mock-view-header">
-          <>
-            <div class="mock-heading-copy">
-              <>
-                <p class="mock-context">{workspace.organization} workspace</p>
-                <h3>{names.get("ai-gateway")}</h3>
-                <p class="mock-description">
-                  {
-                    adminViews.find((view) => view.id === "ai-gateway")
-                      ?.description
-                  }
-                </p>
-              </>
-            </div>
-            <span class="mock-pill">
-              This month: {money(spend)} of{" "}
-              {money(workspace.monthlyBudget).replace(".00", "")}
-            </span>
-          </>
-        </header>
-        <div class="mock-summary-grid">
-          <div class="mock-card">
-            <>
-              <span class="mock-muted">Spend limits</span>
-              <strong>
-                {money(spend)} <small>used this month</small>
-              </strong>
-              <span class="mock-note">
-                of {money(workspace.monthlyBudget)} workspace limit
-              </span>
-            </>
-          </div>
-          <div class="mock-card">
-            <>
-              <span class="mock-muted">Gateway usage</span>
-              <strong>
-                {
-                  new Set(
-                    models
-                      .filter((model) => model.enabled)
-                      .map((model) => model.provider),
-                  ).size
-                }{" "}
-                <small>providers connected</small>
-              </strong>
-              <span class="mock-note">Workspace model availability</span>
-            </>
-          </div>
-        </div>
-        <table class="mock-table mock-model-table">
-          <>
-            <thead>
-              <tr>
-                <>
-                  <th>Model</th>
-                  <th class="mock-secondary">Provider</th>
-                  <th>Used by</th>
-                  <th>Spend this month</th>
-                  <th>Available</th>
-                </>
-              </tr>
-            </thead>
-            <tbody>
-              {models.map((model) => (
-                <tr>
-                  <>
-                    <th scope="row">{model.name}</th>
-                    <td class="mock-secondary">{model.provider}</td>
-                    <td>{model.groups}</td>
-                    <td class="mock-money">{money(model.spend)}</td>
-                    <td>
-                      <button
-                        type="button"
-                        class="mock-switch"
-                        role="switch"
-                        aria-label={`${model.name} available`}
-                        aria-checked={model.enabled ? "true" : "false"}
-                        data-model-toggle
-                      >
-                        <>
-                          <span class="mock-switch-track" aria-hidden="true" />
-                          <span data-switch-text>
-                            {model.enabled ? "Enabled" : "Off"}
-                          </span>
-                        </>
-                      </button>
-                    </td>
-                  </>
-                </tr>
-              ))}
-            </tbody>
-          </>
-        </table>
-        <p class="mock-note">
-          Model availability for this workspace. Example changes stay in this
-          mock.
-        </p>
-      </article>
+      <GatewayDashboard />
       <article data-pane="skills" id="mock-pane-skills" hidden>
         <header class="mock-view-header">
           <>
@@ -547,73 +443,7 @@ const money = (value: number) =>
           </p>
         </section>
       </article>
-      <article data-pane="observability" id="mock-pane-observability" hidden>
-        <header class="mock-view-header">
-          <>
-            <div class="mock-heading-copy">
-              <>
-                <p class="mock-context">{workspace.organization} workspace</p>
-                <h3>{names.get("observability")}</h3>
-                <p class="mock-description">
-                  {
-                    adminViews.find((view) => view.id === "observability")
-                      ?.description
-                  }
-                </p>
-              </>
-            </div>
-            <span class="mock-pill">{workspace.organization} workspace</span>
-          </>
-        </header>
-        <div class="mock-segments mock-scope" aria-label="Trace scope">
-          <>
-            <button
-              type="button"
-              data-scope="own"
-              aria-pressed="true"
-              aria-controls="scope-own"
-            >
-              My traces
-            </button>
-            <button
-              type="button"
-              data-scope="group"
-              aria-pressed="false"
-              aria-controls="scope-group"
-            >
-              Group: Engineering
-            </button>
-            <button
-              type="button"
-              data-scope="workspace"
-              aria-pressed="false"
-              aria-controls="scope-workspace"
-            >
-              Workspace: {workspace.organization}
-            </button>
-          </>
-        </div>
-        <p class="mock-note">
-          You see other people's traces only where you've been given access.
-        </p>
-        {[
-          { id: "own", traces: ownTraces },
-          { id: "group", traces: teamTraces },
-          { id: "workspace", traces: workspaceTraces },
-        ].map((scope) => (
-          <div
-            id={`scope-${scope.id}`}
-            data-scope-panel={scope.id}
-            hidden={scope.id !== "own"}
-          >
-            <TraceExplorer
-              id={`admin-trace-${scope.id}`}
-              traces={scope.traces}
-              admin
-            />
-          </div>
-        ))}
-      </article>
+      <ObservabilityDashboard />
       <article data-pane="audit" id="mock-pane-audit" hidden>
         <header class="mock-view-header">
           <>

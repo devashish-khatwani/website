@@ -1,0 +1,155 @@
+---
+import {
+  ownTraces,
+  teamTraces,
+  workspaceTraces,
+  workspace,
+  people,
+  groups,
+} from "../../lib/content/product-mocks";
+import ObservabilityScope from "./ObservabilityScope.astro";
+import MockIcon from "./MockIcon.astro";
+const scopes = [
+  { id: "own", name: "My traces", traces: ownTraces },
+  { id: "group", name: "Group: Engineering", traces: teamTraces },
+  { id: "workspace", name: "Workspace: Acme", traces: workspaceTraces },
+];
+---
+
+<article
+  data-pane="observability"
+  id="mock-pane-observability"
+  class="mock-dashboard-pane"
+  data-observe
+  hidden
+>
+  <header class="mock-view-header">
+    <div class="mock-heading-copy">
+      <p class="mock-context">{workspace.organization} workspace</p><h3>
+        Observability
+      </h3><p class="mock-description">
+        Explore traces and understand how your agents perform.
+      </p>
+    </div><span class="dash-health">Updated just now · example</span>
+  </header>
+  <div data-tabs="observability">
+    <div class="dash-tabs" aria-label="Observability views">
+      <button
+        type="button"
+        data-tab="dashboard"
+        aria-pressed="true"
+        aria-controls="observe-own-dashboard observe-group-dashboard observe-workspace-dashboard"
+        ><MockIcon name="desktop-app-traces" />Dashboard</button
+      ><button
+        type="button"
+        data-tab="deep-dive"
+        aria-pressed="false"
+        aria-controls="observe-own-deep-dive observe-group-deep-dive observe-workspace-deep-dive"
+        ><MockIcon name="audit" />Deep Dive</button
+      >
+    </div>
+    <div class="dash-observe-filters">
+      <div class="mock-segments mock-scope" aria-label="Trace scope">
+        {
+          scopes.map((s) => (
+            <button
+              type="button"
+              data-scope={s.id}
+              aria-pressed={s.id === "own" ? "true" : "false"}
+              aria-controls={`scope-${s.id}`}
+            >
+              {s.name}
+            </button>
+          ))
+        }
+      </div>
+      <div class="dash-observe-selects">
+        <label
+          >Workspaces<select
+            aria-label="Filter workspaces"
+            data-observe-filter="workspace"
+            ><option value="">All</option><option value="Acme" selected
+              >Acme</option
+            ></select
+          ></label
+        >
+        <label
+          >Groups<select aria-label="Filter groups" data-observe-filter="group"
+            ><option value="">All</option>{
+              groups.map((g) => <option>{g.name}</option>)
+            }</select
+          ></label
+        >
+        <label
+          >Users<select
+            aria-label="Filter users"
+            data-observe-filter="user"
+            disabled
+            ><option value="">All</option>{
+              people.map((p) => (
+                <option selected={p.name === "Maya Ortiz"}>{p.name}</option>
+              ))
+            }</select
+          ></label
+        >
+        <label
+          >Date range<select
+            aria-label="Observability period"
+            data-observe-filter="period"
+            ><option value="1">Last 24 hours</option><option value="3"
+              >Last 3 days</option
+            ><option value="7" selected>Last 7 days</option><option
+              value="custom">Custom</option
+            ></select
+          ></label
+        >
+      </div>
+    </div>
+    <div class="dash-custom-dates" data-observe-dates hidden>
+      <label
+        >Start date<input
+          type="datetime-local"
+          aria-label="Observability start date"
+          data-observe-filter="start"
+          value="2026-11-12T18:00"
+        /></label
+      ><label
+        >End date<input
+          type="datetime-local"
+          aria-label="Observability end date"
+          data-observe-filter="end"
+          value="2026-11-19T18:00"
+        /></label
+      >
+    </div>
+    <p class="dash-error" data-observe-error role="status" hidden></p>
+    <div class="dash-active-filters">
+      <span>Filtered by</span><div data-observe-chips>
+        <button
+          type="button"
+          class="dash-filter-chip"
+          data-observe-clear="workspace"
+          aria-label="Remove workspace filter">Acme ×</button
+        >
+      </div><button
+        type="button"
+        class="dash-text-button"
+        data-observe-clear="all">Clear filters</button
+      >
+    </div>
+    <p class="mock-note dash-access-note">
+      You see other people's traces only where you've been given access.
+    </p>
+    {
+      scopes.map((scope) => (
+        <div
+          id={`scope-${scope.id}`}
+          data-scope-panel={scope.id}
+          hidden={scope.id !== "own"}
+        >
+          <ObservabilityScope id={scope.id} traces={scope.traces} />
+        </div>
+      ))
+    }
+  </div>
+</article>

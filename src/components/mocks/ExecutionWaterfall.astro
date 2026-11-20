@@ -1,0 +1,40 @@
+---
+import type { Trace } from "../../lib/content/product-mocks";
+interface Props {
+  trace: Trace;
+}
+const { trace } = Astro.props;
+const total = trace.timeline.reduce(
+  (sum, step) => sum + parseFloat(step.duration),
+  0,
+);
+let elapsed = 0;
+const steps = trace.timeline.map((step) => {
+  const width = Math.max(1, (parseFloat(step.duration) / total) * 100);
+  const offset = Math.min((elapsed / total) * 100, 100 - width);
+  elapsed += parseFloat(step.duration);
+  return { ...step, width, offset };
+});
+---
+
+<div class="dash-span-timeline">
+  <p class="mock-note">Key step timing · full run {trace.duration}</p>
+  <div class="dash-waterfall-scale"><span>0s</span><span>{total}s</span></div>
+  {
+    steps.map((step) => (
+      <div>
+        <>
+          <>
+            <span>{step.name.includes(".") ? "Approved tool" : step.name}</span>
+            <div>
+              <i
+                class:list={[step.blocked && "is-blocked"]}
+                style={`margin-left:${step.offset}%;width:${step.width}%`}
+              />
+            </div>
+          </>
+        </>
+      </div>
+    ))
+  }
+</div>

@@ -81,8 +81,7 @@ export const adminViews: MockView[] = [
   },
   {
     ...pane("ai-gateway"),
-    description:
-      "Manage AI providers, models, and spending for this workspace.",
+    description: "Manage models, traffic, and spending for this workspace.",
     caption: "Choose the models for your workspace.",
     takeaway:
       "Turn models on or off for everyone, and see what each one costs.",
@@ -279,40 +278,50 @@ export const automation = {
 export const models = [
   {
     name: run.model,
-    provider: "Anthropic",
+    requests: 49314,
+    tokens: 8900000,
+    latency: 820,
     groups: "Engineering, Support",
     spend: 742.1,
     enabled: true,
   },
   {
     name: "GPT-4.1",
-    provider: "OpenAI",
+    requests: 35648,
+    tokens: 6400000,
+    latency: 640,
     groups: "Engineering, Finance",
     spend: 388.65,
     enabled: true,
   },
   {
     name: "GPT-4o mini",
-    provider: "OpenAI",
+    requests: 29802,
+    tokens: 3100000,
+    latency: 280,
     groups: "Support",
     spend: 41.2,
     enabled: true,
   },
   {
     name: "Llama 3.3 70B",
-    provider: "Self-hosted",
+    requests: 13656,
+    tokens: 2600000,
+    latency: 460,
     groups: "Engineering",
     spend: 112.55,
     enabled: true,
   },
   {
     name: "Gemini 2.5 Pro",
-    provider: "Google",
+    requests: 0,
+    tokens: 0,
+    latency: 0,
     groups: "—",
     spend: 0,
     enabled: false,
   },
-];
+] as const;
 export const skills = [
   {
     name: "Database cleanup checklist",
@@ -624,6 +633,16 @@ export const ownTraces: Trace[] = [
     timeline: completed("Exported the Q4 audit log"),
   },
 ];
+export const observabilityTimes: Record<string, string> = {
+  tr_8f2c41: "2026-11-19T09:42",
+  tr_7a30d1: "2026-11-19T09:15",
+  tr_3c8e18: "2026-11-18T18:20",
+  tr_6a19b2: "2026-11-18T16:10",
+  tr_1a90c3: "2026-11-18T15:02",
+  tr_5e74b9: "2026-11-18T13:47",
+  tr_0b12e6: "2026-11-16T17:30",
+  tr_6d42f0: "2026-11-19T08:55",
+};
 export const artifacts = [
   {
     name: "cleanup-summary.md",

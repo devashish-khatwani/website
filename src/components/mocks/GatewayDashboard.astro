@@ -1,0 +1,645 @@
+---
+import { models, workspace } from "../../lib/content/product-mocks";
+import DashboardChart from "./DashboardChart.astro";
+import MockIcon from "./MockIcon.astro";
+const spend = models.reduce((sum, m) => sum + m.spend, 0);
+const total = models.reduce((sum, m) => sum + m.requests, 0);
+const periodFactor = 7 / 30;
+const periodRequests = models.reduce(
+  (sum, m) => sum + Math.round(m.requests * periodFactor),
+  0,
+);
+const periodSpend =
+  models.reduce((sum, m) => sum + Math.round(m.spend * periodFactor * 100), 0) /
+  100;
+const money = (value: number) =>
+  value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+const tabs = [
+  ["dashboard", "Dashboard", "desktop-app-traces"],
+  ["configuration", "Configuration", "panel"],
+  ["limits", "Budgets & limits", "desktop-app-automations"],
+  ["routing", "Routing policies", "connected-tools"],
+];
+---
+
+<article
+  data-pane="ai-gateway"
+  id="mock-pane-ai-gateway"
+  class="mock-dashboard-pane"
+  hidden
+>
+  <header class="mock-view-header">
+    <div class="mock-heading-copy">
+      <p class="mock-context">{workspace.organization} workspace</p><h3>
+        AI Gateway
+      </h3><p class="mock-description">
+        One place to manage your models, traffic, and spend.
+      </p>
+    </div>
+    <span class="dash-health">● Gateway operational · example</span>
+  </header>
+  <div data-tabs="gateway">
+    <div class="dash-tabs" aria-label="AI Gateway views">
+      {
+        tabs.map(([id, label, icon]) => (
+          <button
+            type="button"
+            data-tab={id}
+            aria-pressed={id === "dashboard" ? "true" : "false"}
+            aria-controls={`gateway-${id}`}
+          >
+            <MockIcon name={icon ?? "ai-gateway"} />
+            {label}
+          </button>
+        ))
+      }
+    </div>
+    <section id="gateway-dashboard" data-tab-panel="dashboard" data-usage>
+      <div class="dash-toolbar">
+        <div>
+          <h4>Gateway overview</h4><p>
+            Model traffic, spend, and performance at a glance.
+          </p>
+        </div><div class="dash-controls">
+          <select aria-label="Usage model" data-usage-model
+            ><option value="all">All models</option>{
+              models.map((m, i) => <option value={i}>{m.name}</option>)
+            }</select
+          >
+          <select aria-label="Usage period" data-usage-period
+            ><option value="7" selected>Last 7 days</option><option value="30"
+              >Last 30 days</option
+            ><option value="90">Last 90 days</option><option value="custom"
+              >Custom</option
+            ></select
+          >
+        </div>
+      </div>
+      <div class="dash-custom-dates" data-usage-dates hidden>
+        <label
+          >Start date<input
+            type="date"
+            aria-label="Usage start date"
+            data-usage-start
+            value="2026-11-13"
+            max="2026-11-19"
+          /></label
+        ><label
+          >End date<input
+            type="date"
+            aria-label="Usage end date"
+            data-usage-end
+            value="2026-11-19"
+            max="2026-11-19"
+          /></label
+        >
+      </div>
+      <p class="dash-error" role="status" data-usage-error hidden></p>
+      <div class="dash-kpis" data-usage-results>
+        {
+          [
+            [
+              "Total requests",
+              periodRequests.toLocaleString(),
+              "requests",
+              "↗ +18.1%",
+              "vs. previous period",
+              "desktop-app-traces",
+            ],
+            [
+              "Estimated spend",
+              money(periodSpend),
+              "spend",
+              "↘ −8.2%",
+              "cost per 1K requests",
+              "audit",
+            ],
+            [
+              "Median response time",
+              "642 ms",
+              "latency",
+              "↘ −12.4%",
+              "request to completion",
+              "desktop-app-automations",
+            ],
+            [
+              "Success rate",
+              "99.94%",
+              "success",
+              "↗ +0.08%",
+              "18 failed requests",
+              "people-access",
+            ],
+          ].map(([label, value, key, trend, note, icon]) => (
+            <section class="dash-card dash-kpi">
+              <>
+                <div class="dash-card-heading">
+                  <>
+                    <h5>{label}</h5>
+                    <MockIcon name={icon ?? "ai-gateway"} />
+                  </>
+                </div>
+                <strong data-usage-kpi={key}>{value}</strong>
+                <div class="dash-kpi-bottom">
+                  <>
+                    <span>
+                      <>
+                        <b>{trend}</b>
+                        <small
+                          data-usage-failures={
+                            key === "success" ? "" : undefined
+                          }
+                        >
+                          {note}
+                        </small>
+                      </>
+                    </span>
+                    <svg viewBox="0 0 80 28" aria-hidden="true">
+                      <path d="M1 24 12 15 24 19 36 10 48 14 61 5 78 1" />
+                    </svg>
+                  </>
+                </div>
+              </>
+            </section>
+          ))
+        }
+      </div>
+      <div class="dash-gateway-middle">
+        <section class="dash-card dash-traffic" data-usage-results>
+          <div class="dash-card-heading">
+            <div>
+              <h4>Usage over time</h4><p data-usage-range>
+                November 13–19, 2026
+              </p>
+            </div><div class="mock-segments" aria-label="Usage chart metric">
+              <button
+                type="button"
+                data-usage-metric="requests"
+                aria-pressed="true">Requests</button
+              ><button
+                type="button"
+                data-usage-metric="spend"
+                aria-pressed="false">Spend</button
+              >
+            </div>
+          </div>
+          <p class="dash-legend">
+            <span>● This period</span><span>┄ Previous period</span>
+          </p>
+          <DashboardChart
+            values={[14200, 18900, 15400, 20200, 18120, 22600, 19000].map(
+              (value) => value * periodFactor,
+            )}
+            label="Requests over time"
+            ticks={["Nov 13", "Nov 16", "Nov 19"]}
+            previous
+          />
+        </section>
+        <section class="dash-card dash-budget">
+          <h4>Workspace budget</h4><p>November · Acme workspace</p><div
+            class="dash-ring"
+            role="img"
+            aria-label="64.2% of monthly budget used, with example data"
+          >
+            <svg viewBox="0 0 120 120" aria-hidden="true"
+              ><circle cx="60" cy="60" r="50"></circle><circle
+                cx="60"
+                cy="60"
+                r="50"
+                pathLength="100"
+                stroke-dasharray="64.225 100"></circle></svg
+            ><div><strong>64.2%</strong><small>of budget used</small></div>
+          </div><div class="dash-budget-total">
+            <strong>{money(spend)}</strong><span>of $2,000</span>
+          </div><div class="dash-bar"><i style="width:64.225%"></i></div><dl
+            class="dash-pairs"
+          >
+            <div><dt>Remaining</dt><dd>$715.50</dd></div><div>
+              <dt>Resets on</dt><dd>Dec 1, 2026</dd>
+            </div>
+          </dl><button type="button" class="dash-button" data-tab-go="limits"
+            >Manage budget →</button
+          >
+        </section>
+      </div>
+      <div class="dash-card dash-tokens" data-usage-results>
+        {
+          [
+            ["Input tokens", "3.5M", "70% of total"],
+            ["Output tokens", "1.4M", "30% of total"],
+            ["Cached input", "1.0M", "Included in input"],
+            ["Cache writes", "0.1M", "Included in input"],
+          ].map(([label, value, note], i) => (
+            <div>
+              <>
+                <span>{label}</span>
+                <strong data-usage-token={i}>{value}</strong>
+                <small>{note}</small>
+              </>
+            </div>
+          ))
+        }
+      </div>
+      <section class="dash-card dash-model-usage" data-usage-results>
+        <div class="dash-card-heading">
+          <div>
+            <h4>Model usage</h4><p>Where your requests and spend are going.</p>
+          </div><span data-usage-count>5 models</span>
+        </div><div class="dash-table-wrap">
+          <table class="dash-table">
+            <thead
+              ><tr
+                ><th>Model</th><th>Requests</th><th>Tokens</th><th
+                  >Est. spend</th
+                ><th>Response</th><th>Traffic share</th></tr
+              ></thead
+            ><tbody
+              >{
+                models.map((m, i) => (
+                  <tr
+                    data-usage-row={i}
+                    data-requests={m.requests}
+                    data-tokens={m.tokens}
+                    data-spend={m.spend}
+                    data-latency={m.latency}
+                  >
+                    <>
+                      <th scope="row">{m.name}</th>
+                      <td data-value="requests">
+                        {Math.round(m.requests * periodFactor).toLocaleString()}
+                      </td>
+                      <td data-value="tokens">
+                        {((m.tokens * periodFactor) / 1e6).toFixed(1)}M
+                      </td>
+                      <td data-value="spend">
+                        {money(Math.round(m.spend * periodFactor * 100) / 100)}
+                      </td>
+                      <td>{m.latency ? `${m.latency} ms` : "—"}</td>
+                      <td>
+                        <div class="dash-share">
+                          <>
+                            <div class="dash-bar">
+                              <i
+                                style={`width:${(m.requests / total) * 100}%`}
+                              />
+                            </div>
+                            <span>
+                              {((m.requests / total) * 100).toFixed(1)}%
+                            </span>
+                          </>
+                        </div>
+                      </td>
+                    </>
+                  </tr>
+                ))
+              }</tbody
+            >
+          </table>
+        </div>
+      </section>
+      <p class="mock-note">
+        Example usage estimates. The monthly budget stays fixed when filtering
+        usage.
+      </p>
+    </section>
+    <section id="gateway-configuration" data-tab-panel="configuration" hidden>
+      <div class="dash-toolbar">
+        <div>
+          <h4>Models & availability</h4><p>
+            Choose which models are available through your gateway.
+          </p>
+        </div><span class="mock-pill">Acme workspace</span>
+      </div>
+      <div class="dash-card dash-config-summary">
+        <div>
+          <strong data-enabled-count>4 models enabled</strong><span
+            >Available through the gateway</span
+          >
+        </div><div>
+          <strong>5 models configured</strong><span
+            >Workspace model catalog</span
+          >
+        </div><div>
+          <strong>Access stays scoped</strong><span
+            >Availability follows group permissions</span
+          >
+        </div>
+      </div>
+      <div class="mock-browser dash-config-browser" data-browser>
+        <div class="dash-model-grid" data-detail-list>
+          {
+            models.map((m, i) => (
+              <button
+                type="button"
+                class="dash-card dash-model-tile"
+                data-open={`gateway-model-${i}`}
+                aria-expanded="false"
+                aria-controls={`gateway-model-${i}`}
+              >
+                <>
+                  <span class="dash-model-monogram" aria-hidden="true">
+                    <MockIcon name="ai-gateway" />
+                  </span>
+                  <span
+                    class:list={["mock-pill", m.enabled && "mock-pill--green"]}
+                    data-model-status
+                  >
+                    {m.enabled ? "Enabled" : "Off"}
+                  </span>
+                  <strong>{m.name}</strong>
+                  <span>Chat & completions</span>
+                  <small>
+                    {m.groups === "—" ? "No groups assigned" : m.groups}
+                  </small>
+                  <span class="dash-tile-footer">
+                    Configure model <span aria-hidden="true">→</span>
+                  </span>
+                </>
+              </button>
+            ))
+          }
+        </div>
+        {
+          models.map((m, i) => (
+            <section
+              class="mock-detail dash-drawer"
+              id={`gateway-model-${i}`}
+              data-detail
+              hidden
+              tabindex="-1"
+              aria-label={`${m.name} configuration, with example data`}
+            >
+              <>
+                <button type="button" class="mock-back" data-close>
+                  ← Back to models <span aria-hidden="true">×</span>
+                </button>
+                <p class="mock-context">Model configuration</p>
+                <h4>{m.name}</h4>
+                <p class="mock-muted">Acme production workspace</p>
+                <dl class="dash-pairs">
+                  <>
+                    <div>
+                      <>
+                        <dt>Model type</dt>
+                        <dd>Chat & completions</dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Groups</dt>
+                        <dd>{m.groups}</dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Spend this month</dt>
+                        <dd>{money(m.spend)}</dd>
+                      </>
+                    </div>
+                  </>
+                </dl>
+                <h5>Workspace availability</h5>
+                <button
+                  type="button"
+                  class="mock-switch"
+                  role="switch"
+                  aria-label={`${m.name} available`}
+                  aria-checked={m.enabled ? "true" : "false"}
+                  data-model-toggle
+                >
+                  <>
+                    <span class="mock-switch-track" aria-hidden="true" />
+                    <span data-switch-text>
+                      {m.enabled ? "Enabled" : "Off"}
+                    </span>
+                  </>
+                </button>
+                <div class="dash-notice">
+                  Model availability follows workspace access policies. Enabling
+                  a model does not grant access.
+                </div>
+                <p class="mock-note">
+                  Example changes stay in this mock and reset on refresh.
+                </p>
+              </>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+    <section id="gateway-limits" data-tab-panel="limits" hidden>
+      <div class="dash-toolbar">
+        <div>
+          <h4>Budgets & limits</h4><p>
+            Keep workspace spending and request volume within bounds.
+          </p>
+        </div><span class="mock-pill mock-pill--green">Within budget</span>
+      </div>
+      <section class="dash-card">
+        <div class="dash-card-heading">
+          <div>
+            <h4>Workspace budget & rate limits</h4><p>
+              Acme production · monthly window
+            </p>
+          </div>
+        </div><div class="dash-limits-grid">
+          <div class="dash-limit-spend">
+            <span>SPEND THIS MONTH</span><strong>$1,284.50</strong><p>
+              of $2,000 workspace limit
+            </p><div class="dash-bar"><i style="width:64.225%"></i></div><dl
+              class="dash-pairs"
+            >
+              <div><dt>Remaining</dt><dd>$715.50</dd></div><div>
+                <dt>Next reset</dt><dd>Dec 1, 2026</dd>
+              </div>
+            </dl>
+          </div><div class="dash-settings">
+            <div>
+              <span>Monthly hard limit</span><strong
+                >$2,000.00 <small>USD</small></strong
+              ><p>Requests stop when the limit is reached.</p>
+            </div><div>
+              <span>Soft threshold</span><strong
+                >$1,600.00 <small>80%</small></strong
+              ><p>Notify workspace admins before the cap.</p>
+            </div><div>
+              <span>Request rate</span><strong
+                >500 <small>requests / minute</small></strong
+              ><p>Applied within the workspace.</p>
+            </div><div>
+              <span>Token rate</span><strong
+                >1,000,000 <small>tokens / minute</small></strong
+              ><p>Across available models.</p>
+            </div><div>
+              <span>Parallel requests</span><strong
+                >50 <small>concurrent requests</small></strong
+              ><p>Maximum requests in progress.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="dash-card">
+        <div class="dash-card-heading">
+          <div>
+            <h4>Model limits</h4><p>Example limits grouped by model.</p>
+          </div>
+        </div><div class="dash-table-wrap">
+          <table class="dash-table">
+            <thead
+              ><tr
+                ><th>Model</th><th>Spend this month</th><th>Requests / min</th
+                ><th>Tokens / min</th><th>Status</th></tr
+              ></thead
+            ><tbody
+              >{
+                models.map((m, i) => (
+                  <tr>
+                    <>
+                      <th scope="row">{m.name}</th>
+                      <td>{money(m.spend)}</td>
+                      <td>{i === 4 ? "—" : "120"}</td>
+                      <td>{i === 4 ? "—" : "250,000"}</td>
+                      <td>
+                        <span class="mock-pill">
+                          {m.enabled ? "Within limit" : "Off"}
+                        </span>
+                      </td>
+                    </>
+                  </tr>
+                ))
+              }</tbody
+            >
+          </table>
+        </div>
+      </section><p class="mock-note">
+        Illustrative limits for Acme. No settings are published.
+      </p>
+    </section>
+    <section id="gateway-routing" data-tab-panel="routing" hidden>
+      <div class="dash-toolbar">
+        <div>
+          <h4>Routing policies</h4><p>
+            Choose a strategy for requests among eligible models.
+          </p>
+        </div><span class="mock-pill">2 policies</span>
+      </div>
+      <div class="mock-browser dash-routing-browser" data-browser>
+        <div class="dash-policy-list" data-detail-list>
+          {
+            [
+              [
+                "General assistant",
+                "Priority & fallbacks",
+                "Claude Sonnet 4.5 → GPT-4.1",
+                "Engineering, Support",
+              ],
+              [
+                "Quick summaries",
+                "Lowest cost",
+                "GPT-4o mini · Llama 3.3 70B",
+                "Support",
+              ],
+            ].map(([name, strategy, chain, groups], i) => (
+              <button
+                type="button"
+                class="dash-card dash-policy"
+                data-open={`gateway-policy-${i}`}
+                aria-expanded="false"
+                aria-controls={`gateway-policy-${i}`}
+              >
+                <>
+                  <div>
+                    <>
+                      <MockIcon name="connected-tools" />
+                      <strong>{name}</strong>
+                      <span class="mock-pill">{strategy}</span>
+                    </>
+                  </div>
+                  <p>{chain}</p>
+                  <small>{groups}</small>
+                  <span>View policy →</span>
+                </>
+              </button>
+            ))
+          }
+        </div>
+        {
+          ["General assistant", "Quick summaries"].map((name, i) => (
+            <section
+              class="mock-detail dash-drawer"
+              id={`gateway-policy-${i}`}
+              data-detail
+              hidden
+              tabindex="-1"
+              aria-label={`${name} routing, with example data`}
+            >
+              <>
+                <button type="button" class="mock-back" data-close>
+                  ← Back to policies <span aria-hidden="true">×</span>
+                </button>
+                <p class="mock-context">Routing policy</p>
+                <h4>{name}</h4>
+                <dl class="dash-pairs">
+                  <>
+                    <div>
+                      <>
+                        <dt>Strategy</dt>
+                        <dd>
+                          {i === 0 ? "Priority & fallbacks" : "Lowest cost"}
+                        </dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Timeout</dt>
+                        <dd>30 seconds</dd>
+                      </>
+                    </div>
+                    <div>
+                      <>
+                        <dt>Retries</dt>
+                        <dd>2</dd>
+                      </>
+                    </div>
+                  </>
+                </dl>
+                <h5>{i === 0 ? "Model priority" : "Eligible models"}</h5>
+                <ol class="dash-route-chain">
+                  {(i === 0
+                    ? [models[0], models[1]]
+                    : [models[2], models[3]]
+                  ).map((m, n) => (
+                    <li>
+                      <span>{n + 1}</span>
+                      <div>
+                        <strong>{m.name}</strong>
+                        <small>
+                          {i === 0
+                            ? n === 0
+                              ? "Primary model"
+                              : "Fallback model"
+                            : "Cost-based selection"}
+                        </small>
+                      </div>
+                      <span class="mock-pill mock-pill--green">Eligible</span>
+                    </li>
+                  ))}
+                </ol>
+                <div class="dash-notice">
+                  Routing respects existing model access. A fallback never adds
+                  permissions.
+                </div>
+                <p class="mock-note">
+                  Configuration example only. No request is sent.
+                </p>
+              </>
+            </section>
+          ))
+        }
+      </div><div class="dash-notice">
+        <MockIcon name="people-access" />Routing does not grant model access.
+        Group permissions still apply.
+      </div>
+    </section>
+  </div>
+</article>

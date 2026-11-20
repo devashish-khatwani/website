@@ -1,0 +1,398 @@
+---
+import {
+  models,
+  people,
+  groups,
+  run,
+  observabilityTimes,
+  type Trace,
+} from "../../lib/content/product-mocks";
+import SessionsWorkbench from "./SessionsWorkbench.astro";
+import DashboardChart from "./DashboardChart.astro";
+import TraceDashboardDetail from "./TraceDashboardDetail.astro";
+interface Props {
+  id: string;
+  traces: Trace[];
+}
+const { id, traces } = Astro.props;
+const cost = (trace: Trace) => trace.steps * 0.014;
+const money = (value: number) => `$${value.toFixed(3)}`;
+const totalCost = traces.reduce((sum, t) => sum + cost(t), 0);
+const duration = (trace: Trace) =>
+  trace.duration.includes("m")
+    ? parseInt(trace.duration) * 60 +
+      parseInt(trace.duration.split(" ")[1] || "0")
+    : parseInt(trace.duration);
+const activity = Array.from(
+  { length: 7 },
+  (_, i) =>
+    traces.filter(
+      (t) =>
+        (t.when.startsWith("Today")
+          ? 6
+          : t.when.startsWith("Yesterday")
+            ? 5
+            : 3) === i,
+    ).length,
+);
+const blocked = traces.filter((t) => t.blocked).length;
+const facts = traces.map((t) => ({
+  id: t.id,
+  person: t.person,
+  group: people.find((p) => p.name === t.person)?.groups ?? "",
+  time: observabilityTimes[t.id],
+  duration: duration(t),
+  cost: cost(t),
+  tokens: t.steps * 420,
+  blocked: Boolean(t.blocked),
+  search:
+    `${t.id} ${t.task} ${t.person} ${t.task === run.task ? run.prompt : t.task} ${t.timeline.map((step) => step.outcome).join(" ")}`.toLowerCase(),
+}));
+---
+
+<div
+  class="mock-browser dash-observe-browser"
+  data-browser
+  data-observe-traces={JSON.stringify(facts)}
+>
+  <div data-detail-list>
+    <section id={`observe-${id}-dashboard`} data-tab-panel="dashboard">
+      <div class="dash-toolbar">
+        <div>
+          <h4>Overview</h4><p>
+            Performance and usage across the selected traces.
+          </p>
+        </div><button type="button" class="dash-button" data-tab-go="deep-dive"
+          >Open Deep Dive →</button
+        >
+      </div>
+      <div class="dash-observe-grid">
+        <section class="dash-card">
+          <h5>Total traces</h5><div class="dash-observe-value">
+            <strong data-observe-stat="count">{traces.length}</strong><span
+              >Selected period</span
+            >
+          </div><DashboardChart
+            values={activity}
+            label="Trace activity"
+            metric="count"
+            compact
+          />
+        </section>
+        <section class="dash-card">
+          <h5>Sessions</h5><div class="dash-observe-value">
+            <strong data-observe-stat="sessions">{traces.length}</strong><span
+              >Selected period</span
+            >
+          </div><DashboardChart
+            values={activity}
+            label="Session activity"
+            metric="count"
+            compact
+          />
+        </section>
+        <section class="dash-card dash-assignment">
+          <h5>Glaux users</h5><div class="dash-observe-value">
+            <strong>{people.length}</strong><span>Assigned in Acme</span>
+          </div><div class="dash-assignment-split">
+            <span>People<strong>{people.length}</strong></span><span
+              >Groups<strong>{groups.length}</strong></span
+            >
+          </div><p>
+            Current workspace membership, independent of trace filters.
+          </p>
+        </section>
+        <section class="dash-card">
+          <h5>Latency (p95)</h5><div class="dash-observe-value">
+            <strong data-observe-stat="latency"
+              >{Math.max(...traces.map(duration))}s</strong
+            ><span>Selected period</span>
+          </div><DashboardChart
+            values={activity.map((n) =>
+              n ? Math.max(...traces.map(duration)) : 0,
+            )}
+            label="Trace latency"
+            metric="latency"
+            compact
+          />
+        </section>
+        <section class="dash-card">
+          <h5>Total cost</h5><div class="dash-observe-value">
+            <strong data-observe-stat="cost">{money(totalCost)}</strong><span
+              >Selected traces</span
+            >
+          </div><DashboardChart
+            values={activity.map((n) =>
+              Number(((n * totalCost) / traces.length).toFixed(3)),
+            )}
+            label="Trace cost"
+            metric="cost"
+            compact
+          />
+        </section>
+        <section class="dash-card">
+          <h5>Cost by model</h5><div class="dash-observe-value">
+            <strong data-observe-stat="cost">{money(totalCost)}</strong><span
+              data-observe-stat="models">1 model</span
+            >
+          </div><div class="dash-model-bars">
+            <span
+              >{models[0].name}<strong data-observe-stat="cost"
+                >{money(totalCost)}</strong
+              ></span
+            ><div class="dash-bar">
+              <i style="width:100%"></i>
+            </div>
+          </div><p>Usage within the selected scope.</p>
+        </section>
+        <section class="dash-card dash-slowest">
+          <h5>Slowest traces</h5><p>Open a trace to inspect its execution.</p>{
+            [...traces]
+              .sort((a, b) => duration(b) - duration(a))
+              .map((t) => (
+                <button
+                  type="button"
+                  data-observe-record={t.id}
+                  data-open={`observe-${id}-${t.id}`}
+                  aria-controls={`observe-${id}-${t.id}`}
+                  aria-expanded="false"
+                >
+                  <>
+                    <span>{t.task}</span>
+                    <strong>{t.duration} ↗</strong>
+                  </>
+                </button>
+              ))
+          }
+        </section>
+        <section class="dash-card">
+          <h5>Blocked steps</h5><div class="dash-observe-value">
+            <strong data-observe-stat="blocked">{blocked}</strong><span
+              data-observe-stat="blocked-rate"
+              >{
+                blocked
+                  ? `${((blocked / traces.length) * 100).toFixed(0)}% of traces`
+                  : "No blocked steps"
+              }</span
+            >
+          </div><DashboardChart
+            values={activity.map((_, i) => (i === 6 ? blocked : 0))}
+            label="Blocked step activity"
+            metric="blocked"
+            compact
+          />
+        </section>
+      </div>
+      <p class="mock-note">
+        {
+          id === "own"
+            ? "Showing your traces."
+            : "Showing traces you have been granted access to."
+        } Example data · November 19, 2026
+      </p>
+    </section>
+    <section id={`observe-${id}-deep-dive`} data-tab-panel="deep-dive" hidden>
+      <div class="dash-toolbar">
+        <div>
+          <h4>Deep Dive</h4><p>
+            Follow a session or inspect an individual trace.
+          </p>
+        </div><span class="mock-pill" data-observe-stat="summary"
+          >{traces.length} traces · {traces.length} sessions</span
+        >
+      </div>
+      <div data-tabs={`records-${id}`}>
+        <div class="mock-segments dash-record-tabs" aria-label="Record type">
+          <button
+            type="button"
+            data-tab="sessions"
+            aria-pressed="true"
+            aria-controls={`observe-${id}-sessions`}>Sessions</button
+          ><button
+            type="button"
+            data-tab="traces"
+            aria-pressed="false"
+            aria-controls={`observe-${id}-traces`}>Traces</button
+          >
+        </div>
+        <div id={`observe-${id}-sessions`} data-tab-panel="sessions">
+          <SessionsWorkbench id={id} traces={traces} />
+        </div>
+        <div
+          id={`observe-${id}-traces`}
+          data-tab-panel="traces"
+          hidden
+          data-traces-workbench
+        >
+          <div class="dash-traces-toolbar">
+            <input
+              type="search"
+              aria-label="Search traces"
+              placeholder="Search by trace name, ID, input or output…"
+              data-observe-filter="query"
+            /><select aria-label="Trace status" data-observe-filter="status"
+              ><option value="">All statuses</option><option value="completed"
+                >Completed</option
+              ><option value="blocked">Blocked</option></select
+            ><button
+              type="button"
+              class="dash-button"
+              data-activity-toggle
+              aria-pressed="true"
+              aria-controls={`activity-${id}`}>Chart</button
+            ><details class="dash-columns">
+              <summary>Columns</summary><div>
+                <strong>Visible columns</strong>{
+                  [
+                    "User",
+                    "Group",
+                    "Workspace",
+                    "Duration",
+                    "Tokens",
+                    "Cost",
+                    "Timestamp",
+                  ].map((name) => (
+                    <label>
+                      <input
+                        type="checkbox"
+                        data-observe-column={name.toLowerCase()}
+                        checked={name !== "Group" && name !== "Workspace"}
+                      />
+                      {name}
+                    </label>
+                  ))
+                }
+              </div>
+            </details>
+          </div>
+          <section
+            class="dash-card dash-trace-activity"
+            id={`activity-${id}`}
+            data-trace-activity
+          >
+            <div class="dash-card-heading">
+              <h5>Trace activity</h5><span class="dash-activity-legend"
+                >● Completed <span>● Blocked</span></span
+              >
+            </div><DashboardChart
+              values={activity}
+              label="Trace activity"
+              bars
+              errors={activity.map((_, i) => (i === 6 ? blocked : 0))}
+              metric="activity"
+            /><div class="dash-activity-stats">
+              <span
+                ><strong data-observe-stat="total">{traces.length}</strong> traces</span
+              ><span
+                ><strong data-observe-stat="latency"
+                  >{Math.max(...traces.map(duration))}s</strong
+                > p95 latency</span
+              ><span
+                ><strong data-observe-stat="tokens"
+                  >{
+                    traces
+                      .reduce((sum, t) => sum + t.steps * 420, 0)
+                      .toLocaleString()
+                  }</strong
+                > tokens</span
+              ><span
+                ><strong data-observe-stat="cost">{money(totalCost)}</strong> total
+                cost</span
+              >
+            </div>
+          </section>
+          <div class="dash-table-wrap">
+            <table
+              class="dash-table dash-traces-table"
+              aria-label="Traces, with example data"
+            >
+              <thead
+                ><tr
+                  ><th>Status</th><th>Trace</th><th data-column="user">User</th
+                  ><th data-column="group" hidden>Group</th><th
+                    data-column="workspace"
+                    hidden>Workspace</th
+                  ><th data-column="duration">Duration</th><th
+                    data-column="tokens">Tokens</th
+                  ><th data-column="cost">Cost</th><th data-column="timestamp"
+                    >Timestamp</th
+                  ></tr
+                ></thead
+              ><tbody
+                >{
+                  traces.map((t) => (
+                    <tr data-observe-record={t.id}>
+                      <>
+                        <>
+                          <td>
+                            <span
+                              class:list={[
+                                "mock-pill",
+                                t.blocked
+                                  ? "mock-pill--red"
+                                  : "mock-pill--green",
+                              ]}
+                            >
+                              {t.blocked ? "1 blocked" : "Completed"}
+                            </span>
+                          </td>
+                          <th scope="row">
+                            <button
+                              type="button"
+                              class="dash-trace-name"
+                              data-open={`observe-${id}-${t.id}`}
+                              aria-controls={`observe-${id}-${t.id}`}
+                              aria-expanded="false"
+                              data-trace-id={t.id}
+                              aria-label={`${t.person} ${t.task}, with example data`}
+                            >
+                              <>
+                                <strong>{t.task}</strong>
+                                <code>{t.id}</code>
+                              </>
+                            </button>
+                          </th>
+                          <td data-column="user">{t.person}</td>
+                          <td data-column="group" hidden>
+                            {people.find((p) => p.name === t.person)?.groups}
+                          </td>
+                          <td data-column="workspace" hidden>
+                            Acme
+                          </td>
+                          <td data-column="duration">{t.duration}</td>
+                          <td data-column="tokens">
+                            {(t.steps * 420).toLocaleString()}
+                          </td>
+                          <td data-column="cost">{money(cost(t))}</td>
+                          <td data-column="timestamp">{t.when}</td>
+                        </>
+                      </>
+                    </tr>
+                  ))
+                }</tbody
+              >
+            </table>
+          </div>
+          <p role="status" data-observe-empty hidden>
+            No matching traces. Try a different filter or date range.
+          </p><footer class="dash-table-footer">
+            <span data-observe-stat="summary"
+              >{traces.length} traces · {traces.length} sessions</span
+            ><span>All times in PT · Example data</span>
+          </footer>
+        </div>
+      </div><p class="mock-note">
+        Acme · Example traces within your selected access scope.
+      </p>
+    </section>
+  </div>
+  {
+    traces.map((t) => (
+      <TraceDashboardDetail
+        id={`observe-${id}-${t.id}`}
+        trace={t}
+        cost={cost(t)}
+      />
+    ))
+  }
+</div>

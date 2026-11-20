@@ -1,0 +1,212 @@
+---
+import {
+  run,
+  observabilityTimes,
+  type Trace,
+} from "../../lib/content/product-mocks";
+interface Props {
+  id: string;
+  traces: Trace[];
+}
+const { id, traces } = Astro.props;
+const seconds = (trace: Trace) =>
+  trace.duration.includes("m")
+    ? parseInt(trace.duration) * 60 +
+      parseInt(trace.duration.split(" ")[1] || "0")
+    : parseFloat(trace.duration);
+---
+
+<div class="dash-sessions-workbench" data-sessions>
+  <section
+    class="dash-conversations"
+    role="region"
+    aria-label="Conversations, with example data"
+  >
+    <header>
+      <strong>Conversations</strong><span data-observe-stat="sessions"
+        >{traces.length}</span
+      >
+    </header>
+    {
+      traces.map((t, i) => (
+        <button
+          type="button"
+          data-session-choice={t.id}
+          aria-label={`${t.person} ${t.task}, with example data`}
+          data-observe-record={t.id}
+          aria-pressed={i === 0 ? "true" : "false"}
+          aria-controls={`session-${id}-${t.id}`}
+        >
+          <>
+            <>
+              <strong>{t.task}</strong>
+              <span>{t.person} · Acme</span>
+              <small>
+                1 turn · {t.when}
+                {t.blocked ? " · 1 blocked" : ""}
+              </small>
+            </>
+          </>
+        </button>
+      ))
+    }
+    <p data-conversations-empty hidden>No conversations match these filters.</p>
+  </section>
+  {
+    traces.map((t, i) => {
+      const duration = seconds(t);
+      let elapsed = 0;
+      const steps = t.timeline.map((step) => {
+        const offset = (elapsed / duration) * 100;
+        const width = Math.max(1, (parseFloat(step.duration) / duration) * 100);
+        elapsed += parseFloat(step.duration);
+        return { ...step, offset, width };
+      });
+      return (
+        <section
+          id={`session-${id}-${t.id}`}
+          class="dash-conversation-detail"
+          data-session-panel={t.id}
+          role="region"
+          aria-label="Conversation detail, with example data"
+          hidden={i !== 0}
+        >
+          <header class="dash-session-heading">
+            <>
+              <div>
+                <>
+                  <p class="mock-context">Conversation</p>
+                  <h5>{t.task}</h5>
+                  <p>
+                    {t.person} · Acme · session_{t.id.slice(3)}
+                  </p>
+                </>
+              </div>
+              <button
+                type="button"
+                class="dash-button"
+                data-waterfall-toggle
+                aria-pressed="true"
+                aria-controls={`waterfall-${id}-${t.id}`}
+              >
+                Waterfall
+              </button>
+            </>
+          </header>
+          <div class="dash-session-stats">
+            <>
+              <>
+                <span>1 turn</span>
+                <span>{t.when} · PT</span>
+                <span>{t.steps * 420} tokens</span>
+              </>
+              <span>${(t.steps * 0.014).toFixed(3)}</span>
+              {t.blocked && <span class="dash-blocked">1 blocked</span>}
+            </>
+          </div>
+          <section
+            id={`waterfall-${id}-${t.id}`}
+            class="dash-conversation-waterfall"
+            data-conversation-waterfall
+          >
+            <>
+              <h5>Conversation waterfall</h5>
+              <p>Run and recorded steps · each turn starts at 0s</p>
+              <div class="dash-turn-scale">
+                <>
+                  <span>Turn / start time</span>
+                  <div>
+                    <>
+                      <span>0s</span>
+                      <span>{Math.round(duration / 3)}s</span>
+                      <span>{Math.round((duration * 2) / 3)}s</span>
+                      <span>{duration}s</span>
+                    </>
+                  </div>
+                </>
+              </div>
+              <div class="dash-turn-row">
+                <>
+                  <div>
+                    <>
+                      <strong>Turn 1</strong>
+                      <small>{observabilityTimes[t.id]?.slice(-5)} PT</small>
+                      <small>{t.duration}</small>
+                    </>
+                  </div>
+                  <div class="dash-turn-bars">
+                    <i class="dash-turn-root" />
+                    {steps.map((step) => (
+                      <i
+                        class:list={[
+                          "dash-turn-step",
+                          step.blocked && "is-blocked",
+                        ]}
+                        style={`margin-left:${Math.min(step.offset, 100 - step.width)}%;width:${step.width}%`}
+                      />
+                    ))}
+                  </div>
+                </>
+              </div>
+              <div class="dash-waterfall-legend">
+                <>
+                  <span>● Run</span>
+                  <span>● Recorded step</span>
+                  <span>● Blocked step</span>
+                </>
+              </div>
+            </>
+          </section>
+          <>
+            <div class="dash-transcript-heading">
+              <>
+                <h5>Conversation</h5>
+                <span>Inputs and outputs by turn</span>
+              </>
+            </div>
+            <article class="dash-turn-card">
+              <>
+                <header>
+                  <>
+                    <strong>Turn 1</strong>
+                    <span>
+                      {t.duration} · {t.when}
+                    </span>
+                    <button
+                      type="button"
+                      class="dash-text-button"
+                      data-inspect={t.id}
+                    >
+                      Inspect trace →
+                    </button>
+                  </>
+                </header>
+                <div class="dash-turn-message">
+                  <>
+                    <span>USER</span>
+                    <p>{t.task === run.task ? run.prompt : t.task}</p>
+                  </>
+                </div>
+                <div class="dash-turn-message dash-turn-answer">
+                  <>
+                    <span>ASSISTANT</span>
+                    <p>
+                      {t.blocked
+                        ? "Removed 18,204 expired sessions. The archive table was kept because drop_table is not granted."
+                        : t.timeline.at(-1)?.outcome}
+                    </p>
+                  </>
+                </div>
+              </>
+            </article>
+          </>
+        </section>
+      );
+    })
+  }
+  <div class="dash-no-conversation" data-no-conversation hidden>
+    <h5>No conversations found</h5><p>
+      Change your filters or date range to see conversations.
+    </p>
+  </div>
+</div>

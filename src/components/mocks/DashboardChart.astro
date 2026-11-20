@@ -1,0 +1,116 @@
+---
+interface Props {
+  values: number[];
+  label: string;
+  ticks?: string[];
+  previous?: boolean;
+  compact?: boolean;
+  metric?: string;
+  bars?: boolean;
+  errors?: number[];
+}
+const {
+  values,
+  label,
+  ticks = ["Nov 13", "Nov 16", "Nov 19"],
+  previous = false,
+  compact = false,
+  metric,
+  bars = false,
+  errors = [],
+} = Astro.props;
+const max = Math.max(...values) || 1;
+const points = values
+  .map(
+    (value, i) =>
+      `${40 + (i * 540) / Math.max(values.length - 1, 1)},${140 - (value / max) * 112}`,
+  )
+  .join(" ");
+---
+
+<svg
+  class:list={["dash-chart", compact && "dash-chart--compact"]}
+  viewBox="0 0 600 170"
+  data-observe-chart={metric}
+  data-chart-bars={bars ? "true" : undefined}
+  role="img"
+  aria-label={`${label}, with example data`}
+>
+  <g class="dash-chart-grid">
+    {[28, 65, 102, 140].map((y) => <line x1="40" x2="580" y1={y} y2={y} />)}
+  </g>
+  {
+    !compact && (
+      <g class="dash-chart-labels">
+        <>
+          <text x="0" y="32" data-chart-max>
+            {max.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+          </text>
+          <text x="15" y="143">
+            0
+          </text>
+        </>
+      </g>
+    )
+  }
+  <polygon points={`40,140 ${points} 580,140`} class="dash-chart-fill"
+  ></polygon>
+  {
+    previous && (
+      <polyline
+        points={values
+          .map(
+            (v, i) =>
+              `${40 + (i * 540) / Math.max(values.length - 1, 1)},${140 - (v / max) * 86}`,
+          )
+          .join(" ")}
+        class="dash-chart-previous"
+      />
+    )
+  }
+  <polyline points={points} class="dash-chart-line" data-chart-line></polyline>
+  {
+    bars && (
+      <g>
+        {values.map((value, i) => (
+          <>
+            <rect
+              data-chart-bar={i}
+              x={58 + i * 80}
+              width="34"
+              y={140 - ((value - (errors[i] ?? 0)) / max) * 112}
+              height={((value - (errors[i] ?? 0)) / max) * 112}
+              fill="#3b82f6"
+              rx="2"
+            />
+            <rect
+              data-chart-error={i}
+              x={58 + i * 80}
+              width="34"
+              y={140 - (value / max) * 112}
+              height={((errors[i] ?? 0) / max) * 112}
+              fill="#dc7272"
+              rx="2"
+            />
+          </>
+        ))}
+      </g>
+    )
+  }
+  <g class="dash-chart-labels">
+    {
+      ticks.map((tick, i) => (
+        <text
+          x={40 + (i * 540) / Math.max(ticks.length - 1, 1)}
+          y="164"
+          text-anchor={
+            i === 0 ? "start" : i === ticks.length - 1 ? "end" : "middle"
+          }
+          data-chart-tick
+        >
+          {tick}
+        </text>
+      ))
+    }
+  </g>
+</svg>
