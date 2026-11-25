@@ -142,7 +142,7 @@ test("cloud agents post retains its instance detail and demo CTA", async ({
     }),
   ).toHaveAttribute("src", "/blog/images/cloud-agents/instance-detail.png");
   await expect(
-    article.getByRole("link", { name: "Book a demo", exact: true }),
+    article.getByRole("link", { name: "Get a demo", exact: true }),
   ).toHaveAttribute("href", "https://www.glauxagent.com/contact/");
 });
 

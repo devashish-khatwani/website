@@ -54,4 +54,4 @@ If your team is already running agents in the cloud, or is about to, the first c
 
 Glaux is in its design-partner stage. If you want to walk through the Cloud Agents pane in Control Tower, we'd like to show you.
 
-[Book a demo](https://www.glauxagent.com/contact/)
+[Get a demo](https://www.glauxagent.com/contact/)

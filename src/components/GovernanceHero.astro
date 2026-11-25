@@ -1,0 +1,415 @@
+---
+import ProductIcon from "./ProductIcon.astro";
+---
+
+<div class="hero-scroll-track" data-governance-hero>
+  <section class="hero" aria-labelledby="home-heading">
+    <div class="hero-scene" aria-hidden="true">
+      <img
+        class="hero-image"
+        src="/hero/governance-blue.webp"
+        alt=""
+        width="2172"
+        height="724"
+        fetchpriority="high"
+      />
+    </div>
+    <div class="hero-wash" aria-hidden="true"></div>
+    <div class="hero-shield" aria-hidden="true">
+      <img src="/hero/shield.webp" alt="" width="1254" height="1254" />
+    </div>
+    <div class="hero-copy">
+      <h1 id="home-heading">AI coworkers.<br /> Enterprise control.</h1>
+      <p class="hero-lede">
+        Employees move faster. Security controls what AI can know, do, and
+        share.
+      </p>
+      <form class="demo-form" action="/contact/" method="get">
+        <label class="sr-only" for="demo-email">Work email</label>
+        <!-- No name: email stays in this field and never enters the URL. -->
+        <input
+          id="demo-email"
+          type="email"
+          autocomplete="email"
+          placeholder="Work email"
+          required
+          aria-describedby="demo-next-step"
+        />
+        <button class="button button--primary" type="submit">Get a demo</button>
+      </form>
+      <p class="sr-only" id="demo-next-step">
+        Continue to the demo request form. Your email is not submitted from this
+        page.
+      </p>
+    </div>
+    <div class="scene-callout" aria-hidden="true">
+      <span class="callout-ai"><ProductIcon name="ai" /></span><p
+        class="scene-caption"
+      >
+        Starting with<br />the right access.
+      </p>
+    </div>
+    <a class="scroll-cue" href="#product" aria-label="Explore Glaux products"
+      ><ProductIcon name="chevron" /></a
+    >
+  </section>
+</div>
+
+<script>
+  const track = document.querySelector<HTMLElement>("[data-governance-hero]");
+  const hero = track?.querySelector<HTMLElement>(".hero");
+  const scene = track?.querySelector<HTMLElement>(".hero-scene");
+  const shield = track?.querySelector<HTMLElement>(".hero-shield");
+  const caption = track?.querySelector<HTMLElement>(".scene-caption");
+  const header = document.querySelector<HTMLElement>(".site-header--hero");
+  const motionPreference = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  );
+  const initialCaption = "Starting with\nthe right access.";
+  const captions = [
+    initialCaption,
+    "Using approved\nmodels and tools.",
+    "Working within\nworkspace boundaries.",
+    "Pausing for\nrequired approval.",
+    "Keeping decisions\nreviewable.",
+  ];
+  let frame = 0;
+  function paintHero() {
+    frame = 0;
+    if (!track || !hero || !scene || !shield || !caption) return;
+    const trackRect = track.getBoundingClientRect();
+    const heroRect = hero.getBoundingClientRect();
+    const sceneWidth = Math.max(heroRect.height * 3.75, heroRect.width);
+    scene.style.width = `${sceneWidth}px`;
+    const maxPan = Math.max(sceneWidth - heroRect.width, 0);
+    const start = Math.min(
+      Math.max(sceneWidth * 0.29 - heroRect.width * 0.78, 0),
+      maxPan,
+    );
+    const end = Math.min(
+      Math.max(sceneWidth * 0.95 - heroRect.width * 0.78, start),
+      maxPan,
+    );
+    const travel = Math.max(track.offsetHeight - hero.offsetHeight, 1);
+    const progress = motionPreference.matches
+      ? 0
+      : Math.min(Math.max((12 - trackRect.top) / travel, 0), 1);
+    scene.style.transform = `translate3d(${-(start + (end - start) * progress)}px, 0, 0)`;
+    const x = -heroRect.width * 0.18 * progress;
+    const y = Math.sin(progress * Math.PI * 2) * heroRect.height * 0.08;
+    shield.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${progress * 12}deg)`;
+    caption.textContent =
+      captions[
+        Math.min(Math.floor(progress * captions.length), captions.length - 1)
+      ] ?? initialCaption;
+    header?.classList.toggle("past-hero", trackRect.bottom < 120);
+  }
+  function scheduleHero() {
+    if (!frame) frame = window.requestAnimationFrame(paintHero);
+  }
+  if (track && hero && scene && shield && caption) {
+    track.classList.add("hero-scroll-track--animated");
+    window.addEventListener("scroll", scheduleHero, { passive: true });
+    window.addEventListener("resize", scheduleHero, { passive: true });
+    motionPreference.addEventListener("change", scheduleHero);
+    scheduleHero();
+  }
+</script>
+
+<style>
+  .hero-scroll-track {
+    display: flow-root;
+    position: relative;
+    margin-top: -108px;
+  }
+  .hero-scroll-track--animated {
+    height: calc(100svh + 2500px);
+  }
+  .hero {
+    position: sticky;
+    top: 12px;
+    isolation: isolate;
+    min-height: 680px;
+    height: calc(100svh - 24px);
+    max-height: 1060px;
+    overflow: hidden;
+    margin: 12px;
+    border-radius: 24px;
+    background: #bfdbf7;
+  }
+  .hero-scene {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: max(100%, 375svh);
+    height: 100%;
+    z-index: -3;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: center;
+  }
+  .hero-wash {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: linear-gradient(
+      90deg,
+      #bfdbf7 0,
+      rgb(191 219 247 / 94%) 42%,
+      rgb(191 219 247 / 0%) 68%
+    );
+  }
+  .hero-shield {
+    position: absolute;
+    left: 72%;
+    top: 14%;
+    width: clamp(128px, 14vw, 188px);
+    z-index: -1;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .hero-shield img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 14px 28px rgb(83 66 129 / 9%));
+  }
+  .hero-copy {
+    position: relative;
+    padding: clamp(170px, 21vh, 220px) 32px 120px clamp(28px, 5.5vw, 88px);
+    max-width: 880px;
+  }
+  h1 {
+    margin: 0;
+    color: #0a0a0a;
+    font-size: clamp(54px, 6vw, 88px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+  .hero-lede {
+    font-size: clamp(18px, 1.6vw, 24px);
+    line-height: 1.45;
+    color: #33475c;
+    max-width: 570px;
+    margin: 28px 0 42px;
+    letter-spacing: -0.025em;
+  }
+  .demo-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(100%, 622px);
+    padding: 9px 10px 9px 30px;
+    min-height: 78px;
+    border: 2px solid white;
+    background: rgb(242 247 255 / 68%);
+    border-radius: 999px;
+    backdrop-filter: blur(12px);
+  }
+  .demo-form input {
+    min-width: 0;
+    flex: 1;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 12px 0;
+    color: var(--ink);
+    font-size: 19px;
+  }
+  .demo-form input::placeholder {
+    color: #4a5770;
+    opacity: 1;
+  }
+  .demo-form input:focus {
+    outline-offset: 0;
+    border-radius: 3px;
+  }
+  .demo-form:has(input[aria-invalid="true"]) {
+    border-color: #b42318;
+  }
+  .form-message {
+    max-width: 570px;
+    min-height: 28px;
+    margin: 10px 0 0 18px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .form-message[data-error="true"] {
+    color: #8e1b14;
+    font-weight: 600;
+  }
+  .scene-callout {
+    position: absolute;
+    top: 29%;
+    right: 5%;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 400px;
+    min-height: 112px;
+    padding: 24px;
+    border: 1px solid rgb(255 255 255 / 30%);
+    border-radius: 20px;
+    background: rgb(255 255 255 / 12%);
+    -webkit-backdrop-filter: blur(32px);
+    backdrop-filter: blur(32px);
+  }
+  .callout-ai {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    color: white;
+    background: linear-gradient(#2563eb, #1d4ed8);
+    border-radius: 50%;
+  }
+  .callout-ai :global(svg) {
+    width: 25px;
+    height: 25px;
+    fill: currentColor;
+    stroke: none;
+  }
+  .scene-caption {
+    margin: 0;
+    color: #171620;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    white-space: pre-line;
+  }
+  .scroll-cue {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #faf5f0;
+  }
+  .scroll-cue :global(svg) {
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+  }
+
+  @media (min-width: 1550px) {
+    .hero-copy {
+      max-width: 980px;
+      padding-top: 200px;
+    }
+  }
+  @media (max-width: 1150px) {
+    h1 {
+      font-size: clamp(54px, 6.1vw, 76px);
+    }
+    .hero-copy {
+      max-width: 700px;
+    }
+    .scene-callout {
+      width: 330px;
+    }
+  }
+  @media (max-width: 760px) {
+    .hero-scroll-track {
+      margin-top: -94px;
+    }
+    .hero-scroll-track--animated {
+      height: calc(100svh + 2000px);
+    }
+    .hero {
+      border-radius: 18px;
+      min-height: 720px;
+    }
+    .hero-copy {
+      padding: 140px 28px 0;
+    }
+    .hero-shield {
+      left: 65%;
+      top: 49%;
+      width: 104px;
+    }
+    h1 {
+      font-size: clamp(42px, 7.8vw, 62px);
+    }
+    .hero-lede {
+      font-size: 19px;
+      max-width: 470px;
+    }
+    .hero-wash {
+      background: linear-gradient(
+        180deg,
+        rgb(191 219 247 / 92%) 0,
+        rgb(191 219 247 / 88%) 46%,
+        rgb(191 219 247 / 0%) 70%
+      );
+    }
+    .demo-form {
+      max-width: 540px;
+    }
+    .scene-callout {
+      width: min(360px, calc(100% - 32px));
+      top: auto;
+      bottom: 27%;
+      right: 16px;
+      min-height: 104px;
+      padding: 20px;
+      gap: 16px;
+    }
+    .scene-caption {
+      font-size: 18px;
+    }
+    .callout-ai {
+      width: 40px;
+      height: 40px;
+    }
+    .callout-ai :global(svg) {
+      width: 23px;
+      height: 23px;
+    }
+  }
+  @media (max-width: 460px) {
+    .hero-copy {
+      padding: 128px 20px 0;
+    }
+    h1 {
+      font-size: clamp(34px, 8.5vw, 42px);
+    }
+    .hero-lede {
+      font-size: 17px;
+      margin: 24px 0 30px;
+    }
+    .demo-form {
+      min-height: 66px;
+      padding: 7px 8px 7px 20px;
+      gap: 4px;
+    }
+    .demo-form input {
+      font-size: 16px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scroll-track--animated {
+      height: auto;
+    }
+    .hero {
+      position: relative;
+      top: 0;
+    }
+    .hero-scene,
+    .hero-shield {
+      will-change: auto;
+    }
+  }
+</style>

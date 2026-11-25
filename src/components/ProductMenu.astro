@@ -1,40 +1,101 @@
 ---
 import { productNavigation } from "../lib/site";
 import { productSection } from "../lib/content/product-section";
-
+import ProductIcon from "./ProductIcon.astro";
+import Button from "./Button.astro";
 const { comingSoon } = productSection;
+const groups = [
+  { name: "Work", ids: ["desktop-app", "skills", "cloud-agents"] },
+  { name: "Control", ids: ["people-access", "ai-gateway", "connected-tools"] },
+  { name: "Evidence", ids: ["control-tower", "observability", "audit"] },
+];
+const icons: Record<string, string> = {
+  "desktop-app": "desktop",
+  skills: "skills",
+  "cloud-agents": "cloud",
+  "people-access": "people",
+  "ai-gateway": "gateway",
+  "connected-tools": "tools",
+  "control-tower": "tower",
+  observability: "observability",
+  audit: "audit",
+};
+const futureIcons = ["knowledge", "shield", "model-studio", "eval-engine"];
+const entries = Object.fromEntries(
+  productSection.panes.map((pane, index) => [
+    pane.id,
+    productNavigation[index],
+  ]),
+);
+entries["control-tower"] = {
+  label: "Control Tower",
+  href: "/#control-tower-mock",
+  description: "Manage governance across your workspace.",
+};
 ---
 
 <div class="product-menu">
-  <ul class="product-menu__live">
-    {
-      productNavigation.map((item) => (
-        <li>
-          <a class="product-menu__entry" href={item.href}>
-            <strong>{item.label}</strong>
-            <p>{item.description}</p>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <div class="product-menu__main">
+    <a class="product-menu__overview" href="/#control-tower-mock"
+      >Meet Glaux Control Tower <span aria-hidden="true">↗</span></a
+    >
+    <div class="product-menu__live">
+      {
+        groups.map((group) => (
+          <section class="product-menu__group" aria-label={group.name}>
+            <p class="product-menu__label">{group.name}</p>
+            <ul>
+              {group.ids.map((id) => {
+                const item = entries[id];
+                if (!item) throw new Error(`Missing product menu entry: ${id}`);
+                return (
+                  <li>
+                    <a class="product-menu__entry" href={item.href}>
+                      <span class="product-menu__icon">
+                        <ProductIcon name={icons[id]} />
+                      </span>
+                      <span>
+                        <strong>{item.label}</strong>
+                        <p>{item.description}</p>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+    <div class="product-menu__footer">
+      <a href="/security/"><ProductIcon name="shield" />Security</a>
+      <a href="/how-it-works/"><ProductIcon name="gateway" />How it works</a>
+    </div>
+  </div>
   <section class="product-menu__soon" aria-label={comingSoon.heading}>
     <p class="product-menu__label">{comingSoon.heading}</p>
     <ul>
       {
-        comingSoon.items.map((item) => (
+        comingSoon.items.map((item, index) => (
           <li class="product-menu__entry">
-            <div class="product-menu__name">
-              <strong>{item.name}</strong>
-              <span class="product-menu__tag">{comingSoon.tag}</span>
-            </div>
-            <p>{item.teaser}</p>
+            <span class="product-menu__icon product-menu__icon--soon">
+              <ProductIcon name={futureIcons[index]} />
+            </span>
+            <span>
+              <>
+                <span class="product-menu__name">
+                  <>
+                    <strong>{item.name}</strong>
+                    <span class="product-menu__tag">{comingSoon.tag}</span>
+                  </>
+                </span>
+                <p>{item.teaser}</p>
+              </>
+            </span>
           </li>
         ))
       }
     </ul>
+    <Button href="/contact/" variant="primary">Get a demo</Button>
   </section>
-  <div class="product-menu__footer">
-    <a class="site-nav__link" href="/contact/">Book a demo</a>
-  </div>
 </div>

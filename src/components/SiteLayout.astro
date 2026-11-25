@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import "../styles/marketing.css";
 import BrandLogo from "./BrandLogo.astro";
 import Button from "./Button.astro";
 import ProductMenu from "./ProductMenu.astro";
@@ -66,7 +67,12 @@ const isProductSection = currentPath === "/product/";
     <div class="page-shell">
       <a class="skip-link" href="#main-content">Skip to main content</a>
 
-      <header class="site-header">
+      <header
+        class:list={[
+          "site-header",
+          { "site-header--hero": currentPath === "/" },
+        ]}
+      >
         <a href="/" aria-label="Glaux home" class="brand-home">
           <BrandLogo priority alt="" />
         </a>
@@ -116,13 +122,25 @@ const isProductSection = currentPath === "/product/";
           </div>
           <div class="site-nav__actions">
             <a class="site-nav__link" href={signInUrl}> Sign in </a>
-            <Button href="/contact/" variant="primary">Book a demo</Button>
+            <Button href="/contact/" variant="primary">Get a demo</Button>
           </div>
         </nav>
 
+        <div class="site-header__mobile-demo">
+          <Button href="/contact/" variant="primary">Get a demo</Button>
+        </div>
         <details class="mobile-nav">
           <summary class="mobile-nav__summary" aria-label="Open navigation">
-            Menu
+            <span>Menu</span>
+            <svg
+              aria-hidden="true"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg
+            >
           </summary>
           <nav class="mobile-nav__panel" aria-label="Mobile primary">
             <details class="mobile-product">
@@ -168,7 +186,7 @@ const isProductSection = currentPath === "/product/";
               ))
             }
             <a href={signInUrl}>Sign in</a>
-            <a href="/contact/">Book a demo</a>
+            <Button href="/contact/" variant="primary">Get a demo</Button>
           </nav>
         </div>
       </footer>

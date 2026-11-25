@@ -63,10 +63,10 @@ test("company page renders W-09 mission, maturity status, and contact path", asy
   await expect(companyPhoto).toHaveAttribute("srcset", /w=640 640w/u);
   await expect(companyPhoto).toHaveAttribute("sizes", /50vw/u);
   await expect(page.getByLabel("Company page actions")).toContainText(
-    "Book a demo",
+    "Get a demo",
   );
   await expect(
-    page.getByRole("main").getByRole("link", { name: "Book a demo" }).first(),
+    page.getByRole("main").getByRole("link", { name: "Get a demo" }).first(),
   ).toHaveAttribute("href", "/contact/");
 });
 
@@ -152,7 +152,7 @@ test("company page has no horizontal overflow and keeps contact focus visible", 
   await page.goto("/company/");
   const contactLink = page
     .getByRole("main")
-    .getByRole("link", { name: "Book a demo" })
+    .getByRole("link", { name: "Get a demo" })
     .first();
   await contactLink.focus();
   await expectVisibleFocusOutline(contactLink);

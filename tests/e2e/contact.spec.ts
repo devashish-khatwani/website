@@ -99,7 +99,7 @@ test("contact page renders noindexed HubSpot shell without local form fields", a
 }) => {
   await page.goto("/contact/");
 
-  await expect(page).toHaveTitle(/Book a demo \| Glaux/u);
+  await expect(page).toHaveTitle(/Get a demo \| Glaux/u);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
     "noindex, nofollow",

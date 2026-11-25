@@ -1,7 +1,7 @@
 ---
 import { getEntry } from "astro:content";
 import Button from "../components/Button.astro";
-import HeroShowcase from "../components/HeroShowcase.astro";
+import GovernanceHero from "../components/GovernanceHero.astro";
 import ProductSection from "../components/ProductSection.astro";
 import SiteLayout from "../components/SiteLayout.astro";
 import { buildPageHeadMetadata } from "../lib/site";
@@ -22,28 +22,8 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
   noindex
   og={pageHead.og}
 >
+  <GovernanceHero />
   <div class="home-page home-refresh">
-    <section class="home-hero" aria-labelledby="home-heading">
-      <div class="home-hero__copy">
-        <p class="plain-label">Governed AI for teams</p>
-        <h1 id="home-heading" class="home-title">
-          An AI coworker you can actually trust.
-        </h1>
-        <p class="home-lede">
-          Glaux is a governed AI coworker. Each agent runs in the Glaux desktop
-          app, on its own machine, with only the tools your admin approved.
-          Production data lives in a separate hosted service, reached only
-          through approved MCP tools.
-        </p>
-        <div class="home-actions" aria-label="Primary home actions">
-          <Button href="https://www.glauxagent.com/contact/" variant="primary"
-            >Book a demo</Button
-          >
-        </div>
-      </div>
-      <HeroShowcase />
-    </section>
-
     <section class="incident-section" aria-labelledby="problem-heading">
       <div class="section-heading">
         <p class="plain-label">Based on public reports · 2025</p>
@@ -147,7 +127,7 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
         chosen in Glaux Control Tower.
       </p>
       <Button href="https://www.glauxagent.com/contact/" variant="primary"
-        >Book a demo</Button
+        >Get a demo</Button
       >
     </section>
   </div>
@@ -156,29 +136,6 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
 <style>
   .home-refresh {
     padding-block-end: var(--space-8);
-  }
-  .home-refresh .home-hero {
-    grid-template-columns: minmax(0, 1fr);
-    align-items: center;
-    justify-items: center;
-    gap: var(--space-12);
-    min-height: 45rem;
-  }
-  .home-refresh .home-hero__copy {
-    justify-items: center;
-    text-align: center;
-  }
-  .home-refresh .home-title {
-    max-width: 24ch;
-    font-size: clamp(2.8rem, 1.5rem + 3.5vw, 4.75rem);
-  }
-  .home-refresh .home-lede {
-    font-size: clamp(1rem, 0.9rem + 0.25vw, 1.15rem);
-  }
-  .home-refresh .home-actions {
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-6);
   }
   .incident-section {
     padding-block: var(--space-20);
@@ -218,8 +175,8 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-12);
-    background: var(--color-carbon);
-    color: var(--color-chalk);
+    background: var(--hero-panel-gradient);
+    color: var(--color-graphite);
     padding: var(--space-12);
     border-radius: var(--radius-md);
   }
@@ -228,7 +185,7 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     font-size: var(--text-h2);
   }
   .runtime-section .plain-label {
-    color: var(--color-primary-line);
+    color: #1e3a8a;
   }
   .runtime-contrast {
     display: grid;
@@ -238,7 +195,7 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     margin-block-end: var(--space-3);
   }
   .runtime-contrast p {
-    color: var(--color-hairline);
+    color: #33475c;
   }
   .stage-note {
     display: grid;
@@ -258,17 +215,6 @@ const pageHead = buildPageHeadMetadata(homeEntry.data);
     font-size: clamp(2.5rem, 2rem + 2vw, 4.5rem);
   }
   @media (max-width: 60rem) {
-    .home-refresh .home-hero {
-      grid-template-columns: 1fr;
-      gap: var(--space-10);
-      padding-block: var(--space-12);
-    }
-    .home-refresh .home-title {
-      max-width: 19ch;
-    }
-    .home-hero__copy {
-      max-width: 45rem;
-    }
     .runtime-section {
       grid-template-columns: 1fr;
       gap: var(--space-8);

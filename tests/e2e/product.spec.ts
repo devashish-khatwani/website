@@ -26,7 +26,7 @@ test("product overview keeps its metadata, shared example mocks, demo, and secur
   await expect(page.locator('img[src^="/product/"]')).toHaveCount(0);
   await expect(page.getByText(/real product capture/iu)).toHaveCount(0);
   await expect(
-    page.getByRole("main").getByRole("link", { name: "Book a demo" }).first(),
+    page.getByRole("main").getByRole("link", { name: "Get a demo" }).first(),
   ).toHaveAttribute("href", "https://www.glauxagent.com/contact/");
   await expect(
     page.getByRole("link", { name: "Open technical details" }),

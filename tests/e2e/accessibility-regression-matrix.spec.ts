@@ -4,7 +4,7 @@ import { blogPosts } from "./blog-posts";
 import { productSection } from "../../src/lib/content/product-section";
 
 const routes = [
-  { path: "/", h1: "An AI coworker you can actually trust." },
+  { path: "/", h1: "AI coworkers. Enterprise control." },
   { path: "/product/", h1: "From question to useful outcome." },
   { path: "/security/", h1: "You choose what Glaux can access and do." },
   {
@@ -112,7 +112,7 @@ async function expectNavigationForViewport(
     }
     await page.keyboard.press("Tab");
     await expect(
-      mobileNavigation.locator(".product-menu__live a").first(),
+      mobileNavigation.locator(".product-menu__overview"),
     ).toBeFocused();
     await page.keyboard.press("Shift+Tab");
     await expect(productSummary).toBeFocused();
@@ -152,7 +152,7 @@ async function expectNavigationForViewport(
 
   const demoLink = primaryNavigation
     .locator(".site-nav__actions")
-    .getByRole("link", { name: "Book a demo" });
+    .getByRole("link", { name: "Get a demo" });
   await expect(demoLink).toHaveAttribute("href", "/contact/");
   await demoLink.focus();
   await expectVisibleFocusOutline(demoLink);

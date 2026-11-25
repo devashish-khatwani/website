@@ -83,3 +83,15 @@ the reviewed settings, access controls, verification, and rollback steps.
 The current route remains closed by default. It does not include analytics, a
 custom form backend, auth logic, production credentials, React islands, upstream
 Hermes branding, or public product claims.
+
+## Approved hero and navigation release
+
+The November 25, 2026 design uses a sky-blue business panorama with scroll-driven horizontal movement and a floating glass shield. The hero tagline is “AI coworkers. Enterprise control.” Its glass callouts use a blue AI icon. Reduced motion and JavaScript-disabled visits retain a readable static composition without the extended scroll interval.
+
+The shared Product menu groups current products under Work, Control and Evidence, uses Glaux Control Tower pane icons, and gives each Coming soon product an individual icon. Current menu entries have no Preview availability label. All demo CTAs use the same Get a demo button treatment.
+
+The homepage work-email field validates locally and continues to `/contact/` without transmitting the address, putting it in the URL, or saving it. The existing native HubSpot form on Contact remains the submission owner; no provider settings, consent, tracking, authentication or publication flags changed.
+
+Hero artwork is stored as optimized WebP under `public/hero/`. Navigation icon attribution is in `docs/navigation-icons-LICENSE.txt`.
+
+Large formerly black content panels and the footer use the same sky-blue gradient palette with dark readable text. Primary demo buttons retain the approved shared black treatment.
